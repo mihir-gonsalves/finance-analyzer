@@ -2,6 +2,7 @@
 import csv
 from datetime import datetime
 
+
 def validate_headers(expected_headers, actual_headers, source_name):
     missing = [h for h in expected_headers if h not in actual_headers]
     if missing:
@@ -9,6 +10,7 @@ def validate_headers(expected_headers, actual_headers, source_name):
             f"CSV file does not look like a {source_name} export. "
             f"Missing columns: {missing}"
         )
+
 
 def load_discover_csv(file_path: str):
     transactions = []
@@ -28,6 +30,7 @@ def load_discover_csv(file_path: str):
                 "category": row["Category"]
             })
     return transactions
+
 
 def load_schwab_csv(file_path: str):
     transactions = []
@@ -54,6 +57,7 @@ def load_schwab_csv(file_path: str):
                 "category": None #schwab does not have categories
             })
     return transactions
+
 
 def parse_csv(file_path: str, institution: str):
     """Route to the correct parser based on institution name from UI."""
