@@ -22,4 +22,8 @@ I will first start by creating a file that parses the .csv files. Seeing that di
 
 Next we have to store the data in a database. I will be using SQLAlchemy as my ORM and keep the data in SQLite. The database table will be setup using the standardized format created in step 2 (models.py). I will also create the actual database in database.py. 
 
+4. 
+
 To move the parsed data into the db, I will create a file loaders.py and also create functions that will let users easily write up queries (in queries.py) to get data. 
+
+Queries is for the R functionality in CRUD. I will also be completing the create, update, and delete functions in CRUD. 
