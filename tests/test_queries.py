@@ -1,11 +1,6 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 import datetime
 from datetime import date
-import pytest
 
-from app.models import Transaction, Base
 from app.queries import (
     get_all_transactions,
     get_transactions_by_account,
@@ -19,61 +14,12 @@ from app.queries import (
 )
 
 
-@pytest.fixture
-def session(tmp_path):
-    # use a brand new sqlite db just for tests
-    test_engine = create_engine(
-        f"sqlite:///{tmp_path}/test.db", connect_args={"check_same_thread": False}
-    )
-    Base.metadata.create_all(test_engine)
-    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
-    db = TestingSessionLocal()
-
-    # seed sample transactions
-    db.add_all([
-        Transaction(
-            date=datetime.date(2025, 1, 1),
-            description="Coffee Shop",
-            amount=5.25,
-            account="Discover",
-            category="Food"
-        ),
-        Transaction(
-            date=datetime.date(2025, 1, 2),
-            description="Grocery Store",
-            amount=-50.00,
-            account="Schwab Checking",
-            category="Groceries"
-        ),
-        Transaction(
-            date=datetime.date(2025, 1, 10),
-            description="Rent",
-            amount=-1200.00,
-            account="Schwab Checking",
-            category="Housing"
-        ),
-        Transaction(
-            date=datetime.date(2025, 2, 5),
-            description="Concert Ticket",
-            amount=-100.00,
-            account="Discover",
-            category="Entertainment"
-        )
-    ])
-    db.commit()
-
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 # ---------------------------
 # Default query tests
 # ---------------------------
 def test_get_all_transactions(session):
     results = get_all_transactions(session)
-    assert len(results) == 4
+    assert len(results) == 4  # pre-seeded by session fixture
 
 
 def test_get_transactions_by_account(session):
@@ -88,7 +34,7 @@ def test_get_transactions_by_date_range(session):
         datetime.date(2025, 1, 1),
         datetime.date(2025, 1, 5)
     )
-    assert len(results) == 2  # coffee + groceries
+    assert len(results) == 2  # Coffee Shop + Grocery Store
 
 
 def test_get_transactions_by_category(session):
@@ -125,33 +71,27 @@ def test_get_transactions_with_filters(session):
 # Aggregate queries
 # ---------------------------
 def test_get_total_spent_by_category(session):
-    total_housing = get_total_spent_by_category(session, "Housing")
-    assert total_housing == -1200.00
-
-    total_food = get_total_spent_by_category(session, "Food")
-    assert total_food == 5.25
+    assert get_total_spent_by_category(session, "Housing") == -1200.00
+    assert get_total_spent_by_category(session, "Food") == 5.25
 
 
 def test_get_weekly_totals(session):
     results = dict(get_weekly_totals(session, 2025))
     
-    totals_by_week = {}
-    transactions = [
+    # expected weekly totals
+    expected = {}
+    for d, amt in [
         (date(2025, 1, 1), 5.25),       # Coffee Shop
         (date(2025, 1, 2), -50.0),      # Grocery Store
         (date(2025, 1, 10), -1200.0),   # Rent
         (date(2025, 2, 5), -100.0)      # Concert Ticket
-    ]
+    ]:
+        week = d.isocalendar()[1]
+        label = f"{d.year}-W{week:02d}"
+        expected[label] = expected.get(label, 0) + amt
 
-    for d, amt in transactions:
-        week_num = d.isocalendar()[1]
-        label = f"{d.year}-W{week_num:02d}"
-        totals_by_week[label] = totals_by_week.get(label, 0) + amt
-
-    # Check that all weeks exist
-    for week_label in totals_by_week:
-        assert week_label in results
-        assert round(results[week_label], 2) == round(totals_by_week[week_label], 2)
+    for week_label, total in expected.items():
+        assert round(results[week_label], 2) == round(total, 2)
 
 
 def test_get_monthly_totals(session):
