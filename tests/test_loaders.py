@@ -1,12 +1,14 @@
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 import os
 import tempfile
 from datetime import date
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 from app.models import Base, Transaction
 from app.loaders import save_transactions
+
 
 @pytest.fixture
 def test_db():
@@ -23,6 +25,10 @@ def test_db():
     os.close(db_fd)
     os.unlink(db_path)
 
+
+# ---------------------------
+# Transactions into db tests
+# ---------------------------
 def test_save_transactions(test_db):
     # fake transactions to insert
     fake_txns = [
@@ -42,7 +48,7 @@ def test_save_transactions(test_db):
         }
     ]
 
-    # call save_transactions with our fake session
+    # call save_transactions with fake session
     db = test_db()
     save_transactions(fake_txns, db_session=db)
 

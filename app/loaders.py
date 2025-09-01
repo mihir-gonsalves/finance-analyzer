@@ -1,7 +1,9 @@
 # take parsed .csv and load into DB
 from datetime import datetime
+
 from .database import SessionLocal, init_db
 from .models import Transaction
+
 
 def save_transactions(transactions, db_session=None):
     if db_session is None:

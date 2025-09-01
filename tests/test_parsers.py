@@ -5,6 +5,7 @@ import pytest
 
 from app import parsers
 
+
 def make_temp_csv(headers, rows):
     """Helper to create a temporary CSV file with given headers + rows."""
     tmp = tempfile.NamedTemporaryFile(delete=False, mode="w", newline="")
