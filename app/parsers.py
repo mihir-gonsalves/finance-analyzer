@@ -1,6 +1,6 @@
 # parse .csv downloads from Discover CC and Schwab Checking Account
 import csv
-from datetime import datetime
+from datetime import datetime # need the class and don't want to write datetime.datetime.strptime()
 
 
 def validate_headers(expected_headers, actual_headers, source_name):
@@ -54,7 +54,7 @@ def load_schwab_csv(file_path: str):
                 "description": row["Description"],
                 "amount": amount,
                 "account": "Schwab Checking",
-                "category": None #schwab does not have categories
+                "category": None # schwab does not have categories
             })
     return transactions
 

@@ -1,5 +1,6 @@
-from datetime import date
+import datetime
 
+from app.schemas import TransactionCreate, TransactionUpdate
 from app.models import Transaction
 from app.crud import (
     create_transaction,
@@ -14,11 +15,13 @@ from app.crud import (
 def test_create_transaction(session):
     tx = create_transaction(
         session,
-        description="Book Purchase",
-        amount=-25.0,
-        account="Discover",
-        category="Books",
-        date_=date(2025, 3, 10)
+        TransactionCreate(
+            description = "Book Purchase",
+            amount = -25.0,
+            account = "Discover",
+            category = "Books",
+            date_ = datetime.date(2025, 3, 10)
+        ),
     )
     assert tx.id is not None
     assert tx.description == "Book Purchase"
@@ -33,13 +36,22 @@ def test_create_transaction(session):
 def test_update_transaction(session):
     tx = create_transaction(
         session,
-        description="Lunch",
-        amount=-10.0,
-        account="Discover",
-        category="Food",
-        date_=date(2025, 3, 11)
+        TransactionCreate(
+            description = "Lunch",
+            amount = -10.0,
+            account = "Discover",
+            category = "Food",
+            date_ = datetime.date(2025, 3, 11)
+        ),
     )
-    updated = update_transaction(session, tx.id, amount=-12.0, category="Dining")
+    updated = update_transaction(
+        session, 
+        tx.id,
+        TransactionUpdate(
+            amount=-12.0, 
+            category="Dining"
+        ),
+    )
     assert updated.amount == -12.0
     assert updated.category == "Dining"
 
@@ -50,11 +62,13 @@ def test_update_transaction(session):
 def test_delete_transaction(session):
     tx = create_transaction(
         session,
-        description="Movie Ticket",
-        amount=-15.0,
-        account="Discover",
-        category="Entertainment",
-        date_=date(2025, 3, 12)
+        TransactionCreate(
+            description = "Movie Ticket",
+            amount = -15.0,
+            account = "Discover",
+            category = "Entertainment",
+            date_ = datetime.date(2025, 3, 12)
+        ),
     )
     result = delete_transaction(session, tx.id)
     assert result is True

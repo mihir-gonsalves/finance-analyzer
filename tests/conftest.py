@@ -23,32 +23,32 @@ def session(tmp_path):
     # seed sample transactions
     db.add_all([
         Transaction(
-            date=datetime.date(2025, 1, 1),
-            description="Coffee Shop",
-            amount=5.25,
-            account="Discover",
-            category="Food"
+            date = datetime.date(2025, 1, 1),
+            description = "Coffee Shop",
+            amount = 5.25,
+            account = "Discover",
+            category = "Food"
         ),
         Transaction(
-            date=datetime.date(2025, 1, 2),
-            description="Grocery Store",
-            amount=-50.00,
-            account="Schwab Checking",
-            category="Groceries"
+            date = datetime.date(2025, 1, 2),
+            description = "Grocery Store",
+            amount = -50.00,
+            account = "Schwab Checking",
+            category = "Groceries"
         ),
         Transaction(
-            date=datetime.date(2025, 1, 10),
-            description="Rent",
-            amount=-1200.00,
-            account="Schwab Checking",
-            category="Housing"
+            date = datetime.date(2025, 1, 10),
+            description = "Rent",
+            amount = -1200.00,
+            account = "Schwab Checking",
+            category = "Housing"
         ),
         Transaction(
-            date=datetime.date(2025, 2, 5),
-            description="Concert Ticket",
-            amount=-100.00,
-            account="Discover",
-            category="Entertainment"
+            date = datetime.date(2025, 2, 5),
+            description = "Concert Ticket",
+            amount = -100.00,
+            account = "Discover",
+            category = "Entertainment"
         )
     ])
     db.commit()
