@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 import os
 import tempfile
-from datetime import date
+import datetime
 import pytest
 
 from app.models import Base, Transaction
@@ -61,11 +61,11 @@ def test_save_transactions(test_db):
     assert t1.amount == 5.25
     assert t1.account == "Discover"
     assert t1.category == "Food"
-    assert isinstance(t1.date, date)
+    assert isinstance(t1.date, datetime.date)
 
     t2 = results[1]
     assert t2.description == "Grocery Store"
     assert t2.amount == -50.00
     assert t2.account == "Schwab Checking"
     assert t2.category is None
-    assert isinstance(t2.date, date)
+    assert isinstance(t2.date, datetime.date)

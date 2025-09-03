@@ -1,87 +1,70 @@
-# contains the code for C-U-D functions in CRUD
-# for R function --> find in app/queries.py
 from sqlalchemy.orm import Session
 
-from datetime import date
+import datetime
 
 from app.models import Transaction
+from app import schemas
 
 
+# ---------------------
 # CREATE
-def create_transaction(
-    session: Session,
-    description: str,
-    amount: float,
-    account: str,
-    category: str = None,
-    date_: date = None,
-):
+# ---------------------
+def create_transaction(db: Session, txn: schemas.TransactionCreate) -> Transaction:
     """
     Add a new transaction to the database.
     If no date is provided, defaults to today.
     """
-    if date_ is None:
-        date_ = date.today()
-
     new_tx = Transaction(
-        date=date_,
-        description=description,
-        amount=amount,
-        account=account,
-        category=category,
+        date=txn.date or datetime.date.today(),
+        description=txn.description,
+        amount=txn.amount,
+        account=txn.account,
+        category=txn.category
     )
-    session.add(new_tx)
-    session.commit()
-    session.refresh(new_tx)
+    db.add(new_tx)
+    db.commit()
+    db.refresh(new_tx)
     return new_tx
 
 
-# for R function --> find in app/queries.py
+# ---------------------
+# READ IS FOUND IN queries.py
+# ---------------------
 
 
+# ---------------------
 # UPDATE
-def update_transaction(
-    session: Session,
-    tx_id: int,
-    description: str = None,
-    amount: float = None,
-    account: str = None,
-    category: str = None,
-    date_: date = None,
-):
+# ---------------------
+def update_transaction(db: Session, tx_id: int, txn: schemas.TransactionUpdate) -> Transaction | None:
     """
-    Update fields of an existing transaction by ID.
-    Only provided fields will be updated.
+    Update fields of an existing transaction.
+    Only provided fields are updated.
     """
-    tx = session.get(Transaction, tx_id)
-    if not tx:
+    existing_tx = db.get(Transaction, tx_id)
+    if not existing_tx:
         return None
 
-    if description is not None:
-        tx.description = description
-    if amount is not None:
-        tx.amount = amount
-    if account is not None:
-        tx.account = account
-    if category is not None:
-        tx.category = category
-    if date_ is not None:
-        tx.date = date_
+    # Update only provided fields
+    for field, value in txn.dict(exclude_unset=True).items():
+        setattr(existing_tx, field, value)
 
-    session.commit()
-    session.refresh(tx)
-    return tx
+    db.commit()
+    db.refresh(existing_tx)
+    return existing_tx
 
 
-# DELETE 
-def delete_transaction(session: Session, tx_id: int):
+# ---------------------
+# DELETE
+# ---------------------
+def delete_transaction(db: Session, tx_id: int) -> bool:
     """
     Delete a transaction by ID.
     Returns True if deleted, False if not found.
     """
-    tx = session.get(Transaction, tx_id)
+    tx = db.get(Transaction, tx_id)
     if not tx:
         return False
-    session.delete(tx)
-    session.commit()
+
+    db.delete(tx)
+    db.commit()
     return True

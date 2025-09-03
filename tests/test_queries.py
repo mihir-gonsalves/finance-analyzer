@@ -1,5 +1,4 @@
 import datetime
-from datetime import date
 
 from app.queries import (
     get_all_transactions,
@@ -81,10 +80,10 @@ def test_get_weekly_totals(session):
     # expected weekly totals
     expected = {}
     for d, amt in [
-        (date(2025, 1, 1), 5.25),       # Coffee Shop
-        (date(2025, 1, 2), -50.0),      # Grocery Store
-        (date(2025, 1, 10), -1200.0),   # Rent
-        (date(2025, 2, 5), -100.0)      # Concert Ticket
+        (datetime.date(2025, 1, 1), 5.25),       # Coffee Shop
+        (datetime.date(2025, 1, 2), -50.0),      # Grocery Store
+        (datetime.date(2025, 1, 10), -1200.0),   # Rent
+        (datetime.date(2025, 2, 5), -100.0)      # Concert Ticket
     ]:
         week = d.isocalendar()[1]
         label = f"{d.year}-W{week:02d}"
