@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 import datetime
 
-from app.models import Transaction
+from .models import Transaction
 from app import schemas
 
 

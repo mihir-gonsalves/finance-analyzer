@@ -7,7 +7,7 @@ from collections import defaultdict
 import datetime
 from typing import List, Optional, Tuple
 
-from app.models import Transaction
+from .models import Transaction
 
 
 # ---------------------
