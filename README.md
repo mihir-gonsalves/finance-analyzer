@@ -1,3 +1,22 @@
+System Design, Tech Stack: 
+
+Backend
+- Python
+- FastAPI (API framework)
+- SQLite (database for persistence)
+- SQLAlchemy (ORM)
+- Pydantic (schemas, request/response validation)
+- Uvicorn (ASGI server)
+- Pytest (tests for CRUD + API)
+
+Frontend
+- React (UI library)
+- Vite (build tool, super fast dev server)
+- TypeScript (type safety)
+- Material UI (MUI) (UI components like tables, dialogs, buttons)
+- Axios (HTTP client for API calls)
+- React Query (@tanstack/react-query)
+
 Using this to take notes on how i created this and make comments. Quick note - this is being developed via Test Driven Development.
 
 1.
