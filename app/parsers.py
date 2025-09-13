@@ -34,17 +34,17 @@ def load_discover_csv(file_path: str):
 
 def load_schwab_csv(file_path: str):
     transactions = []
-    with open(file_path, newline="") as csvfile:
+    with open(file_path, newline="", encoding="utf-8") as csvfile:
         reader = csv.DictReader(csvfile)
-        validate_headers(
-            ["Date", "Description", "Withdrawal", "Deposit", "Check #"],
-            reader.fieldnames,
-            "Schwab Checking"
-        )
-        for row in reader: # one field will always be blank from what i can tell
-            if row["Withdrawal"]:
+
+        # match your real Schwab headers
+        expected = ["Date", "Description", "Withdrawal", "Deposit"]
+        validate_headers(expected, reader.fieldnames, "Schwab Checking")
+
+        for row in reader:
+            if row.get("Withdrawal"):
                 amount = -float(row["Withdrawal"].replace(",", ""))
-            elif row["Deposit"]:
+            elif row.get("Deposit"):
                 amount = float(row["Deposit"].replace(",", ""))
             else:
                 amount = 0.0
@@ -54,7 +54,7 @@ def load_schwab_csv(file_path: str):
                 "description": row["Description"],
                 "amount": amount,
                 "account": "Schwab Checking",
-                "category": None # schwab does not have categories
+                "category": None  # Schwab doesn’t export categories
             })
     return transactions
 

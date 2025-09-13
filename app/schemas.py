@@ -1,3 +1,4 @@
+# pydantic enforces data integrity by enabling type checking into python's more lax OOP
 from pydantic import BaseModel
 
 import datetime
@@ -9,7 +10,7 @@ class TransactionBase(BaseModel):
     amount: float
     account: str
     category: Optional[str] = None
-    date: Optional[datetime.date] = None
+    date: datetime.date
 
 
 class TransactionCreate(TransactionBase):

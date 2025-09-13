@@ -13,11 +13,11 @@ def save_transactions(transactions, db_session=None):
     try:
         for t in transactions:
             db_transaction = Transaction(
-                date=datetime.strptime(t["date"], "%m/%d/%Y").date(),
+                date=t["date"],
                 description=t["description"],
                 amount=t["amount"],
                 account=t["account"],
-                category=t["category"]
+                category=t["category"],
             )
             db_session.add(db_transaction)
         db_session.commit()

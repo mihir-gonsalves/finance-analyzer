@@ -1,7 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
 import client from "../api/client";
-
 
 export interface Transaction {
   id: number;
@@ -11,7 +9,6 @@ export interface Transaction {
   category?: string;
   date?: string;
 }
-
 
 // Fetch all transactions
 export function useTransactions() {
@@ -24,7 +21,6 @@ export function useTransactions() {
   });
 }
 
-
 // Delete a transaction
 export function useDeleteTransaction() {
   const queryClient = useQueryClient();
@@ -33,7 +29,20 @@ export function useDeleteTransaction() {
       await client.delete(`/transactions/${id}`);
     },
     onSuccess: () => {
-      // invalidate cache so list refetches
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    },
+  });
+}
+
+// Update a transaction
+export function useUpdateTransaction() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (txn: Transaction) => {
+      const res = await client.put(`/transactions/${txn.id}`, txn);
+      return res.data;
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
   });

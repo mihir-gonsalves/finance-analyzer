@@ -1,11 +1,14 @@
 from sqlalchemy.orm import Session
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, Form
 
 import datetime
+import tempfile
 
 from app import crud, queries, schemas
 from app.database import SessionLocal
+from app.parsers import parse_csv
+from app.loaders import save_transactions
 
 
 router = APIRouter(
@@ -27,9 +30,8 @@ def get_db():
 # READ endpoints (queries.py)
 # ---------------------
 @router.get("/", response_model=list[schemas.TransactionOut])
-def read_transactions(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    all_txns = queries.get_all_transactions(db)
-    return all_txns[skip : skip + limit]
+def read_transactions(db: Session = Depends(get_db)):
+    return queries.get_all_transactions(db)
 
 
 @router.get("/filter", response_model=list[schemas.TransactionOut])
@@ -88,3 +90,30 @@ def delete_transaction(txn_id: int, db: Session = Depends(get_db)):
     if not deleted:
         raise HTTPException(status_code=404, detail="Transaction not found")
     return {"message": "Transaction deleted"}
+
+
+# ---------------------
+# BULK UPLOAD (CSV → DB)
+# ---------------------
+@router.post("/upload-csv")
+async def upload_csv(
+    institution: str = Form(...),
+    file: UploadFile = Form(...),
+    db: Session = Depends(get_db),
+):
+    """
+    Upload a CSV file from Discover/Schwab, parse it, and save to DB.
+    """
+    # Save uploaded file to a temp path
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp:
+        tmp.write(await file.read())
+        tmp_path = tmp.name
+
+    # Parse and save
+    try:
+        transactions = parse_csv(tmp_path, institution)
+        save_transactions(transactions, db)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    return {"message": f"Loaded {len(transactions)} transactions"}

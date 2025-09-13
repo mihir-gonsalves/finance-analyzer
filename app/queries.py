@@ -8,7 +8,7 @@ import datetime
 from typing import List, Optional, Tuple
 
 from .models import Transaction
-
+from .schemas import TransactionUpdate
 
 # ---------------------
 # Basic retrievals
@@ -106,3 +106,14 @@ def get_unique_accounts(session: Session) -> List[str]:
     Return a list of unique account names from the transactions table.
     """
     return [acc for (acc,) in session.query(Transaction.account).distinct().all()]
+
+
+# ---------------------
+# Update
+# ---------------------
+def update_transaction(db: Session, db_txn: Transaction, txn_update: TransactionUpdate):
+    for key, value in txn_update.dict(exclude_unset=True).items():
+        setattr(db_txn, key, value)
+    db.commit()
+    db.refresh(db_txn)
+    return db_txn
