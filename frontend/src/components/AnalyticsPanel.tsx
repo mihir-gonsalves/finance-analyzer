@@ -1,3 +1,4 @@
+// components/AnalyticsPanel:
 import { Card, CardContent, Typography, Box, List, ListItem, ListItemText, Divider } from "@mui/material";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
