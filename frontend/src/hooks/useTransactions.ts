@@ -3,11 +3,19 @@ import client from "../api/client";
 
 export interface Transaction {
   id: number;
+  date: string;
   description: string;
+  category?: string;
   amount: number;
   account: string;
+}
+
+export interface CreateTransactionData {
+  date: string;
+  description: string;
   category?: string;
-  date?: string;
+  amount: number;
+  account: string;
 }
 
 // Fetch all transactions
@@ -17,6 +25,20 @@ export function useTransactions() {
     queryFn: async () => {
       const res = await client.get("/transactions");
       return res.data;
+    },
+  });
+}
+
+// Create a new transaction
+export function useCreateTransaction() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (txn: CreateTransactionData) => {
+      const res = await client.post("/transactions", txn);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
   });
 }

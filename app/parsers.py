@@ -1,5 +1,6 @@
 # parse .csv downloads from Discover CC and Schwab Checking Account
 import csv
+import re
 from datetime import datetime # need the class and don't want to write datetime.datetime.strptime()
 
 
@@ -10,6 +11,26 @@ def validate_headers(expected_headers, actual_headers, source_name):
             f"CSV file does not look like a {source_name} export. "
             f"Missing columns: {missing}"
         )
+
+
+def clean_currency_string(value):
+    """Remove currency symbols, commas, and whitespace from monetary values."""
+    if not value or value.strip() == "":
+        return 0.0
+    
+    # Remove dollar signs, commas, and whitespace
+    cleaned = re.sub(r'[$,\s]', '', str(value).strip())
+    
+    # Handle empty string after cleaning
+    if not cleaned:
+        return 0.0
+    
+    try:
+        return float(cleaned)
+    except ValueError:
+        # If we still can't convert, return 0 and let the caller handle it
+        print(f"Warning: Could not convert '{value}' to float, using 0.0")
+        return 0.0
 
 
 def load_discover_csv(file_path: str):
@@ -25,7 +46,7 @@ def load_discover_csv(file_path: str):
             transactions.append({
                 "date": datetime.strptime(row["Trans. Date"], "%m/%d/%Y").date(),
                 "description": row["Description"],
-                "amount": float(row["Amount"]),
+                "amount": clean_currency_string(row["Amount"]),
                 "account": "Discover",
                 "category": row["Category"]
             })
@@ -42,10 +63,14 @@ def load_schwab_csv(file_path: str):
         validate_headers(expected, reader.fieldnames, "Schwab Checking")
 
         for row in reader:
-            if row.get("Withdrawal"):
-                amount = -float(row["Withdrawal"].replace(",", ""))
-            elif row.get("Deposit"):
-                amount = float(row["Deposit"].replace(",", ""))
+            # Clean and process withdrawal amount
+            withdrawal_str = row.get("Withdrawal", "").strip()
+            deposit_str = row.get("Deposit", "").strip()
+            
+            if withdrawal_str and withdrawal_str != "":
+                amount = -clean_currency_string(withdrawal_str)
+            elif deposit_str and deposit_str != "":
+                amount = clean_currency_string(deposit_str)
             else:
                 amount = 0.0
 
@@ -54,7 +79,7 @@ def load_schwab_csv(file_path: str):
                 "description": row["Description"],
                 "amount": amount,
                 "account": "Schwab Checking",
-                "category": None  # Schwab doesn’t export categories
+                "category": None  # Schwab doesn't export categories
             })
     return transactions
 

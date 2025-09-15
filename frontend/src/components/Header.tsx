@@ -1,19 +1,16 @@
-import { AppBar, Toolbar, Typography, IconButton } from "@mui/material";
+import { AppBar, Toolbar, Typography, IconButton, Box } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
 
 export default function Header() {
   return (
     <AppBar position="static" elevation={1} sx={{ bgcolor: 'white', color: 'text.primary' }}>
-      <Toolbar sx={{ justifyContent: 'space-between' }}>
-        {/* Left side - App name */}
-        <Typography variant="h6" component="div" sx={{ fontWeight: 600, color: 'primary.main' }}>
-          Finance Analyzer
-        </Typography>
-
-        {/* Center - Current page */}
-        <Typography variant="h6" component="div" sx={{ color: 'text.secondary' }}>
-          Dashboard
-        </Typography>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {/* Center - App name */}
+        <Box sx={{ flex: 1, textAlign: 'center' }}>
+          <Typography variant="h4" component="div" sx={{ fontWeight: 600, color: 'primary.main' }}>
+            Finance Analyzer
+          </Typography>
+        </Box>
 
         {/* Right side - User icon */}
         <IconButton 
@@ -24,6 +21,7 @@ export default function Header() {
             // TODO: Add user settings functionality
             console.log("User settings clicked");
           }}
+          sx={{ position: 'absolute', right: 16 }}
         >
           <AccountCircle />
         </IconButton>
