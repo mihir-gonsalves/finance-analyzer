@@ -1,36 +1,59 @@
 // components/LedgerChart.tsx
+import { useMemo } from "react";
 import { Card, CardContent, Typography, Box } from "@mui/material";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
+import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from "recharts";
 
 import { useTransactions } from "../hooks/useTransactions";
+import { chartStyles } from "../theme";
+
+interface ChartDataPoint {
+  date: string;
+  balance: number;
+  amount: number;
+  description: string;
+  formattedDate: string;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: any[];
+  label?: string;
+}
 
 export default function LedgerChart() {  
   const { data: transactions = [] } = useTransactions();
 
-  // Process data for running balance chart
-  // Create a copy of the array before sorting to avoid mutating the read-only array
-  const chartData = [...transactions]
-    .sort((a, b) => new Date(a.date || '').getTime() - new Date(b.date || '').getTime())
-    .reduce((acc: any[], transaction, index) => {
-      const previousBalance = index === 0 ? 0 : acc[acc.length - 1]?.balance || 0;
-      const newBalance = previousBalance + transaction.amount;
-      
-      acc.push({
-        date: transaction.date,
-        balance: newBalance,
-        amount: transaction.amount,
-        description: transaction.description,
-        formattedDate: new Date(transaction.date || '').toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-        }),
-      });
-      
-      return acc;
-    }, []);
+  const chartData = useMemo(() => {
+    return [...transactions]
+      .sort((a, b) => new Date(a.date || '').getTime() - new Date(b.date || '').getTime())
+      .reduce((acc: ChartDataPoint[], transaction, index) => {
+        const previousBalance = index === 0 ? 0 : acc[acc.length - 1]?.balance || 0;
+        const newBalance = previousBalance + transaction.amount;
+        
+        acc.push({
+          date: transaction.date,
+          balance: newBalance,
+          amount: transaction.amount,
+          description: transaction.description,
+          formattedDate: new Date(transaction.date || '').toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+          }),
+        });
+        
+        return acc;
+      }, []);
+  }, [transactions]);
 
-  // Format currency
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -39,113 +62,163 @@ export default function LedgerChart() {
     }).format(amount);
   };
 
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <Box
-          sx={{
-            bgcolor: 'background.paper',
-            p: 2,
-            border: 1,
-            borderColor: 'divider',
-            borderRadius: 1,
-            boxShadow: 3,
-            minWidth: 200,
+  const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+    if (!active || !payload || !payload.length) return null;
+    
+    const data = payload[0].payload;
+    return (
+      <Box
+        sx={{
+          bgcolor: chartStyles.colors.background,
+          background: chartStyles.tooltip.background,
+          p: chartStyles.tooltip.padding,
+          border: chartStyles.tooltip.border,
+          borderRadius: chartStyles.tooltip.borderRadius,
+          boxShadow: chartStyles.tooltip.boxShadow,
+          minWidth: chartStyles.tooltip.minWidth,
+        }}
+      >
+        <Typography variant="subtitle2" sx={{ color: chartStyles.colors.textPrimary, fontWeight: 600 }} gutterBottom>
+          {new Date(data.date).toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          })}
+        </Typography>
+        <Typography variant="body2" sx={{ color: chartStyles.colors.textSecondary }} gutterBottom>
+          {data.description}
+        </Typography>
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            color: data.amount >= 0 ? 'success.main' : 'error.main',
+            fontWeight: 500,
           }}
         >
-          <Typography variant="subtitle2" gutterBottom>
-            {new Date(data.date).toLocaleDateString('en-US', {
-              weekday: 'short',
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            })}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            {data.description}
-          </Typography>
-          <Typography variant="body2" sx={{ color: data.amount >= 0 ? 'success.main' : 'error.main' }}>
-            Transaction: {data.amount >= 0 ? '+' : ''}{formatCurrency(data.amount)}
-          </Typography>
-          <Typography variant="body1" fontWeight="medium" sx={{ mt: 1 }}>
-            Balance: {formatCurrency(data.balance)}
-          </Typography>
-        </Box>
-      );
-    }
-    return null;
+          Transaction: {data.amount >= 0 ? '+' : ''}{formatCurrency(data.amount)}
+        </Typography>
+        <Typography 
+          variant="body1" 
+          fontWeight="600" 
+          sx={{ 
+            mt: 1.5,
+            color: chartStyles.colors.textPrimary,
+            fontSize: '1.1rem',
+          }}
+        >
+          Balance: {formatCurrency(data.balance)}
+        </Typography>
+      </Box>
+    );
   };
 
-  if (chartData.length === 0) {
-    return (
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Account Balance Over Time
+  const ChartGradientDefs = () => (
+    <defs>
+      <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
+        {chartStyles.gradientStops.map((stop, index) => (
+          <stop 
+            key={index}
+            offset={stop.offset} 
+            stopColor={stop.stopColor} 
+            stopOpacity={stop.stopOpacity}
+          />
+        ))}
+      </linearGradient>
+    </defs>
+  );
+
+  const EmptyState = () => (
+    <Card>
+      <CardContent>
+        <Typography variant="h6" gutterBottom sx={{ color: chartStyles.colors.textPrimary }}>
+          Account Balance Over Time
+        </Typography>
+        <Box sx={chartStyles.emptyState}>
+          <Typography sx={{ color: chartStyles.colors.textSecondary }}>
+            No transaction data available
           </Typography>
-          <Box textAlign="center" py={8}>
-            <Typography color="text.secondary">
-              No transaction data available
-            </Typography>
-          </Box>
-        </CardContent>
-      </Card>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+
+  const ChartHeader = ({ currentBalance }: { currentBalance: number }) => {
+    const isPositive = currentBalance >= 0;
+    
+    return (
+      <Box sx={chartStyles.header}>
+        <Typography variant="h6" component="h2" sx={{ color: chartStyles.colors.textPrimary, fontWeight: 600 }}>
+          Account Balance Over Time
+        </Typography>
+        <Box sx={chartStyles.balanceDisplay}>
+          <Typography variant="body2" sx={{ color: chartStyles.colors.textSecondary, fontWeight: 500 }}>
+            Current Balance
+          </Typography>
+          <Typography 
+            variant="h5" 
+            fontWeight="700" 
+            sx={{ 
+              color: isPositive ? 'success.main' : 'error.main',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            {formatCurrency(currentBalance)}
+          </Typography>
+        </Box>
+      </Box>
     );
+  };
+
+  const ChartFooter = ({ dataLength, startDate, endDate }: { 
+    dataLength: number; 
+    startDate: string; 
+    endDate: string; 
+  }) => (
+    <Box sx={chartStyles.footer}>
+      <Typography variant="body2" color="text.secondary">
+        Showing {dataLength} transactions • 
+        From {new Date(startDate).toLocaleDateString()} to {new Date(endDate).toLocaleDateString()}
+      </Typography>
+    </Box>
+  );
+
+  if (chartData.length === 0) {
+    return <EmptyState />;
   }
 
   const currentBalance = chartData[chartData.length - 1]?.balance || 0;
-  const isPositive = currentBalance >= 0;
+  const startDate = chartData[0]?.date;
+  const endDate = chartData[chartData.length - 1]?.date;
 
   return (
     <Card>
       <CardContent>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h6" component="h2">
-            Account Balance Over Time
-          </Typography>
-          <Box textAlign="right">
-            <Typography variant="body2" color="text.secondary">
-              Current Balance
-            </Typography>
-            <Typography 
-              variant="h5" 
-              fontWeight="bold" 
-              sx={{ color: isPositive ? 'success.main' : 'error.main' }}
-            >
-              {formatCurrency(currentBalance)}
-            </Typography>
-          </Box>
-        </Box>
+        <ChartHeader currentBalance={currentBalance} />
 
-        <Box sx={{ width: '100%', height: 400 }}>
+        <Box sx={chartStyles.container}>
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
-              <defs>
-                <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#1976d2" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#1976d2" stopOpacity={0.05}/>
-                </linearGradient>
-                <pattern id="dots" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
-                  <circle cx="2" cy="2" r="1" fill="#1976d2" fillOpacity="0.1"/>
-                </pattern>
-              </defs>
+            <AreaChart data={chartData} margin={chartStyles.margins}>
+              <ChartGradientDefs />
               
-              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke={chartStyles.colors.gridStroke} 
+                opacity={chartStyles.gridOpacity} 
+              />
               
               <XAxis 
                 dataKey="formattedDate" 
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: '#666' }}
+                tick={{ fontSize: 13, fill: chartStyles.colors.textSecondary, fontWeight: 500 }}
               />
               
               <YAxis 
                 tickFormatter={formatCurrency}
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: '#666' }}
+                tick={{ fontSize: 13, fill: chartStyles.colors.textSecondary, fontWeight: 500 }}
               />
               
               <Tooltip content={<CustomTooltip />} />
@@ -153,31 +226,27 @@ export default function LedgerChart() {
               <Area
                 type="monotone"
                 dataKey="balance"
-                stroke="#1976d2"
-                strokeWidth={3}
+                stroke={chartStyles.colors.primary}
+                strokeWidth={chartStyles.strokeWidth}
                 fill="url(#balanceGradient)"
-              />
-              
-              <Line 
-                type="monotone" 
-                dataKey="balance" 
-                stroke="#1976d2" 
-                strokeWidth={3}
-                dot={{ fill: '#1976d2', strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: '#1976d2', strokeWidth: 2, fill: 'white' }}
+                dot={false}
+                activeDot={{ 
+                  r: chartStyles.activeDot.r, 
+                  stroke: chartStyles.colors.primary, 
+                  strokeWidth: chartStyles.activeDot.strokeWidth, 
+                  fill: 'white',
+                  style: { filter: chartStyles.activeDot.dropShadow }
+                }}
               />
             </AreaChart>
           </ResponsiveContainer>
         </Box>
 
-        <Box mt={2}>
-          <Typography variant="body2" color="text.secondary">
-            Showing {chartData.length} transactions • 
-            {chartData.length > 0 && (
-              <> From {new Date(chartData[0].date).toLocaleDateString()} to {new Date(chartData[chartData.length - 1].date).toLocaleDateString()}</>
-            )}
-          </Typography>
-        </Box>
+        <ChartFooter 
+          dataLength={chartData.length} 
+          startDate={startDate} 
+          endDate={endDate} 
+        />
       </CardContent>
     </Card>
   );
