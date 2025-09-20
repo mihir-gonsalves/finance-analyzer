@@ -32,7 +32,8 @@ import {
   useUpdateTransaction,
   useCreateTransaction,
   type Transaction,
-  type CreateTransactionData
+  type CreateTransactionData,
+  type UpdateTransactionData
 } from "../hooks/useTransactions";
 import { useCSVUpload } from "../hooks/useCSVUpload";
 import LedgerChart from "./LedgerChart";
@@ -42,7 +43,7 @@ import type { FilterState } from "../types/filters";
 const INITIAL_TRANSACTION_DATA: CreateTransactionData = {
   date: new Date().toISOString().split('T')[0],
   description: "",
-  category: "",
+  category_names: [],
   amount: 0,
   account: "",
 };
@@ -116,6 +117,10 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
 
   const [csvDialog, setCsvDialog] = useState<CSVDialogState>(CSV_INITIAL_STATE);
 
+  // Category input strings for UI display
+  const [addCategoryInput, setAddCategoryInput] = useState<string>("");
+  const [editCategoryInput, setEditCategoryInput] = useState<string>("");
+
   // Utility functions
   const formatCurrency = useCallback((amount: number): string => {
     return new Intl.NumberFormat('en-US', {
@@ -140,17 +145,30 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
   // Event handlers
   const handleEdit = useCallback((transaction: Transaction) => {
     setEditDialog({ open: true, transaction });
+    // Initialize category input with existing categories
+    setEditCategoryInput(transaction.categories?.map(cat => cat.name).join(", ") || "");
   }, []);
 
   const handleSaveEdit = useCallback(() => {
     if (!editDialog.transaction) return;
-    
-    updateMutation.mutate(editDialog.transaction, {
+
+    // Convert to UpdateTransactionData format
+    const updateData = {
+      id: editDialog.transaction.id,
+      date: editDialog.transaction.date,
+      description: editDialog.transaction.description,
+      amount: editDialog.transaction.amount,
+      account: editDialog.transaction.account,
+      category_names: editCategoryInput ? editCategoryInput.split(",").map(cat => cat.trim()).filter(cat => cat.length > 0) : []
+    };
+
+    updateMutation.mutate(updateData, {
       onSuccess: () => {
         setEditDialog({ open: false, transaction: null });
+        setEditCategoryInput("");
       }
     });
-  }, [editDialog.transaction, updateMutation]);
+  }, [editDialog.transaction, editCategoryInput, updateMutation]);
 
   const handleDelete = useCallback((id: number) => {
     setDeleteDialog({ open: true, transactionId: id });
@@ -172,25 +190,33 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
       open: true,
       transaction: { ...INITIAL_TRANSACTION_DATA },
     });
+    setAddCategoryInput("");
   }, []);
 
   const handleSaveAdd = useCallback(() => {
     const { description, account, amount } = addDialog.transaction;
-    
+
     // Validation
     if (!description || !account || amount === 0) {
       return;
     }
-    
-    createMutation.mutate(addDialog.transaction, {
+
+    // Parse categories from input string
+    const finalTransaction = {
+      ...addDialog.transaction,
+      category_names: addCategoryInput ? addCategoryInput.split(",").map(cat => cat.trim()).filter(cat => cat.length > 0) : []
+    };
+
+    createMutation.mutate(finalTransaction, {
       onSuccess: () => {
         setAddDialog({
           open: false,
           transaction: { ...INITIAL_TRANSACTION_DATA },
         });
+        setAddCategoryInput("");
       }
     });
-  }, [addDialog.transaction, createMutation]);
+  }, [addDialog.transaction, addCategoryInput, createMutation]);
 
   const handleCSVUpload = useCallback(() => {
     setMenuAnchor(null);
@@ -248,6 +274,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
   // Dialog close handlers
   const closeEditDialog = useCallback(() => {
     setEditDialog({ open: false, transaction: null });
+    setEditCategoryInput("");
   }, []);
 
   const closeDeleteDialog = useCallback(() => {
@@ -256,6 +283,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
 
   const closeAddDialog = useCallback(() => {
     setAddDialog({ open: false, transaction: addDialog.transaction });
+    setAddCategoryInput("");
   }, [addDialog.transaction]);
 
   const closeCsvDialog = useCallback(() => {
@@ -270,7 +298,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
     }));
   }, []);
 
-  const updateEditTransaction = useCallback((updates: Partial<Transaction>) => {
+  const updateEditTransaction = useCallback((updates: Partial<Transaction & { category_names?: string[] }>) => {
     setEditDialog(prev => ({
       ...prev,
       transaction: prev.transaction ? { ...prev.transaction, ...updates } : null,
@@ -366,14 +394,28 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
       minWidth: 200,
     },
     {
-      field: 'category',
-      headerName: 'Category',
-      width: 130,
+      field: 'categories',
+      headerName: 'Categories',
+      width: 200,
       renderCell: (params) => {
-        if (!params.value) {
+        const categories = params.value || [];
+        if (categories.length === 0) {
           return <Chip label="Uncategorized" size="small" variant="outlined" color="default" />;
         }
-        return <Chip label={params.value} size="small" color="primary" />;
+        return (
+          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+            {categories.map((category: { id: number; name: string }, index: number) => (
+              <Chip
+                key={category.id}
+                label={category.name}
+                size="small"
+                color="primary"
+                variant="outlined"
+                sx={{ fontSize: '0.75rem' }}
+              />
+            ))}
+          </Box>
+        );
       },
     },
     {
@@ -648,11 +690,26 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
               required
             />
             <TextField
-              label="Category"
-              value={addDialog.transaction.category || ""}
-              onChange={(e) => updateAddTransaction({ category: e.target.value })}
+              label="Categories (comma-separated)"
+              value={addCategoryInput}
+              onChange={(e) => {
+                const value = e.target.value;
+                console.log('Category input value:', value);
+                setAddCategoryInput(value);
+              }}
+              onKeyDown={(e) => {
+                console.log('Key pressed:', e.key, e.keyCode);
+                // Don't prevent any default behavior
+              }}
               fullWidth
-              placeholder="Optional"
+              placeholder="e.g. restaurants, miami"
+              helperText="Enter multiple categories separated by commas"
+              multiline
+              maxRows={3}
+              inputProps={{
+                style: { resize: 'vertical' },
+                'data-testid': 'category-input'
+              }}
             />
             <TextField
               label="Date"
@@ -714,10 +771,26 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
               fullWidth
             />
             <TextField
-              label="Category"
-              value={editDialog.transaction?.category || ""}
-              onChange={(e) => updateEditTransaction({ category: e.target.value })}
+              label="Categories (comma-separated)"
+              value={editCategoryInput}
+              onChange={(e) => {
+                const value = e.target.value;
+                console.log('Edit category input value:', value);
+                setEditCategoryInput(value);
+              }}
+              onKeyDown={(e) => {
+                console.log('Edit key pressed:', e.key, e.keyCode);
+                // Don't prevent any default behavior
+              }}
               fullWidth
+              placeholder="e.g. restaurants, miami"
+              helperText="Enter multiple categories separated by commas"
+              multiline
+              maxRows={3}
+              inputProps={{
+                style: { resize: 'vertical' },
+                'data-testid': 'edit-category-input'
+              }}
             />
             <TextField
               label="Date"

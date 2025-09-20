@@ -45,10 +45,13 @@ export default function FiltersPanel({ filters, onFiltersChange, onClose }: Filt
 
   // Get unique values for filter options
   const { categories, accounts } = useMemo(() => {
-    const uniqueCategories = Array.from(
-      new Set(transactions.map(t => t.category).filter(Boolean))
-    ).sort();
-    
+    // Extract all category names from all transactions
+    const allCategoryNames = transactions.flatMap(t =>
+      t.categories ? t.categories.map(cat => cat.name) : []
+    );
+
+    const uniqueCategories = Array.from(new Set(allCategoryNames)).sort();
+
     const uniqueAccounts = Array.from(
       new Set(transactions.map(t => t.account).filter(Boolean))
     ).sort();

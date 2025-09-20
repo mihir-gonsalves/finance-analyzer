@@ -2,11 +2,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import client from "../api/client";
 import type { FilterState } from "../types/filters";
 
+export interface Category {
+  id: number;
+  name: string;
+}
+
 export interface Transaction {
   id: number;
   date: string;
   description: string;
-  category?: string;
+  categories: Category[];
   amount: number;
   account: string;
 }
@@ -14,7 +19,7 @@ export interface Transaction {
 export interface CreateTransactionData {
   date: string;
   description: string;
-  category?: string;
+  category_names?: string[];
   amount: number;
   account: string;
 }
@@ -74,7 +79,7 @@ export function useFilteredTransactions(filters: FilterState) {
         const searchLower = filters.searchTerm.toLowerCase();
         transactions = transactions.filter((t: Transaction) => {
           const matchesDescription = t.description.toLowerCase().includes(searchLower);
-          const matchesCategory = t.category?.toLowerCase().includes(searchLower);
+          const matchesCategory = t.categories.some(cat => cat.name.toLowerCase().includes(searchLower));
           const matchesAccount = t.account.toLowerCase().includes(searchLower);
           return matchesDescription || matchesCategory || matchesAccount;
         });
@@ -112,12 +117,22 @@ export function useDeleteTransaction() {
   });
 }
 
+export interface UpdateTransactionData {
+  id: number;
+  date?: string;
+  description?: string;
+  category_names?: string[];
+  amount?: number;
+  account?: string;
+}
+
 // Update a transaction
 export function useUpdateTransaction() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (txn: Transaction) => {
-      const res = await client.put(`/transactions/${txn.id}`, txn);
+    mutationFn: async (txn: UpdateTransactionData) => {
+      const { id, ...updateData } = txn;
+      const res = await client.put(`/transactions/${id}`, updateData);
       return res.data;
     },
     onSuccess: () => {
