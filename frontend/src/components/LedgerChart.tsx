@@ -11,8 +11,9 @@ import {
   ResponsiveContainer 
 } from "recharts";
 
-import { useTransactions } from "../hooks/useTransactions";
+import { useFilteredTransactions } from "../hooks/useTransactions";
 import { chartStyles } from "../theme";
+import type { FilterState } from "../types/filters";
 
 interface ChartDataPoint {
   date: string;
@@ -28,11 +29,15 @@ interface CustomTooltipProps {
   label?: string;
 }
 
-export default function LedgerChart() {  
-  const { data: transactions = [] } = useTransactions();
+interface LedgerChartProps {
+  filters: FilterState;
+}
+
+export default function LedgerChart({ filters }: LedgerChartProps) {
+  const { data: filteredTransactions = [] } = useFilteredTransactions(filters);
 
   const chartData = useMemo(() => {
-    return [...transactions]
+    return [...filteredTransactions]
       .sort((a, b) => new Date(a.date || '').getTime() - new Date(b.date || '').getTime())
       .reduce((acc: ChartDataPoint[], transaction, index) => {
         const previousBalance = index === 0 ? 0 : acc[acc.length - 1]?.balance || 0;
@@ -51,7 +56,7 @@ export default function LedgerChart() {
         
         return acc;
       }, []);
-  }, [transactions]);
+  }, [filteredTransactions]);
 
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-US', {
@@ -175,8 +180,18 @@ export default function LedgerChart() {
     startDate: string; 
     endDate: string; 
   }) => (
-    <Box sx={chartStyles.footer}>
-      <Typography variant="body2" color="text.secondary">
+    <Box sx={{
+      mt: 2,
+      pt: 2,
+      borderTop: '1px solid',
+      borderColor: 'grey.200',
+      background: 'grey.50',
+      borderRadius: 1,
+      p: 2,
+      mx: -2,
+      mb: -2,
+    }}>
+      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
         Showing {dataLength} transactions • 
         From {new Date(startDate).toLocaleDateString()} to {new Date(endDate).toLocaleDateString()}
       </Typography>
@@ -193,10 +208,10 @@ export default function LedgerChart() {
 
   return (
     <Card>
-      <CardContent>
+      <CardContent sx={{ pb: 1 }}>
         <ChartHeader currentBalance={currentBalance} />
 
-        <Box sx={chartStyles.container}>
+        <Box sx={{ ...chartStyles.container, height: 380 }}>
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={chartStyles.margins}>
               <ChartGradientDefs />

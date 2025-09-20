@@ -24,7 +24,8 @@ import {
   Assessment 
 } from "@mui/icons-material";
 
-import { useTransactions } from "../hooks/useTransactions";
+import { useFilteredTransactions } from "../hooks/useTransactions";
+import type { FilterState } from "../types/filters";
 
 interface CategoryData {
   name: string;
@@ -36,12 +37,16 @@ interface CustomTooltipProps {
   payload?: any[];
 }
 
-export default function AnalyticsPanel() {
-  const theme = useTheme();
-  const { data: transactions = [], isLoading } = useTransactions();
+interface AnalyticsPanelProps {
+  filters: FilterState;
+}
 
-  // Calculate spending by category
-  const categorySpending = transactions.reduce((acc, transaction) => {
+export default function AnalyticsPanel({ filters }: AnalyticsPanelProps) {
+  const theme = useTheme();
+  const { data: filteredTransactions = [], isLoading } = useFilteredTransactions(filters);
+
+  // Calculate spending by category using filtered data
+  const categorySpending = filteredTransactions.reduce((acc, transaction) => {
     // Only count negative amounts (expenses)
     if (transaction.amount >= 0) return acc;
     
@@ -63,8 +68,8 @@ export default function AnalyticsPanel() {
   // Total spent
   const totalSpent = chartData.reduce((sum, item) => sum + item.value, 0);
   
-  // Total income (positive amounts)
-  const totalIncome = transactions
+  // Total income (positive amounts) from filtered data
+  const totalIncome = filteredTransactions
     .filter(t => t.amount > 0)
     .reduce((sum, t) => sum + t.amount, 0);
 
@@ -101,6 +106,8 @@ export default function AnalyticsPanel() {
             borderColor: 'grey.200',
             borderRadius: 2,
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            zIndex: 1000,
+            position: 'relative',
           }}
         >
           <Typography variant="body2" fontWeight="600" gutterBottom>
@@ -152,7 +159,7 @@ export default function AnalyticsPanel() {
               </Typography>
             </Box>
           ) : (
-            <Box position="relative" height={280}>
+            <Box position="relative" height={280} sx={{ '& .recharts-tooltip-wrapper': { zIndex: 9999 } }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -183,6 +190,8 @@ export default function AnalyticsPanel() {
                 sx={{
                   transform: 'translate(-50%, -50%)',
                   textAlign: 'center',
+                  pointerEvents: 'none',
+                  zIndex: 1,
                 }}
               >
                 <Typography 
@@ -330,7 +339,7 @@ export default function AnalyticsPanel() {
                 Transactions
               </Typography>
               <Typography fontWeight="500" variant="body2">
-                {transactions.length}
+                {filteredTransactions.length}
               </Typography>
             </Box>
             
@@ -348,8 +357,8 @@ export default function AnalyticsPanel() {
                 Avg per Expense
               </Typography>
               <Typography fontWeight="500" variant="body2">
-                {transactions.filter(t => t.amount < 0).length > 0 
-                  ? formatCurrency(totalSpent / transactions.filter(t => t.amount < 0).length)
+                {filteredTransactions.filter(t => t.amount < 0).length > 0 
+                  ? formatCurrency(totalSpent / filteredTransactions.filter(t => t.amount < 0).length)
                   : '$0.00'
                 }
               </Typography>

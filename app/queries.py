@@ -1,11 +1,11 @@
 # this is the R in CRUD (for enhanced filtering purposes)
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 import calendar
 from collections import defaultdict
 import datetime
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 from .models import Transaction
 from .schemas import TransactionUpdate
@@ -34,20 +34,52 @@ def get_transactions_by_category(session: Session, category: str) -> List[Transa
 # ---------------------
 def get_transactions(
     session: Session,
-    account: Optional[str] = None,
-    category: Optional[str] = None,
+    account: Optional[Union[str, List[str]]] = None,
+    category: Optional[Union[str, List[str]]] = None,
     start: Optional[datetime.date] = None,
     end: Optional[datetime.date] = None,
 ) -> List[Transaction]:
     """
     Fetch transactions with optional filters.
-    Any combination of account, category, and date range can be dynamically applied.
+    Any combination of account(s), category/categories, and date range can be dynamically applied.
     """
+    print(f"Query filters - account: {account} (type: {type(account)}), category: {category} (type: {type(category)})")  # Debug log
+
     query = session.query(Transaction)
     if account:
-        query = query.filter(Transaction.account == account)
+        # Handle both single string (backward compatibility) and list
+        if isinstance(account, str):
+            print(f"Filtering by single account: {account}")
+            query = query.filter(Transaction.account == account)
+        else:
+            print(f"Filtering by account list: {account}")
+            query = query.filter(Transaction.account.in_(account))
     if category:
-        query = query.filter(Transaction.category == category)
+        # Handle both single string (backward compatibility) and list
+        if isinstance(category, str):
+            if category == '':
+                # Handle uncategorized (NULL) case
+                query = query.filter(Transaction.category.is_(None))
+            else:
+                query = query.filter(Transaction.category == category)
+        else:
+            # Handle list of categories, including empty string for uncategorized
+            if '' in category:
+                # Split into NULL check and regular categories
+                other_categories = [cat for cat in category if cat != '']
+                if other_categories:
+                    query = query.filter(
+                        or_(
+                            Transaction.category.is_(None),
+                            Transaction.category.in_(other_categories)
+                        )
+                    )
+                else:
+                    # Only uncategorized selected
+                    query = query.filter(Transaction.category.is_(None))
+            else:
+                # No uncategorized, just regular categories
+                query = query.filter(Transaction.category.in_(category))
     if start:
         query = query.filter(Transaction.date >= start)
     if end:
@@ -106,6 +138,14 @@ def get_unique_accounts(session: Session) -> List[str]:
     Return a list of unique account names from the transactions table.
     """
     return [acc for (acc,) in session.query(Transaction.account).distinct().all()]
+
+
+def get_unique_categories(session: Session) -> List[str]:
+    """
+    Return a list of unique category names from the transactions table.
+    Filters out None values.
+    """
+    return [cat for (cat,) in session.query(Transaction.category).distinct().all() if cat is not None]
 
 
 # ---------------------

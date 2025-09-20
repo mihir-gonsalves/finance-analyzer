@@ -179,7 +179,7 @@ export const chartStyles = {
   balanceDisplay: {
     textAlign: 'right' as const,
     background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-    borderRadius: 2,
+    borderRadius: 1,
     padding: 2,
     border: '1px solid #e2e8f0',
   },
