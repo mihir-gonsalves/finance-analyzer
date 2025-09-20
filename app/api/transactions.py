@@ -60,6 +60,27 @@ def get_categories(db: Session = Depends(get_db)):
     return queries.get_unique_categories(db)
 
 
+@router.get("/categories/full", response_model=list[schemas.CategoryOut])
+def get_full_categories(db: Session = Depends(get_db)):
+    """Get all categories with their IDs."""
+    return crud.get_all_categories(db)
+
+
+@router.post("/categories", response_model=schemas.CategoryOut)
+def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)):
+    """Create a new category."""
+    return crud.get_or_create_category(db, category.name)
+
+
+@router.delete("/categories/{category_id}", response_model=dict)
+def delete_category(category_id: int, db: Session = Depends(get_db)):
+    """Delete a category if it's not being used by any transactions."""
+    deleted = crud.delete_category(db, category_id)
+    if not deleted:
+        raise HTTPException(status_code=400, detail="Category not found or still in use")
+    return {"message": "Category deleted"}
+
+
 @router.get("/totals/category/{category}", response_model=float)
 def total_by_category(category: str, db: Session = Depends(get_db)):
     return queries.get_total_spent_by_category(db, category)

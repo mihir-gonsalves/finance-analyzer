@@ -43,12 +43,24 @@ def load_discover_csv(file_path: str):
             "Discover"
         )
         for row in reader:
+            raw_amount = clean_currency_string(row["Amount"])
+            category = row["Category"]
+
+            # For Discover (credit card), all transactions should be negative (expenses)
+            # except for payments/credits which are already negative in the CSV
+            if category == "Payments and Credits":
+                # These are already negative in CSV (payments to credit card)
+                amount = raw_amount
+            else:
+                # All other Discover transactions are expenses - make negative
+                amount = -abs(raw_amount)
+
             transactions.append({
                 "date": datetime.strptime(row["Trans. Date"], "%m/%d/%Y").date(),
                 "description": row["Description"],
-                "amount": clean_currency_string(row["Amount"]),
+                "amount": amount,
                 "account": "Discover",
-                "category": row["Category"]
+                "category": category
             })
     return transactions
 
@@ -66,11 +78,38 @@ def load_schwab_csv(file_path: str):
             # Clean and process withdrawal amount
             withdrawal_str = row.get("Withdrawal", "").strip()
             deposit_str = row.get("Deposit", "").strip()
-            
+            description = row["Description"]
+
             if withdrawal_str and withdrawal_str != "":
+                # All withdrawals are expenses (negative)
                 amount = -clean_currency_string(withdrawal_str)
             elif deposit_str and deposit_str != "":
-                amount = clean_currency_string(deposit_str)
+                # Deposits could be income or transfers - need to categorize
+                raw_amount = clean_currency_string(deposit_str)
+
+                # Income indicators (keep positive)
+                income_keywords = [
+                    "PAYROLL", "DIRECT DEP", "SALARY", "WAGE", "Interest Paid",
+                    "DIVIDEND", "BONUS", "REFUND", "CASHBACK"
+                ]
+
+                # Check if this is income
+                is_income = any(keyword.lower() in description.lower() for keyword in income_keywords)
+
+                # Special case: Zelle FROM someone is income, Zelle TO someone is expense
+                if "ZELLE FROM" in description.upper():
+                    is_income = True
+                elif "ZELLE TO" in description.upper():
+                    # This shouldn't happen in deposits, but handle it
+                    amount = -raw_amount
+                else:
+                    # For other deposits, default to income unless proven otherwise
+                    amount = raw_amount if is_income else raw_amount
+
+                if is_income:
+                    amount = raw_amount
+                else:
+                    amount = raw_amount  # Keep as positive for now, might need adjustment
             else:
                 amount = 0.0
 
