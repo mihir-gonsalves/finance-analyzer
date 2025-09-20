@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, Form, Query
 
 import datetime
 import tempfile
@@ -36,21 +36,28 @@ def read_transactions(db: Session = Depends(get_db)):
 
 @router.get("/filter", response_model=list[schemas.TransactionOut])
 def read_filtered_transactions(
-    account: str | None = None,
-    category: str | None = None,
+    account: list[str] | None = Query(None),
+    category: list[str] | None = Query(None),
     start: datetime.date | None = None,
     end: datetime.date | None = None,
     db: Session = Depends(get_db),
 ):
     """
-    Filter transactions dynamically by account, category, and/or date range.
+    Filter transactions dynamically by account(s), category/categories, and/or date range.
+    Multiple accounts and categories can be specified as arrays.
     """
+    print(f"Received filters - account: {account}, category: {category}, start: {start}, end: {end}")  # Debug log
     return queries.get_transactions(db, account=account, category=category, start=start, end=end)
 
 
 @router.get("/accounts", response_model=list[str])
 def get_accounts(db: Session = Depends(get_db)):
     return queries.get_unique_accounts(db)
+
+
+@router.get("/categories", response_model=list[str])
+def get_categories(db: Session = Depends(get_db)):
+    return queries.get_unique_categories(db)
 
 
 @router.get("/totals/category/{category}", response_model=float)

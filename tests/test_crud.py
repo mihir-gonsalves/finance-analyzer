@@ -20,7 +20,7 @@ def test_create_transaction(session):
             amount = -25.0,
             account = "Discover",
             category = "Books",
-            date_ = datetime.date(2025, 3, 10)
+            date = datetime.date(2025, 3, 10)
         ),
     )
     assert tx.id is not None
@@ -41,7 +41,7 @@ def test_update_transaction(session):
             amount = -10.0,
             account = "Discover",
             category = "Food",
-            date_ = datetime.date(2025, 3, 11)
+            date = datetime.date(2025, 3, 11)
         ),
     )
     updated = update_transaction(
@@ -67,7 +67,7 @@ def test_delete_transaction(session):
             amount = -15.0,
             account = "Discover",
             category = "Entertainment",
-            date_ = datetime.date(2025, 3, 12)
+            date = datetime.date(2025, 3, 12)
         ),
     )
     result = delete_transaction(session, tx.id)

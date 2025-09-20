@@ -23,18 +23,20 @@ import {
 } from "@mui/material";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
-import { Edit, Delete, Add, MoreVert, Upload, FileUpload, TableChart, ShowChart } from "@mui/icons-material";
+import { Edit, Delete, Add, MoreVert, Upload, FileUpload, TableChart, ShowChart, FilterList, Category, AccountBalance, CalendarMonth } from "@mui/icons-material";
 
-import { 
-  useTransactions, 
-  useDeleteTransaction, 
-  useUpdateTransaction, 
+import {
+  useTransactions,
+  useFilteredTransactions,
+  useDeleteTransaction,
+  useUpdateTransaction,
   useCreateTransaction,
   type Transaction,
   type CreateTransactionData
 } from "../hooks/useTransactions";
 import { useCSVUpload } from "../hooks/useCSVUpload";
 import LedgerChart from "./LedgerChart";
+import type { FilterState } from "../types/filters";
 
 // Constants
 const INITIAL_TRANSACTION_DATA: CreateTransactionData = {
@@ -75,21 +77,28 @@ interface CSVDialogState {
   institution: string;
 }
 
-export default function TransactionTable() {
+interface TransactionTableProps {
+  filters: FilterState;
+  filtersOpen: boolean;
+  onToggleFilters: () => void;
+}
+
+export default function TransactionTable({ filters, filtersOpen, onToggleFilters }: TransactionTableProps) {
   // Hooks
-  const { data: transactions = [], isLoading, error } = useTransactions();
+  const { data: allTransactions = [], error } = useTransactions();
+  const { data: filteredTransactions = [], isLoading } = useFilteredTransactions(filters);
   const deleteMutation = useDeleteTransaction();
   const updateMutation = useUpdateTransaction();
   const createMutation = useCreateTransaction();
   const csvUploadMutation = useCSVUpload();
-  
+
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // State
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('table');
-  
+
   const [editDialog, setEditDialog] = useState<EditDialogState>({
     open: false,
     transaction: null,
@@ -272,7 +281,77 @@ export default function TransactionTable() {
     setCsvDialog(prev => ({ ...prev, ...updates }));
   }, []);
 
-  // DataGrid columns - memoized for performance
+  // Get active filter tags
+  const getActiveFilterTags = useCallback(() => {
+    const tags = [];
+
+    if (filters.accounts.length > 0) {
+      tags.push(
+        <Chip
+          key="accounts"
+          icon={<AccountBalance />}
+          label={filters.accounts.length === 1 ? filters.accounts[0] : `${filters.accounts.length} accounts`}
+          size="small"
+          color="primary"
+          variant="outlined"
+        />
+      );
+    }
+
+    if (filters.categories.length > 0) {
+      tags.push(
+        <Chip
+          key="categories"
+          icon={<Category />}
+          label={filters.categories.length === 1 ? filters.categories[0] : `${filters.categories.length} categories`}
+          size="small"
+          color="primary"
+          variant="outlined"
+        />
+      );
+    }
+
+    if (filters.dateFrom || filters.dateTo) {
+      tags.push(
+        <Chip
+          key="dates"
+          icon={<CalendarMonth />}
+          label={`Dates: ${filters.dateFrom || '...'} to ${filters.dateTo || '...'}`}
+          size="small"
+          color="primary"
+          variant="outlined"
+        />
+      );
+    }
+
+    if (filters.searchTerm) {
+      tags.push(
+        <Chip
+          key="search"
+          label={`Description: "${filters.searchTerm}"`}
+          size="small"
+          color="primary"
+          variant="outlined"
+        />
+      );
+    }
+
+    if (filters.minAmount || filters.maxAmount) {
+      tags.push(
+        <Chip
+          key="amount"
+          label={`Amount: $${filters.minAmount || '...'} to $${filters.maxAmount || '...'}`}
+          size="small"
+          color="primary"
+          variant="outlined"
+        />
+      );
+    }
+
+    return tags;
+  }, [filters]);
+
+  // DataGrid columns - memoized for performance with fixed alignment
   const columns: GridColDef[] = useMemo(() => [
     {
       field: 'date',
@@ -301,15 +380,19 @@ export default function TransactionTable() {
       field: 'amount',
       headerName: 'Amount',
       width: 120,
-      align: 'right',
-      headerAlign: 'right',
+      align: 'left',
+      headerAlign: 'left',
       renderCell: (params) => (
-        <Typography
-          sx={{ color: params.value < 0 ? 'error.main' : 'success.main' }}
-          fontWeight="medium"
-        >
-          {params.value < 0 ? '-' : '+'}{formatCurrency(params.value)}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+          <Typography
+            sx={{ 
+              color: params.value < 0 ? 'error.main' : 'success.main'
+            }}
+            fontWeight="medium"
+          >
+            {params.value < 0 ? '-' : '+'}{formatCurrency(params.value)}
+          </Typography>
+        </Box>
       ),
     },
     {
@@ -380,7 +463,19 @@ export default function TransactionTable() {
               {viewMode === 'table' ? 'Ledger' : 'Chart'}
             </Button>
             
-            <Box display="flex" alignItems="center" gap={1}>
+            <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+              {/* Active Filter Tags */}
+              {getActiveFilterTags().map(tag => tag)}
+
+              <Button
+                variant={filtersOpen ? "contained" : "outlined"}
+                startIcon={<FilterList />}
+                onClick={onToggleFilters}
+                sx={{ mr: 1 }}
+              >
+                Filters
+              </Button>
+
               <Button
                 variant="contained"
                 startIcon={<Add />}
@@ -388,12 +483,12 @@ export default function TransactionTable() {
               >
                 Add Transaction
               </Button>
-              
+
               <IconButton
                 onClick={handleMenuOpen}
                 size="small"
-                sx={{ 
-                  border: 1, 
+                sx={{
+                  border: 1,
                   borderColor: 'divider',
                   borderRadius: 1,
                 }}
@@ -427,7 +522,7 @@ export default function TransactionTable() {
 
           {viewMode === 'table' ? (
             <DataGrid
-              rows={transactions}
+              rows={filteredTransactions}
               columns={columns}
               loading={isLoading}
               pageSizeOptions={[25, 50, 100]}
@@ -442,12 +537,16 @@ export default function TransactionTable() {
                 '& .MuiDataGrid-row:hover': {
                   backgroundColor: 'action.hover',
                 },
+                '& .MuiDataGrid-cell': {
+                  display: 'flex',
+                  alignItems: 'center',
+                },
               }}
               disableRowSelectionOnClick
             />
           ) : (
             <Box sx={{ height: 600 }}>
-              <LedgerChart />
+              <LedgerChart filters={filters} />
             </Box>
           )}
         </CardContent>

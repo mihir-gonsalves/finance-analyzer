@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import client from "../api/client";
+import type { FilterState } from "../types/filters";
 
 export interface Transaction {
   id: number;
@@ -25,6 +26,61 @@ export function useTransactions() {
     queryFn: async () => {
       const res = await client.get("/transactions");
       return res.data;
+    },
+  });
+}
+
+// Fetch filtered transactions from backend
+export function useFilteredTransactions(filters: FilterState) {
+  return useQuery<Transaction[]>({
+    queryKey: ["transactions", "filtered", filters],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+
+      // Add array filters manually
+      if (filters.accounts.length > 0) {
+        filters.accounts.forEach(account => {
+          params.append('account', account);
+        });
+      }
+      if (filters.categories.length > 0) {
+        filters.categories.forEach(category => {
+          const catValue = category === 'Uncategorized' ? '' : category;
+          params.append('category', catValue);
+        });
+      }
+
+      // Add other filters
+      if (filters.dateFrom) params.append('start', filters.dateFrom);
+      if (filters.dateTo) params.append('end', filters.dateTo);
+
+      console.log('Sending filter params:', params.toString()); // Debug log
+
+      const res = await client.get(`/transactions/filter?${params.toString()}`);
+
+      // Apply client-side filters that backend doesn't handle
+      let transactions = res.data;
+
+      // Amount filters
+      if (filters.minAmount) {
+        transactions = transactions.filter((t: Transaction) => t.amount >= parseFloat(filters.minAmount));
+      }
+      if (filters.maxAmount) {
+        transactions = transactions.filter((t: Transaction) => t.amount <= parseFloat(filters.maxAmount));
+      }
+
+      // Search term filter
+      if (filters.searchTerm) {
+        const searchLower = filters.searchTerm.toLowerCase();
+        transactions = transactions.filter((t: Transaction) => {
+          const matchesDescription = t.description.toLowerCase().includes(searchLower);
+          const matchesCategory = t.category?.toLowerCase().includes(searchLower);
+          const matchesAccount = t.account.toLowerCase().includes(searchLower);
+          return matchesDescription || matchesCategory || matchesAccount;
+        });
+      }
+
+      return transactions;
     },
   });
 }
