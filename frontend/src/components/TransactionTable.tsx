@@ -35,13 +35,14 @@ import {
   type CreateTransactionData,
   type UpdateTransactionData
 } from "../hooks/useTransactions";
+import { formatDateString, getTodayDateString } from "../utils/dateUtils";
 import { useCSVUpload } from "../hooks/useCSVUpload";
 import LedgerChart from "./LedgerChart";
 import type { FilterState } from "../types/filters";
 
 // Constants
 const INITIAL_TRANSACTION_DATA: CreateTransactionData = {
-  date: new Date().toISOString().split('T')[0],
+  date: getTodayDateString(),
   description: "",
   category_names: [],
   amount: 0,
@@ -130,16 +131,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
   }, []);
 
   const formatDate = useCallback((dateStr: string): string => {
-    if (!dateStr) return "";
-    try {
-      return new Date(dateStr).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
-    } catch {
-      return dateStr;
-    }
+    return formatDateString(dateStr);
   }, []);
 
   // Event handlers
@@ -795,7 +787,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
             <TextField
               label="Date"
               type="date"
-              value={editDialog.transaction?.date ? editDialog.transaction.date.split('T')[0] : ""}
+              value={editDialog.transaction?.date || ""}
               onChange={(e) => updateEditTransaction({ date: e.target.value })}
               fullWidth
               InputLabelProps={{ shrink: true }}

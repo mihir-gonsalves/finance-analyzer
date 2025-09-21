@@ -64,16 +64,20 @@ export default function AnalyticsPanel({ filters }: AnalyticsPanelProps) {
       return acc;
     }
 
-    // Add full amount to each category the transaction belongs to
-    transaction.categories.forEach(category => {
-      // Skip payments and credits - these are not spending categories
-      if (category.name.toLowerCase().includes('payment') || category.name.toLowerCase().includes('credit')) {
-        return;
-      }
+    // Get non-payment/credit/income/savings categories
+    const validCategories = transaction.categories.filter(category =>
+      !category.name.toLowerCase().includes('payment') &&
+      !category.name.toLowerCase().includes('credit') &&
+      !category.name.toLowerCase().includes('income') &&
+      !category.name.toLowerCase().includes('savings')
+    );
 
-      // Each category gets the full transaction amount attributed to it
-      acc[category.name] = (acc[category.name] || 0) + amount;
-    });
+    if (validCategories.length > 0) {
+      // Always show full amounts for each category
+      validCategories.forEach(category => {
+        acc[category.name] = (acc[category.name] || 0) + amount;
+      });
+    }
 
     return acc;
   }, {} as Record<string, number>);
@@ -87,8 +91,23 @@ export default function AnalyticsPanel({ filters }: AnalyticsPanelProps) {
   // Top 5 categories
   const topCategories = chartData.slice(0, 5);
 
-  // Total spent
-  const totalSpent = chartData.reduce((sum, item) => sum + item.value, 0);
+  // Total spent - calculate from actual transactions to avoid double-counting
+  const totalSpent = filteredTransactions
+    .filter(t => {
+      if (t.amount >= 0) return false; // Only expenses
+
+      // If transaction has no categories, include it
+      if (t.categories.length === 0) return true;
+
+      // Check if transaction has any non-payment/credit/income/savings categories
+      return t.categories.some(cat =>
+        !cat.name.toLowerCase().includes('payment') &&
+        !cat.name.toLowerCase().includes('credit') &&
+        !cat.name.toLowerCase().includes('income') &&
+        !cat.name.toLowerCase().includes('savings')
+      );
+    })
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
   
   // Total income (positive amounts) from filtered data
   const totalIncome = filteredTransactions
@@ -431,11 +450,14 @@ export default function AnalyticsPanel({ filters }: AnalyticsPanelProps) {
                 const expenseCount = filteredTransactions.filter(transaction => {
                   if (transaction.amount >= 0) return false;
 
-                  // Check if transaction has any non-payment/credit categories or is uncategorized
+                  // Check if transaction has any non-payment/credit/income/savings categories or is uncategorized
                   if (transaction.categories.length === 0) return true; // Uncategorized
 
                   return transaction.categories.some(cat =>
-                    !cat.name.toLowerCase().includes('payment') && !cat.name.toLowerCase().includes('credit')
+                    !cat.name.toLowerCase().includes('payment') &&
+                    !cat.name.toLowerCase().includes('credit') &&
+                    !cat.name.toLowerCase().includes('income') &&
+                    !cat.name.toLowerCase().includes('savings')
                   );
                 }).length;
 

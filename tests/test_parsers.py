@@ -32,7 +32,23 @@ def test_load_discover_csv_success():
 
     assert len(txns) == 1
     assert txns[0]["account"] == "Discover"
-    assert txns[0]["amount"] == 3.50
+    assert txns[0]["amount"] == -3.50  # Positive CSV amount becomes negative expense
+
+
+def test_load_discover_csv_credit():
+    """Test that negative CSV amounts (credits/returns) become positive in ledger."""
+    file_path = make_temp_csv(
+        headers=["Trans. Date", "Description", "Amount", "Category"],
+        rows=[{"Trans. Date": "08/05/2023", "Description": "Return refund",
+               "Amount": "-25.00", "Category": "Returns"}]
+    )
+
+    txns = parsers.load_discover_csv(file_path)
+    os.unlink(file_path)
+
+    assert len(txns) == 1
+    assert txns[0]["account"] == "Discover"
+    assert txns[0]["amount"] == 25.00  # Negative CSV amount becomes positive credit
 
 
 def test_load_discover_csv_wrong_headers():
