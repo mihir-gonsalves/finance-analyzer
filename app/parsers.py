@@ -46,14 +46,9 @@ def load_discover_csv(file_path: str):
             raw_amount = clean_currency_string(row["Amount"])
             category = row["Category"]
 
-            # For Discover (credit card), all transactions should be negative (expenses)
-            # except for payments/credits which are already negative in the CSV
-            if category == "Payments and Credits":
-                # These are already negative in CSV (payments to credit card)
-                amount = raw_amount
-            else:
-                # All other Discover transactions are expenses - make negative
-                amount = -abs(raw_amount)
+            # For Discover: negative amounts in CSV = credits (positive in ledger)
+            #               positive amounts in CSV = expenses (negative in ledger)
+            amount = -raw_amount
 
             transactions.append({
                 "date": datetime.strptime(row["Trans. Date"], "%m/%d/%Y").date(),

@@ -13,6 +13,7 @@ import {
 
 import { useFilteredTransactions } from "../hooks/useTransactions";
 import { chartStyles } from "../theme";
+import { formatDateString, parseDateString } from "../utils/dateUtils";
 import type { FilterState } from "../types/filters";
 
 interface ChartDataPoint {
@@ -38,22 +39,22 @@ export default function LedgerChart({ filters }: LedgerChartProps) {
 
   const chartData = useMemo(() => {
     return [...filteredTransactions]
-      .sort((a, b) => new Date(a.date || '').getTime() - new Date(b.date || '').getTime())
+      .sort((a, b) => parseDateString(a.date || '').getTime() - parseDateString(b.date || '').getTime())
       .reduce((acc: ChartDataPoint[], transaction, index) => {
         const previousBalance = index === 0 ? 0 : acc[acc.length - 1]?.balance || 0;
         const newBalance = previousBalance + transaction.amount;
-        
+
         acc.push({
           date: transaction.date,
           balance: newBalance,
           amount: transaction.amount,
           description: transaction.description,
-          formattedDate: new Date(transaction.date || '').toLocaleDateString('en-US', {
+          formattedDate: formatDateString(transaction.date || '', {
             month: 'short',
             day: 'numeric',
           }),
         });
-        
+
         return acc;
       }, []);
   }, [filteredTransactions]);
@@ -84,7 +85,7 @@ export default function LedgerChart({ filters }: LedgerChartProps) {
         }}
       >
         <Typography variant="subtitle2" sx={{ color: chartStyles.colors.textPrimary, fontWeight: 600 }} gutterBottom>
-          {new Date(data.date).toLocaleDateString('en-US', {
+          {formatDateString(data.date, {
             weekday: 'short',
             month: 'short',
             day: 'numeric',
@@ -192,8 +193,8 @@ export default function LedgerChart({ filters }: LedgerChartProps) {
       mb: -2,
     }}>
       <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
-        Showing {dataLength} transactions • 
-        From {new Date(startDate).toLocaleDateString()} to {new Date(endDate).toLocaleDateString()}
+        Showing {dataLength} transactions •
+        From {formatDateString(startDate)} to {formatDateString(endDate)}
       </Typography>
     </Box>
   );
