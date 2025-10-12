@@ -4,7 +4,7 @@ import { CssBaseline, Box } from "@mui/material";
 
 import Dashboard from "./pages/Dashboard";
 import Header from "./components/Header.tsx";
-import { theme } from "./theme.ts";
+import { theme } from "./styles/theme.ts";
 import "./App.css";
 
 const queryClient = new QueryClient();

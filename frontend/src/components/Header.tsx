@@ -1,4 +1,4 @@
-// components/Header.tsx
+// frontend/src/components/Header.tsx
 import { 
   AppBar, 
   Toolbar, 

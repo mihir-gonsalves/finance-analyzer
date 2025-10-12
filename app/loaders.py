@@ -1,4 +1,4 @@
-# take parsed .csv and load into DB
+# app/loaders.py - takes parsed .csv data and loads it into DB
 from datetime import datetime
 
 from .database import SessionLocal, init_db

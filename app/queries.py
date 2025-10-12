@@ -1,4 +1,4 @@
-# this is the R in CRUD (for enhanced filtering purposes)
+# app/queries.py - sets up the R in CRUD for enhanced filtering functions
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_, and_
 
@@ -9,6 +9,7 @@ from typing import List, Optional, Tuple, Union
 
 from .models import Transaction, Category
 from .schemas import TransactionUpdate
+
 
 # ---------------------
 # Basic retrievals
@@ -26,9 +27,6 @@ def get_transactions_by_date_range(session: Session, start: datetime.date, end: 
 
 
 def get_transactions_by_category(session: Session, category: str) -> List[Transaction]:
-    """
-    Get transactions that have the specified category.
-    """
     return session.query(Transaction).join(Transaction.categories).filter(Category.name == category).all()
 
 
@@ -72,9 +70,8 @@ def get_transactions(
                 query = query.filter(Transaction.categories.any(Category.name == category))
         else:
             # Handle list of categories
-            if '' in category:
-                # Include uncategorized transactions and specified categories
-                other_categories = [cat for cat in category if cat != '']
+            if '' in category: # Include uncategorized transactions and specified categories
+                other_categories = [cat for cat in category if cat != ''] # List of non-empty categories
                 if other_categories:
                     query = query.filter(
                         or_(
@@ -161,13 +158,3 @@ def get_unique_categories(session: Session) -> List[str]:
     """
     return [cat for (cat,) in session.query(Category.name).distinct().all()]
 
-
-# ---------------------
-# Update
-# ---------------------
-def update_transaction(db: Session, db_txn: Transaction, txn_update: TransactionUpdate):
-    for key, value in txn_update.model_dump(exclude_unset=True).items():
-        setattr(db_txn, key, value)
-    db.commit()
-    db.refresh(db_txn)
-    return db_txn
