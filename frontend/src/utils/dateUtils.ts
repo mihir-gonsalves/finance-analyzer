@@ -1,7 +1,7 @@
+// frontend/src/utils/dateUtils.ts
 // Utility functions for consistent date handling
 // Prevents timezone offset issues when working with date-only strings
-
-/**
+/*
  * Parse a date string (YYYY-MM-DD) into a Date object without timezone conversion
  */
 export function parseDateString(dateStr: string): Date {

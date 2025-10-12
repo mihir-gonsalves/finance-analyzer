@@ -1,4 +1,4 @@
-// types/filters.ts
+// frontend/src/types/filters.ts
 export interface FilterState {
   dateFrom: string;
   dateTo: string;

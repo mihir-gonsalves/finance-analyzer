@@ -1,4 +1,4 @@
-# parse .csv downloads from Discover CC and Schwab Checking Account
+# app/parsers.py - parses .csv downloads from Discover CC and Schwab Checking Account
 import csv
 import re
 from datetime import datetime # need the class and don't want to write datetime.datetime.strptime()

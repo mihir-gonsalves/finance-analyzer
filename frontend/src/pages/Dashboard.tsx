@@ -1,7 +1,6 @@
-// pages/Dashboard.tsx
+// frontend/src/pages/Dashboard.tsx
 import { useState } from "react";
 import { Container, Grid, Box, Fade, Collapse } from "@mui/material";
-import { Add } from "@mui/icons-material";
 
 import TransactionTable from "../components/TransactionTable";
 import AnalyticsPanel from "../components/AnalyticsPanel";

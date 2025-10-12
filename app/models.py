@@ -1,8 +1,10 @@
-# setup database tables
+# app/models.py - sets up SQLite database tables using SQLAlchemy ORM
 from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, Table
 from sqlalchemy.orm import declarative_base, relationship
 
+
 Base = declarative_base()
+
 
 # Association table for many-to-many relationship between transactions and categories
 transaction_categories = Table(

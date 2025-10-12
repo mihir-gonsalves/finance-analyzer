@@ -1,3 +1,4 @@
+# app/api/transactions.py - sets up FastAPI endpoints
 from sqlalchemy.orm import Session
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, Form, Query
@@ -27,14 +28,38 @@ def get_db():
 
 
 # ---------------------
+# CREATE, UPDATE, DELETE endpoints (crud.py)
+# ---------------------
+@router.post("/", response_model=schemas.TransactionWithCategories)
+def create_transaction(txn: schemas.TransactionCreate, db: Session = Depends(get_db)):
+    return crud.create_transaction(db, txn)
+
+
+@router.put("/{txn_id}", response_model=schemas.TransactionWithCategories)
+def update_transaction(txn_id: int, txn: schemas.TransactionUpdate, db: Session = Depends(get_db)):
+    updated = crud.update_transaction(db, txn_id, txn)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    return updated
+
+
+@router.delete("/{txn_id}", response_model=dict)
+def delete_transaction(txn_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_transaction(db, txn_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    return {"message": "Transaction deleted"}
+
+
+# ---------------------
 # READ endpoints (queries.py)
 # ---------------------
-@router.get("/", response_model=list[schemas.TransactionOut])
+@router.get("/", response_model=list[schemas.TransactionWithCategories])
 def read_transactions(db: Session = Depends(get_db)):
     return queries.get_all_transactions(db)
 
 
-@router.get("/filter", response_model=list[schemas.TransactionOut])
+@router.get("/filter", response_model=list[schemas.TransactionWithCategories])
 def read_filtered_transactions(
     account: list[str] | None = Query(None),
     category: list[str] | None = Query(None),
@@ -60,13 +85,13 @@ def get_categories(db: Session = Depends(get_db)):
     return queries.get_unique_categories(db)
 
 
-@router.get("/categories/full", response_model=list[schemas.CategoryOut])
+@router.get("/categories/full", response_model=list[schemas.CategoryWithID])
 def get_full_categories(db: Session = Depends(get_db)):
     """Get all categories with their IDs."""
     return crud.get_all_categories(db)
 
 
-@router.post("/categories", response_model=schemas.CategoryOut)
+@router.post("/categories", response_model=schemas.CategoryWithID)
 def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)):
     """Create a new category."""
     return crud.get_or_create_category(db, category.name)
@@ -96,33 +121,9 @@ def monthly_totals(year: int, db: Session = Depends(get_db)):
     return queries.get_monthly_totals(db, year)
 
 
-# ---------------------
-# CREATE, UPDATE, DELETE endpoints (crud.py)
-# ---------------------
-@router.post("/", response_model=schemas.TransactionOut)
-def create_transaction(txn: schemas.TransactionCreate, db: Session = Depends(get_db)):
-    return crud.create_transaction(db, txn)
-
-
-@router.put("/{txn_id}", response_model=schemas.TransactionOut)
-def update_transaction(txn_id: int, txn: schemas.TransactionUpdate, db: Session = Depends(get_db)):
-    updated = crud.update_transaction(db, txn_id, txn)
-    if not updated:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-    return updated
-
-
-@router.delete("/{txn_id}", response_model=dict)
-def delete_transaction(txn_id: int, db: Session = Depends(get_db)):
-    deleted = crud.delete_transaction(db, txn_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-    return {"message": "Transaction deleted"}
-
-
-# ---------------------
-# BULK UPLOAD (CSV → DB)
-# ---------------------
+# -----------------------
+# BULK UPLOAD (CSV -> DB)
+# -----------------------
 @router.post("/upload-csv")
 async def upload_csv(
     institution: str = Form(...),

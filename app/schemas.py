@@ -1,4 +1,4 @@
-# pydantic enforces data integrity by enabling type checking into python's more lax OOP
+# app/schemas.py - pydantic enforces data integrity by enabling type checking into python's more lax OOP
 from pydantic import BaseModel
 
 import datetime
@@ -13,7 +13,7 @@ class CategoryCreate(CategoryBase):
     pass
 
 
-class CategoryOut(CategoryBase):
+class CategoryWithID(CategoryBase):
     id: int
 
     class Config:
@@ -39,9 +39,9 @@ class TransactionUpdate(BaseModel):
     date: Optional[datetime.date] = None
 
 
-class TransactionOut(TransactionBase):
+class TransactionWithCategories(TransactionBase):
     id: int
-    categories: List[CategoryOut] = []
+    categories: List[CategoryWithID] = []
 
     class Config:
         orm_mode = True   # lets Pydantic work with SQLAlchemy models
