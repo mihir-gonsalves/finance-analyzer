@@ -1,7 +1,7 @@
 // frontend/src/hooks/useTransactions.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import client from "../api/client";
-import type { FilterState } from "../types/filters";
+import type { TransactionFilters } from "../types/filters";
 
 export interface Category {
   id: number;
@@ -37,7 +37,7 @@ export function useTransactions() {
 }
 
 // Fetch filtered transactions from backend
-export function useFilteredTransactions(filters: FilterState) {
+export function useFilteredTransactions(filters: TransactionFilters) {
   return useQuery<Transaction[]>({
     queryKey: ["transactions", "filtered", filters],
     queryFn: async () => {

@@ -1,10 +1,11 @@
 // frontend/src/components/transactions/FilterTags.tsx
 import { Box, Chip } from "@mui/material";
 import { AccountBalance, Category, CalendarMonth } from "@mui/icons-material";
-import type { FilterState } from "../../types/filters";
+import { formatDateString } from "../../utils/dateUtils";
+import type { TransactionFilters } from "../../types/filters";
 
 interface FilterTagsProps {
-  filters: FilterState;
+  filters: TransactionFilters;
 }
 
 export function FilterTags({ filters }: FilterTagsProps) {
@@ -16,9 +17,6 @@ export function FilterTags({ filters }: FilterTagsProps) {
         key="accounts"
         icon={<AccountBalance />}
         label={filters.accounts.length === 1 ? filters.accounts[0] : `${filters.accounts.length} accounts`}
-        size="small"
-        color="primary"
-        variant="outlined"
       />
     );
   }
@@ -29,22 +27,19 @@ export function FilterTags({ filters }: FilterTagsProps) {
         key="categories"
         icon={<Category />}
         label={filters.categories.length === 1 ? filters.categories[0] : `${filters.categories.length} categories`}
-        size="small"
-        color="primary"
-        variant="outlined"
       />
     );
   }
 
   if (filters.dateFrom || filters.dateTo) {
+    const formattedDateFrom = filters.dateFrom ? formatDateString(filters.dateFrom) : '...';
+    const formattedDateTo = filters.dateTo ? formatDateString(filters.dateTo) : '...';
+    
     tags.push(
       <Chip
         key="dates"
         icon={<CalendarMonth />}
-        label={`Dates: ${filters.dateFrom || '...'} to ${filters.dateTo || '...'}`}
-        size="small"
-        color="primary"
-        variant="outlined"
+        label={`Dates: ${formattedDateFrom} to ${formattedDateTo}`}
       />
     );
   }
@@ -54,9 +49,6 @@ export function FilterTags({ filters }: FilterTagsProps) {
       <Chip
         key="search"
         label={`Description: "${filters.searchTerm}"`}
-        size="small"
-        color="primary"
-        variant="outlined"
       />
     );
   }
@@ -66,9 +58,6 @@ export function FilterTags({ filters }: FilterTagsProps) {
       <Chip
         key="amount"
         label={`Amount: $${filters.minAmount || '...'} to $${filters.maxAmount || '...'}`}
-        size="small"
-        color="primary"
-        variant="outlined"
       />
     );
   }
@@ -76,7 +65,7 @@ export function FilterTags({ filters }: FilterTagsProps) {
   if (tags.length === 0) return null;
 
   return (
-    <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+    <Box display="flex" flexWrap="wrap" alignItems="center" gap={1.5} >
       {tags}
     </Box>
   );

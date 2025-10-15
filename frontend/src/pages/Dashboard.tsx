@@ -1,14 +1,13 @@
 // frontend/src/pages/Dashboard.tsx
 import { useState } from "react";
 import { Container, Grid, Box, Fade, Collapse } from "@mui/material";
-
 import TransactionTable from "../components/TransactionTable";
 import AnalyticsPanel from "../components/AnalyticsPanel";
 import FiltersPanel from "../components/FiltersPanel";
-import type { FilterState } from "../types/filters";
+import type { TransactionFilters } from "../types/filters";
 
 export default function Dashboard() {
-  const [filters, setFilters] = useState<FilterState>({
+  const [filters, setFilters] = useState<TransactionFilters>({
     dateFrom: '',
     dateTo: '',
     categories: [],
@@ -26,7 +25,7 @@ export default function Dashboard() {
         maxWidth="xl" 
         sx={{ 
           mt: { xs: 2, md: 3 }, 
-          mb: 4,
+          mb: 2.5,
           px: { xs: 2, sm: 3 }
         }}
       >

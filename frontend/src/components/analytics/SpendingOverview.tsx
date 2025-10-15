@@ -33,7 +33,7 @@ export function SpendingOverview({ chartData, totalSpent }: SpendingOverviewProp
       flexDirection="column" 
       justifyContent="center" 
       alignItems="center"
-      sx={{ height: '520px' }}
+      sx={{ height: '530px' }}
     >
       <CategoryPieChart data={chartData} totalSpent={totalSpent} />
     </Box>

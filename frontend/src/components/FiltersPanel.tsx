@@ -11,13 +11,13 @@ import { CategoryFilter } from "./filters/CategoryFilter";
 import { AccountFilter } from "./filters/AccountFilter";
 import { AmountRangeFilter } from "./filters/AmountRangeFilter";
 import { FilterActions } from "./filters/FilterActions";
-import type { FilterState } from "../types/filters";
+import type { TransactionFilters } from "../types/filters";
 
-export type { FilterState };
+export type { TransactionFilters };
 
 interface FiltersPanelProps {
-  filters: FilterState;
-  onFiltersChange: (filters: FilterState) => void;
+  filters: TransactionFilters;
+  onFiltersChange: (filters: TransactionFilters) => void;
   onClose: () => void;
 }
 

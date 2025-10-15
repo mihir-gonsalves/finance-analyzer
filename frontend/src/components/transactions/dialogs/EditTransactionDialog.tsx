@@ -1,14 +1,6 @@
 // frontend/src/components/transactions/dialogs/EditTransactionDialog.tsx
 import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Box,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, } from "@mui/material";
 import type { Transaction, UpdateTransactionData } from "../../../hooks/useTransactions";
 
 interface EditTransactionDialogProps {
@@ -60,6 +52,13 @@ export function EditTransactionDialog({
     handleClose();
   };
 
+  const formatAmount = (amount: number | string) => {
+    if (typeof amount === "number") {
+      return amount.toFixed(2);
+    }
+    return amount;
+  };
+
   if (!transaction) return null;
 
   return (
@@ -76,7 +75,7 @@ export function EditTransactionDialog({
           <TextField
             label="Amount"
             type="number"
-            value={editData.amount || ""}
+            value={formatAmount(editData.amount || "")}
             onChange={(e) => setEditData(prev => ({ ...prev, amount: Number(e.target.value) }))}
             fullWidth
           />
