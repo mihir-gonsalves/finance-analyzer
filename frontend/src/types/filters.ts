@@ -1,5 +1,5 @@
-// frontend/src/types/filters.ts
-export interface FilterState {
+// frontend/src/types/filters.ts - defines the types of transaction filters available in filter panel
+export interface TransactionFilters {
   dateFrom: string;
   dateTo: string;
   categories: string[];

@@ -15,11 +15,8 @@ export function TopCategoriesList({ categories, totalSpent }: TopCategoriesListP
   const COLORS = [
     theme.palette.primary.main,
     theme.palette.secondary.main,
-    theme.palette.success.main,
-    theme.palette.error.main,
-    theme.palette.grey[600],
-    theme.palette.warning.main,
     theme.palette.info.main,
+    theme.palette.error.main,
   ];
 
   if (categories.length === 0) {
@@ -40,16 +37,16 @@ export function TopCategoriesList({ categories, totalSpent }: TopCategoriesListP
   }
 
   return (
-    <Box sx={{ height: '520px', overflow: 'auto' }}>
+    <Box sx={{ height: '563px', overflow: 'auto' }}>
       <List disablePadding>
         {categories.map((category, index) => (
-          <Box key={category.name}>
+          <Box key={category.name} sx={{ pl: 0.5, width: '97.5%' }}>
             <ListItem disableGutters sx={{ py: 2 }}>
               <Box
                 sx={{
                   width: 16,
                   height: 16,
-                  borderRadius: '50%',
+                  borderRadius: '100%',
                   bgcolor: COLORS[index % COLORS.length],
                   mr: 2,
                   flexShrink: 0,
@@ -76,7 +73,7 @@ export function TopCategoriesList({ categories, totalSpent }: TopCategoriesListP
               </Typography>
             </ListItem>
             {index < categories.length - 1 && (
-              <Divider sx={{ ml: 4 }} />
+              <Divider />
             )}
           </Box>
         ))}

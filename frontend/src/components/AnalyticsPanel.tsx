@@ -7,12 +7,12 @@ import { useSpendingAnalytics } from "../hooks/useSpendingAnalytics";
 import { SpendingOverview } from "./analytics/SpendingOverview";
 import { TopCategoriesList } from "./analytics/TopCategoriesList";
 import { QuickStatsView } from "./analytics/QuickStatsView";
-import type { FilterState } from "../types/filters";
+import type { TransactionFilters } from "../types/filters";
 
 type ViewMode = 'overview' | 'categories' | 'stats';
 
 interface AnalyticsPanelProps {
-  filters: FilterState;
+  filters: TransactionFilters;
 }
 
 const VIEW_CONFIG = {
@@ -46,7 +46,7 @@ export default function AnalyticsPanel({ filters }: AnalyticsPanelProps) {
   }
 
   return (
-    <Card sx={{ height: 694 }}>
+    <Card sx={{ height: 653 }}>
       <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Button

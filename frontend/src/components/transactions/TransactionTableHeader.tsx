@@ -3,13 +3,15 @@ import { useState } from "react";
 import { Box, Button, IconButton, Menu, MenuItem } from "@mui/material";
 import { Add, FilterList, MoreVert, TableChart, ShowChart, Upload } from "@mui/icons-material";
 import { FilterTags } from "./FilterTags";
-import type { FilterState } from "../../types/filters";
+import type { TransactionFilters } from "../../types/filters";
+
 
 type ViewMode = 'table' | 'chart';
 
+
 interface TransactionTableHeaderProps {
   viewMode: ViewMode;
-  filters: FilterState;
+  filters: TransactionFilters;
   filtersOpen: boolean;
   onToggleView: () => void;
   onToggleFilters: () => void;
@@ -17,15 +19,8 @@ interface TransactionTableHeaderProps {
   onCSVUpload: () => void;
 }
 
-export function TransactionTableHeader({
-  viewMode,
-  filters,
-  filtersOpen,
-  onToggleView,
-  onToggleFilters,
-  onAddTransaction,
-  onCSVUpload,
-}: TransactionTableHeaderProps) {
+
+export function TransactionTableHeader({ viewMode, filters, filtersOpen, onToggleView, onToggleFilters, onAddTransaction, onCSVUpload, }: TransactionTableHeaderProps) {
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -45,42 +40,43 @@ export function TransactionTableHeader({
     <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
       <Button
         onClick={onToggleView}
-        sx={{
-          color: 'text.primary',
-          textTransform: 'none',
-          fontSize: '1.25rem',
-          fontWeight: 600,
+        sx={(theme) => ({
+          color: theme.palette.text.primary,
+          fontSize: theme.typography.h6.fontSize,
+          letterSpacing: theme.typography.h6.letterSpacing,
           p: 0,
           minWidth: 'auto',
           '&:hover': {
             backgroundColor: 'transparent',
-            color: 'primary.main',
-          },
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-        }}
+            color: theme.palette.primary.main,
+          },          
+          gap: theme.spacing(1),
+        })}
       >
         {viewMode === 'table' ? <TableChart /> : <ShowChart />}
         {viewMode === 'table' ? 'Ledger' : 'Chart'}
       </Button>
       
-      <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+      <Box display="flex" gap={1.5}> 
         <FilterTags filters={filters} />
-
         <Button
           variant={filtersOpen ? "contained" : "outlined"}
           startIcon={<FilterList />}
           onClick={onToggleFilters}
-          sx={{ mr: 1 }}
         >
           Filters
         </Button>
 
-        <Button
+        <Button 
           variant="contained"
           startIcon={<Add />}
           onClick={onAddTransaction}
+          sx={(theme) => ({
+            backgroundColor: theme.palette.primary.main,
+            '&:hover': {
+              backgroundColor: theme.palette.primary.dark,
+            },
+          })}
         >
           Add Transaction
         </Button>
@@ -88,11 +84,11 @@ export function TransactionTableHeader({
         <IconButton
           onClick={handleMenuOpen}
           size="small"
-          sx={{
+          sx={(theme) => ({
             border: 1,
-            borderColor: 'divider',
+            borderColor: theme.palette.divider,
             borderRadius: 1,
-          }}
+          })}
         >
           <MoreVert />
         </IconButton>
@@ -104,8 +100,16 @@ export function TransactionTableHeader({
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <MenuItem onClick={handleCSVClick}>
-            <Upload sx={{ mr: 1 }} />
+          <MenuItem 
+            onClick={handleCSVClick}
+            sx={{
+              gap: 1,
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.1)',
+              },
+            }}
+          >
+            <Upload/>
             Upload CSV
           </MenuItem>
         </Menu>

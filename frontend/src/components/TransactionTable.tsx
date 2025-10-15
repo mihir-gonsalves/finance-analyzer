@@ -1,16 +1,7 @@
 // frontend/src/components/TransactionTable.tsx
 import { useState, useRef } from "react";
 import { Card, CardContent, Box, Alert } from "@mui/material";
-import {
-  useTransactions,
-  useFilteredTransactions,
-  useDeleteTransaction,
-  useUpdateTransaction,
-  useCreateTransaction,
-  type Transaction,
-  type CreateTransactionData,
-  type UpdateTransactionData,
-} from "../hooks/useTransactions";
+import { useTransactions, useFilteredTransactions, useDeleteTransaction, useUpdateTransaction, useCreateTransaction, type Transaction, type CreateTransactionData, type UpdateTransactionData, } from "../hooks/useTransactions";
 import { useCSVUpload } from "../hooks/useCSVUpload";
 import { TransactionTableHeader } from "./transactions/TransactionTableHeader";
 import { TransactionDataGrid } from "./transactions/TransactionDataGrid";
@@ -19,15 +10,18 @@ import { EditTransactionDialog } from "./transactions/dialogs/EditTransactionDia
 import { DeleteConfirmDialog } from "./transactions/dialogs/DeleteConfirmDialog";
 import { CSVUploadDialog } from "./transactions/dialogs/CSVUploadDialog";
 import LedgerChart from "./LedgerChart";
-import type { FilterState } from "../types/filters";
+import type { TransactionFilters } from "../types/filters";
+
 
 type ViewMode = 'table' | 'chart';
 
+
 interface TransactionTableProps {
-  filters: FilterState;
+  filters: TransactionFilters;
   filtersOpen: boolean;
   onToggleFilters: () => void;
 }
+
 
 export default function TransactionTable({ filters, filtersOpen, onToggleFilters }: TransactionTableProps) {
   // Data hooks
@@ -153,14 +147,16 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
           />
 
           {viewMode === 'table' ? (
-            <TransactionDataGrid
-              transactions={filteredTransactions}
-              isLoading={isLoading}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
+            <Box sx={{ height: 560 }}> 
+              <TransactionDataGrid
+                transactions={filteredTransactions}
+                isLoading={isLoading}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            </Box>
           ) : (
-            <Box sx={{ height: 600 }}>
+            <Box sx={{ height: 560 }}>
               <LedgerChart filters={filters} />
             </Box>
           )}

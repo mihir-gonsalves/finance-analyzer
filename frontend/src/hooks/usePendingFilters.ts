@@ -1,16 +1,16 @@
 // frontend/src/hooks/usePendingFilters.ts
 import { useState, useEffect, useCallback } from 'react';
-import type { FilterState } from '../types/filters';
+import type { TransactionFilters } from '../types/filters';
 
-export function usePendingFilters(appliedFilters: FilterState) {
-  const [pendingFilters, setPendingFilters] = useState<FilterState>(appliedFilters);
+export function usePendingFilters(appliedFilters: TransactionFilters) {
+  const [pendingFilters, setPendingFilters] = useState<TransactionFilters>(appliedFilters);
 
   // Sync with applied filters when they change externally
   useEffect(() => {
     setPendingFilters(appliedFilters);
   }, [appliedFilters]);
 
-  const updateFilter = useCallback((field: keyof FilterState, value: string | string[]) => {
+  const updateFilter = useCallback((field: keyof TransactionFilters, value: string | string[]) => {
     setPendingFilters(prev => ({
       ...prev,
       [field]: value,

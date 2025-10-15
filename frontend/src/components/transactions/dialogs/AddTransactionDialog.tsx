@@ -1,16 +1,9 @@
 // frontend/src/components/transactions/dialogs/AddTransactionDialog.tsx
 import { useState } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Box,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, } from "@mui/material";
 import { getTodayDateString } from "../../../utils/dateUtils";
 import type { CreateTransactionData } from "../../../hooks/useTransactions";
+
 
 interface AddTransactionDialogProps {
   open: boolean;
@@ -19,6 +12,7 @@ interface AddTransactionDialogProps {
   isLoading?: boolean;
 }
 
+
 const INITIAL_STATE: CreateTransactionData = {
   date: getTodayDateString(),
   description: "",
@@ -26,6 +20,7 @@ const INITIAL_STATE: CreateTransactionData = {
   amount: 0,
   account: "",
 };
+
 
 export function AddTransactionDialog({
   open,

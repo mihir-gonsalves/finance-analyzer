@@ -7,12 +7,14 @@ import { Box, Chip, Typography } from "@mui/material";
 import { formatDateString } from "../../utils/dateUtils";
 import type { Transaction } from "../../hooks/useTransactions";
 
+
 interface TransactionDataGridProps {
   transactions: Transaction[];
   isLoading: boolean;
   onEdit: (transaction: Transaction) => void;
   onDelete: (id: number) => void;
 }
+
 
 export function TransactionDataGrid({
   transactions,
@@ -32,34 +34,29 @@ export function TransactionDataGrid({
     {
       field: 'date',
       headerName: 'Date',
-      width: 120,
+      width: 105,
       valueFormatter: (value: string) => formatDateString(value),
     },
     {
       field: 'description',
       headerName: 'Description',
-      flex: 1,
-      minWidth: 200,
+      width: 240,
     },
     {
       field: 'categories',
       headerName: 'Categories',
-      width: 200,
+      width: 275,
       renderCell: (params) => {
         const categories = params.value || [];
         if (categories.length === 0) {
-          return <Chip label="Uncategorized" size="small" variant="outlined" color="default" />;
+          return <Chip label="Uncategorized" />;
         }
         return (
-          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
             {categories.map((category: { id: number; name: string }) => (
               <Chip
                 key={category.id}
                 label={category.name}
-                size="small"
-                color="primary"
-                variant="outlined"
-                sx={{ fontSize: '0.75rem' }}
               />
             ))}
           </Box>
@@ -69,11 +66,9 @@ export function TransactionDataGrid({
     {
       field: 'amount',
       headerName: 'Amount',
-      width: 120,
-      align: 'left',
-      headerAlign: 'left',
+      width: 105,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Typography
             sx={{ 
               color: params.value < 0 ? 'error.main' : 'success.main'
@@ -88,20 +83,19 @@ export function TransactionDataGrid({
     {
       field: 'account',
       headerName: 'Account',
-      width: 130,
+      width: 105,
     },
     {
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
-      width: 100,
+      width: 90,
       getActions: (params) => [
         <GridActionsCellItem
           key="edit"
-          icon={<Edit />}
+          icon={<Edit sx={{ color: 'primary.main' }} /> }
           label="Edit"
           onClick={() => onEdit(params.row)}
-          color="primary"
         />,
         <GridActionsCellItem
           key="delete"
@@ -126,7 +120,8 @@ export function TransactionDataGrid({
         },
       }}
       sx={{
-        height: 600,
+        height: 569,
+        backgroundColor: '#ffffff', // need to figure out header bg color
         '& .MuiDataGrid-row:hover': {
           backgroundColor: 'action.hover',
         },
@@ -136,6 +131,7 @@ export function TransactionDataGrid({
         },
       }}
       disableRowSelectionOnClick
+      disableColumnMenu
     />
   );
 }

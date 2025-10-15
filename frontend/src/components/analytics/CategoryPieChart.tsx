@@ -15,25 +15,23 @@ export function CategoryPieChart({ data, totalSpent }: CategoryPieChartProps) {
   const COLORS = [
     theme.palette.primary.main,
     theme.palette.secondary.main,
-    theme.palette.success.main,
-    theme.palette.error.main,
-    theme.palette.grey[600],
-    theme.palette.warning.main,
     theme.palette.info.main,
+    theme.palette.error.main,
   ];
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0];
       const percentage = ((data.value / totalSpent) * 100).toFixed(1);
+
       return (
         <Box
           sx={{
-            bgcolor: 'background.paper',
+            bgcolor: '#ffffff',
             p: 2,
             border: '1px solid',
             borderColor: 'grey.200',
-            borderRadius: 2,
+            borderRadius: 1,
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
           }}
         >
@@ -63,16 +61,15 @@ export function CategoryPieChart({ data, totalSpent }: CategoryPieChartProps) {
             dataKey="value"
           >
             {data.map((_, index) => (
-              <Cell 
-                key={`cell-${index}`} 
-                fill={COLORS[index % COLORS.length]} 
-              />
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip 
+            content={<CustomTooltip />} 
+            wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
+          />
         </PieChart>
       </ResponsiveContainer>
-      
       <Box
         position="absolute"
         top="50%"
@@ -83,9 +80,9 @@ export function CategoryPieChart({ data, totalSpent }: CategoryPieChartProps) {
           pointerEvents: 'none',
         }}
       >
-        <Typography 
-          variant="h4" 
-          fontWeight="700" 
+        <Typography
+          variant="h4"
+          fontWeight="700"
           color="primary.main"
           sx={{ letterSpacing: '-0.02em' }}
         >

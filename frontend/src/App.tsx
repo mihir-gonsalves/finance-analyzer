@@ -1,13 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ThemeProvider } from "@mui/material/styles";
-import { CssBaseline, Box } from "@mui/material";
-
-import Dashboard from "./pages/Dashboard";
+import { CssBaseline, Box, ThemeProvider } from "@mui/material";
 import Header from "./components/Header.tsx";
+import Dashboard from "./pages/Dashboard";
 import { theme } from "./styles/theme.ts";
-import "./App.css";
+
 
 const queryClient = new QueryClient();
+
 
 export default function App() {
   return (
