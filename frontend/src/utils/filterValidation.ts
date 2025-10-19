@@ -1,15 +1,18 @@
 // frontend/src/utils/filterValidation.ts
 import type { TransactionFilters } from '../types/filters';
 
+
 export interface ValidationError {
   field: keyof TransactionFilters;
   message: string;
 }
 
+
 export interface ValidationResult {
   isValid: boolean;
   errors: ValidationError[];
 }
+
 
 /**
  * Validate transaction filters before applying them
@@ -93,6 +96,7 @@ export function validateFilters(filters: TransactionFilters): ValidationResult {
   };
 }
 
+
 /**
  * Get user-friendly error message from validation result
  */
@@ -100,6 +104,7 @@ export function getValidationErrorMessage(result: ValidationResult): string {
   if (result.isValid) return '';
   return result.errors.map(e => e.message).join('. ');
 }
+
 
 /**
  * Sanitize filter values (trim strings, ensure arrays are valid)

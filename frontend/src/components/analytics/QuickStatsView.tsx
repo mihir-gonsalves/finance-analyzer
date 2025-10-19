@@ -3,9 +3,11 @@ import { Box, Typography, Divider } from "@mui/material";
 import { formatCurrency } from "../../utils/analyticsUtils";
 import type { SpendingAnalytics } from "../../hooks/useSpendingAnalytics";
 
+
 interface QuickStatsViewProps {
   analytics: SpendingAnalytics;
 }
+
 
 export function QuickStatsView({ analytics }: QuickStatsViewProps) {
   const { totalIncome, totalSpent, netBalance, stats } = analytics;
@@ -23,7 +25,7 @@ export function QuickStatsView({ analytics }: QuickStatsViewProps) {
         }}
       >
         <Typography color="success.dark" variant="h6" fontWeight="600">
-          Total Income
+          Gross Cash
         </Typography>
         <Typography
           fontWeight="700"
@@ -88,7 +90,7 @@ export function QuickStatsView({ analytics }: QuickStatsViewProps) {
       <Box display="flex" flexDirection="column" gap={1} sx={{ my: -2 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ p: 1 }}>
           <Typography color="text.secondary" variant="body1" fontWeight="500">
-            Average Paycheck Amount
+            Average Paycheck
           </Typography>
           <Typography fontWeight="600" variant="h6">
             {formatCurrency(stats.avgPerPaycheck)}
@@ -97,7 +99,7 @@ export function QuickStatsView({ analytics }: QuickStatsViewProps) {
 
         <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ p: 1 }}>
           <Typography color="text.secondary" variant="body1" fontWeight="500">
-            Average Expense Amount
+            Average Expense
           </Typography>
           <Typography fontWeight="600" variant="h6">
             {formatCurrency(stats.avgPerExpense)}
@@ -106,7 +108,7 @@ export function QuickStatsView({ analytics }: QuickStatsViewProps) {
 
         <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ p: 1 }}>
           <Typography color="text.secondary" variant="body1" fontWeight="500">
-            Categories
+            Spend Categories
           </Typography>
           <Typography fontWeight="600" variant="h6">
             {stats.categoryCount}

@@ -3,10 +3,12 @@ import { useMemo } from 'react';
 import { calculateCategorySpending, calculateTotalSpent, calculateTotalIncome, filterValidExpenseCategories, filterIncome } from '../utils/analyticsUtils';
 import type { Transaction } from '../hooks/useTransactions';
 
+
 export interface CategoryData {
   name: string;
   value: number;
 }
+
 
 export interface SpendingAnalytics {
   categorySpending: Record<string, number>;
@@ -23,6 +25,7 @@ export interface SpendingAnalytics {
     avgPerPaycheck: number;
   };
 }
+
 
 export function useSpendingAnalytics(transactions: Transaction[]): SpendingAnalytics {
   return useMemo(() => {

@@ -4,16 +4,8 @@ import { useState } from "react";
 import { useTransactions } from "../hooks/useTransactions";
 import { useFilterOptions } from "../hooks/useFilterOptions";
 import { usePendingFilters } from "../hooks/usePendingFilters";
-import {
-  getActiveFilterCount,
-  hasActiveFilters,
-  createEmptyFilters
-} from "../utils/filterUtils";
-import {
-  validateFilters,
-  sanitizeFilters,
-  getValidationErrorMessage
-} from "../utils/filterValidation"
+import { getActiveFilterCount, hasActiveFilters, createEmptyFilters } from "../utils/filterUtils";
+import { validateFilters, sanitizeFilters, getValidationErrorMessage } from "../utils/filterValidation"
 import { FiltersPanelHeader } from "./filters/FiltersPanelHeader";
 import { SearchFilter } from "./filters/SearchFilter";
 import { DateRangeFilter } from "./filters/DateRangeFilter";
@@ -23,13 +15,16 @@ import { AmountRangeFilter } from "./filters/AmountRangeFilter";
 import { FilterActions } from "./filters/FilterActions";
 import type { TransactionFilters } from "../types/filters";
 
+
 export type { TransactionFilters };
+
 
 interface FiltersPanelProps {
   filters: TransactionFilters;
   onFiltersChange: (filters: TransactionFilters) => void;
   onClose: () => void;
 }
+
 
 export default function FiltersPanel({
   filters,

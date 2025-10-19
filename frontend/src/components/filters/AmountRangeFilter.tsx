@@ -1,12 +1,14 @@
 // frontend/src/components/filters/AmountRangeFilter.tsx
 import { TextField } from "@mui/material";
 
+
 interface AmountRangeFilterProps {
   minAmount: string;
   maxAmount: string;
   onMinAmountChange: (value: string) => void;
   onMaxAmountChange: (value: string) => void;
 }
+
 
 export function AmountRangeFilter({
   minAmount,

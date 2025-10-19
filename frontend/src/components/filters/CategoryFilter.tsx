@@ -1,11 +1,13 @@
 // frontend/src/components/filters/CategoryFilter.tsx
 import { FormControl, InputLabel, Select, MenuItem, Chip, Box } from "@mui/material";
 
+
 interface CategoryFilterProps {
   value: string[];
   options: string[];
   onChange: (value: string[]) => void;
 }
+
 
 export function CategoryFilter({ value, options, onChange }: CategoryFilterProps) {
   return (

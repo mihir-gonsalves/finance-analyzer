@@ -4,10 +4,12 @@ import { Category as CategoryIcon } from "@mui/icons-material";
 import { formatCurrency } from "../../utils/analyticsUtils";
 import type { CategoryData } from "../../hooks/useSpendingAnalytics";
 
+
 interface TopCategoriesListProps {
   categories: CategoryData[];
   totalSpent: number;
 }
+
 
 export function TopCategoriesList({ categories, totalSpent }: TopCategoriesListProps) {
   const theme = useTheme();

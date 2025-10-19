@@ -1,11 +1,13 @@
 // frontend/src/components/filters/FilterActions.tsx
 import { Box, Button } from "@mui/material";
 
+
 interface FilterActionsProps {
   hasUnsavedChanges: boolean;
   onReset: () => void;
   onApply: () => void;
 }
+
 
 export function FilterActions({
   hasUnsavedChanges,

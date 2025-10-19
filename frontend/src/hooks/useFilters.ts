@@ -1,7 +1,8 @@
-// frontend/src/hooks/useFilteredOrAllTransactions.ts
+// frontend/src/hooks/useFilters.ts
 import type { TransactionFilters } from "../types/filters";
 import { hasActiveFilters } from "../utils/filterUtils";
 import { useTransactions, useFilteredTransactions } from "./useTransactions";
+
 
 /**
  * Smart hook that returns all transactions if no filters are applied,

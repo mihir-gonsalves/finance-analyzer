@@ -1,6 +1,7 @@
 // frontend/src/components/TransactionTable.tsx
 import { useState, useRef } from "react";
 import { Card, CardContent, Box, Alert } from "@mui/material";
+import LedgerChart from "./LedgerChart";
 import { useDeleteTransaction, useUpdateTransaction, useCreateTransaction, type Transaction, type CreateTransactionData, type UpdateTransactionData, } from "../hooks/useTransactions";
 import { useCSVUpload } from "../hooks/useCSVUpload";
 import { TransactionTableHeader } from "./transactions/TransactionTableHeader";
@@ -9,7 +10,6 @@ import { AddTransactionDialog } from "./transactions/dialogs/AddTransactionDialo
 import { EditTransactionDialog } from "./transactions/dialogs/EditTransactionDialog";
 import { DeleteConfirmDialog } from "./transactions/dialogs/DeleteConfirmDialog";
 import { CSVUploadDialog } from "./transactions/dialogs/CSVUploadDialog";
-import LedgerChart from "./LedgerChart";
 import type { TransactionFilters } from "../types/filters";
 import { useTransactionData } from "../context/TransactionContext";
 

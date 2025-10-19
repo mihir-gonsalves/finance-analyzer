@@ -7,6 +7,7 @@ import AnalyticsPanel from "../components/AnalyticsPanel";
 import FiltersPanel from "../components/FiltersPanel";
 import type { TransactionFilters } from "../types/filters";
 
+
 export default function Dashboard() {
   const [filters, setFilters] = useState<TransactionFilters>({
     dateFrom: '',

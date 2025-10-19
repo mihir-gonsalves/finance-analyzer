@@ -3,9 +3,9 @@ import type { Transaction, Category } from '../hooks/useTransactions';
 
 
 // Keywords that indicate non-expense categories (e.g., transfers, income)
-const EXCLUDED_CATEGORY_KEYWORDS = ['payment', 'credit', 'income', 'savings'];
-
+const EXCLUDED_CATEGORY_KEYWORDS = ['payment', 'credit', 'income', 'savings', 'interest', 'cash transfers', 'refund'];
 const INCOME = ['income'];
+
 
 /*
  * Determines if a category should be considered a valid expense category.

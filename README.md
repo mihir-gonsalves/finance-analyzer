@@ -1,6 +1,6 @@
 ## Project Overview
 
-This is a personal finance analyzer built with a FastAPI backend and React frontend. Users can upload CSV files from their bank/credit card accounts to analyze their transactions. The application follows Test-Driven Development practices.
+This is a personal budget analyzer built with a FastAPI backend and React frontend. Users can upload CSV files from their bank/credit card accounts to analyze their transactions.
 
 ## Architecture
 
@@ -16,7 +16,7 @@ Core modules:
 - `app/models.py`: SQLAlchemy Transaction model
 - `app/parsers.py`: CSV parsing logic for different bank formats
 - `app/loaders.py`: Data loading functions to move parsed data into database
-- `app/queries.py`: Query functions for retrieving/filtering transactions
+- `app/queries.py`: Read operations
 - `app/crud.py`: Create, Update, Delete operations
 - `app/database.py`: Database connection and initialization
 - `app/schemas.py`: Pydantic models for API validation
@@ -28,6 +28,13 @@ Core modules:
 - **Material UI (MUI)** for UI components, including data grids and dialogs
 - **React Query (@tanstack/react-query)** for server state management
 - **Axios** for HTTP client communication with backend
+
+Core modules:
+- `frontend/src/App.tsx`: contains the QueryClientProvider, ThemeProvider, App Header, and App Dashboard
+- `frontend/src/api/client.ts`: configures Axios client
+- `frontend/src/types/filters.ts`: defines the types of transaction filters available in filter panel
+- `frontend/src/context/TransactionContext.tsx`:  gives context to frontend whether filters are applied or not
+
 
 ## Commands
 
@@ -70,14 +77,6 @@ npm run lint
 npm run preview
 ```
 
-## Development Workflow
-
-1. **Backend-first approach**: Core functionality implemented in backend with comprehensive tests
-2. **CSV parsing**: Different banks have different CSV formats, parsers handle standardization
-3. **Database operations**: Use existing CRUD functions rather than direct SQL
-4. **API endpoints**: Follow REST conventions, all endpoints are in `app/api/transactions.py`
-5. **Frontend integration**: Components use React Query for data fetching and caching
-
 ## Testing
 
 - Tests are located in `/tests` directory
@@ -93,10 +92,6 @@ npm run preview
 - **CORS configured**: Frontend (localhost:5173) can communicate with backend
 - **Category field optional**: Some banks don't provide categories, users can add manually
 
-
-
-Using this to take notes on how i created this and make comments. Quick note - this is being developed via Test Driven Development.
-
 1.
 
 First, I researched how to get data from my bank and credit card accounts. 
@@ -107,7 +102,7 @@ I found that you can simply download a .csv file of all your transactions instea
 
 I haven't looked into it yet - but because a ledger is publicly available for all eyes, I'm assuming that it will be much easier to get access to API endpoints for crypto wallets. 
 
-For now to avoid having to comply with Finra/SEC regulations - I will force users to manually download and upload their .csv transactions to the application. (FYI - the application is offline so there should be no room for security concerns).
+For now, to avoid having to comply with Finra/SEC regulations - I will force users to manually download and upload their .csv transactions to the application.
 
 To demonstrate automatic API connectivity - users will be able to connect their cryptocurrency wallets to the application. 
 

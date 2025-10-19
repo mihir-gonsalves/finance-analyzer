@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { TransactionFilters } from '../types/filters';
 import { areFiltersEqual } from '../utils/filterUtils';
 
+
 export function usePendingFilters(appliedFilters: TransactionFilters) {
   const [pendingFilters, setPendingFilters] = useState<TransactionFilters>(appliedFilters);
 
