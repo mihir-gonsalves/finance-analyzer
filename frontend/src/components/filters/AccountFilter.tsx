@@ -16,8 +16,8 @@ export function AccountFilter({ value, options, onChange }: AccountFilterProps) 
         value={value}
         label="Accounts"
         onChange={(e) => {
-          const newValue = typeof e.target.value === 'string' 
-            ? e.target.value.split(',') 
+          const newValue = typeof e.target.value === 'string'
+            ? e.target.value.split(',')
             : e.target.value;
           onChange(newValue);
         }}

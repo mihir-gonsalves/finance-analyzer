@@ -101,9 +101,9 @@ export function AddTransactionDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button 
-          onClick={handleSave} 
-          variant="contained" 
+        <Button
+          onClick={handleSave}
+          variant="contained"
           disabled={isLoading || !isValid}
         >
           {isLoading ? 'Adding...' : 'Add Transaction'}

@@ -1,12 +1,12 @@
 # app/models.py - sets up SQLite database tables using SQLAlchemy ORM
-from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, Table, Index
 from sqlalchemy.orm import declarative_base, relationship
 
 
 Base = declarative_base()
 
 
-# Association table for many-to-many relationship between transactions and categories
+# Association table for many-to-many relationship
 transaction_categories = Table(
     'transaction_categories',
     Base.metadata,
@@ -22,7 +22,11 @@ class Category(Base):
     name = Column(String, unique=True, nullable=False, index=True)
 
     # Many-to-many relationship with transactions
-    transactions = relationship("Transaction", secondary=transaction_categories, back_populates="categories")
+    transactions = relationship(
+        "Transaction", 
+        secondary=transaction_categories, 
+        back_populates="categories"
+    )
 
     def __repr__(self):
         return f"<Category(name={self.name})>"
@@ -32,14 +36,22 @@ class Transaction(Base):
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True, index=True)
-    date = Column(Date, nullable=False)
+    date = Column(Date, nullable=False, index=True)  # Index for date filtering
     description = Column(String, nullable=False)
     amount = Column(Float, nullable=False)
-    account = Column(String, nullable=False)
+    account = Column(String, nullable=False, index=True)  # Index for account filtering
 
     # Many-to-many relationship with categories
-    categories = relationship("Category", secondary=transaction_categories, back_populates="transactions")
+    categories = relationship(
+        "Category", 
+        secondary=transaction_categories, 
+        back_populates="transactions"
+    )
 
-    # including this for logging and debugging purposes
+    # Composite index for common query pattern (account + date)
+    __table_args__ = (
+        Index('idx_account_date', 'account', 'date'),
+    )
+
     def __repr__(self):
         return f"<Transaction(date={self.date}, amount={self.amount}, account={self.account})>"

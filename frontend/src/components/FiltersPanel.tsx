@@ -1,9 +1,19 @@
 // frontend/src/components/FiltersPanel.tsx
-import { Card, CardContent, Box, Divider } from "@mui/material";
+import { Card, CardContent, Box, Divider, Alert } from "@mui/material";
+import { useState } from "react";
 import { useTransactions } from "../hooks/useTransactions";
 import { useFilterOptions } from "../hooks/useFilterOptions";
 import { usePendingFilters } from "../hooks/usePendingFilters";
-import { getActiveFilterCount, hasActiveFilters, createEmptyFilters } from "../utils/filterUtils";
+import {
+  getActiveFilterCount,
+  hasActiveFilters,
+  createEmptyFilters
+} from "../utils/filterUtils";
+import {
+  validateFilters,
+  sanitizeFilters,
+  getValidationErrorMessage
+} from "../utils/filterValidation"
 import { FiltersPanelHeader } from "./filters/FiltersPanelHeader";
 import { SearchFilter } from "./filters/SearchFilter";
 import { DateRangeFilter } from "./filters/DateRangeFilter";
@@ -21,22 +31,50 @@ interface FiltersPanelProps {
   onClose: () => void;
 }
 
-export default function FiltersPanel({ 
-  filters, 
-  onFiltersChange, 
-  onClose 
+export default function FiltersPanel({
+  filters,
+  onFiltersChange,
+  onClose
 }: FiltersPanelProps) {
   const { data: transactions = [] } = useTransactions();
   const { categories, accounts } = useFilterOptions(transactions);
-  const { pendingFilters, updateFilter, reset, hasUnsavedChanges } = usePendingFilters(filters);
+  const {
+    pendingFilters,
+    updateFilter,
+    reset,
+    hasUnsavedChanges
+  } = usePendingFilters(filters);
+
+  const [validationError, setValidationError] = useState<string>("");
 
   const handleApply = () => {
-    onFiltersChange(pendingFilters);
+    // Sanitize filters first
+    const sanitized = sanitizeFilters(pendingFilters);
+
+    // Validate filters
+    const validation = validateFilters(sanitized);
+
+    if (!validation.isValid) {
+      setValidationError(getValidationErrorMessage(validation));
+      return;
+    }
+
+    // Clear any previous errors
+    setValidationError("");
+
+    // Apply filters
+    onFiltersChange(sanitized);
   };
 
   const handleClearAll = () => {
     const emptyFilters = createEmptyFilters();
     onFiltersChange(emptyFilters);
+    setValidationError("");
+  };
+
+  const handleReset = () => {
+    reset();
+    setValidationError("");
   };
 
   const activeFilterCount = getActiveFilterCount(filters);
@@ -53,6 +91,12 @@ export default function FiltersPanel({
         />
 
         <Divider sx={{ mb: 3 }} />
+
+        {validationError && (
+          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setValidationError("")}>
+            {validationError}
+          </Alert>
+        )}
 
         <Box display="flex" flexDirection="column" gap={3}>
           {/* Search and Date Range Row */}
@@ -108,7 +152,7 @@ export default function FiltersPanel({
           {/* Actions Row */}
           <FilterActions
             hasUnsavedChanges={hasUnsavedChanges}
-            onReset={reset}
+            onReset={handleReset}
             onApply={handleApply}
           />
         </Box>

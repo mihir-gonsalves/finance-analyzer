@@ -1,7 +1,7 @@
 // frontend/src/components/TransactionTable.tsx
 import { useState, useRef } from "react";
 import { Card, CardContent, Box, Alert } from "@mui/material";
-import { useTransactions, useFilteredTransactions, useDeleteTransaction, useUpdateTransaction, useCreateTransaction, type Transaction, type CreateTransactionData, type UpdateTransactionData, } from "../hooks/useTransactions";
+import { useDeleteTransaction, useUpdateTransaction, useCreateTransaction, type Transaction, type CreateTransactionData, type UpdateTransactionData, } from "../hooks/useTransactions";
 import { useCSVUpload } from "../hooks/useCSVUpload";
 import { TransactionTableHeader } from "./transactions/TransactionTableHeader";
 import { TransactionDataGrid } from "./transactions/TransactionDataGrid";
@@ -11,6 +11,7 @@ import { DeleteConfirmDialog } from "./transactions/dialogs/DeleteConfirmDialog"
 import { CSVUploadDialog } from "./transactions/dialogs/CSVUploadDialog";
 import LedgerChart from "./LedgerChart";
 import type { TransactionFilters } from "../types/filters";
+import { useTransactionData } from "../context/TransactionContext";
 
 
 type ViewMode = 'table' | 'chart';
@@ -25,8 +26,7 @@ interface TransactionTableProps {
 
 export default function TransactionTable({ filters, filtersOpen, onToggleFilters }: TransactionTableProps) {
   // Data hooks
-  const { error } = useTransactions();
-  const { data: filteredTransactions = [], isLoading } = useFilteredTransactions(filters);
+  const { transactions: filteredTransactions, isLoading, error } = useTransactionData();
   const deleteMutation = useDeleteTransaction();
   const updateMutation = useUpdateTransaction();
   const createMutation = useCreateTransaction();
@@ -80,14 +80,14 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    
+
     if (file?.name.endsWith('.csv')) {
       setCsvFile(file);
       setCsvInstitution("");
     } else {
       alert('Please select a CSV file');
     }
-    
+
     if (event.target) {
       event.target.value = '';
     }
@@ -95,7 +95,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
 
   const handleCSVSubmit = () => {
     if (!csvFile || !csvInstitution) return;
-    
+
     csvUploadMutation.mutate(
       { file: csvFile, institution: csvInstitution },
       {
@@ -147,7 +147,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
           />
 
           {viewMode === 'table' ? (
-            <Box sx={{ height: 560 }}> 
+            <Box sx={{ height: 560 }}>
               <TransactionDataGrid
                 transactions={filteredTransactions}
                 isLoading={isLoading}
@@ -157,7 +157,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
             </Box>
           ) : (
             <Box sx={{ height: 560 }}>
-              <LedgerChart filters={filters} />
+              <LedgerChart />
             </Box>
           )}
         </CardContent>

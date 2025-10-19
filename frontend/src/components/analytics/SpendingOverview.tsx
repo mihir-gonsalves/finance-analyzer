@@ -12,10 +12,10 @@ interface SpendingOverviewProps {
 export function SpendingOverview({ chartData, totalSpent }: SpendingOverviewProps) {
   if (chartData.length === 0) {
     return (
-      <Box 
-        display="flex" 
-        flexDirection="column" 
-        justifyContent="center" 
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
         alignItems="center"
         sx={{ height: '520px' }}
       >
@@ -28,10 +28,10 @@ export function SpendingOverview({ chartData, totalSpent }: SpendingOverviewProp
   }
 
   return (
-    <Box 
-      display="flex" 
-      flexDirection="column" 
-      justifyContent="center" 
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
       alignItems="center"
       sx={{ height: '530px' }}
     >

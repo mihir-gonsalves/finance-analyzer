@@ -3,11 +3,9 @@ import { useEffect, useRef, useMemo, useState } from "react";
 import { Card, CardContent, Typography, Box } from "@mui/material";
 import { createChart, BaselineSeries } from "lightweight-charts";
 import type { IChartApi, Time } from "lightweight-charts";
-import { useFilteredTransactions } from "../hooks/useTransactions";
 import { chartStyles } from "../styles/charts";
 import { formatDateString, parseDateString } from "../utils/dateUtils";
-import type { TransactionFilters } from "../types/filters";
-
+import { useTransactionData } from "../context/TransactionContext";
 
 interface ChartDataPoint {
   date: string;
@@ -23,11 +21,6 @@ interface TooltipData {
   description: string;
   amount: number;
   balance: number;
-}
-
-
-interface LedgerChartProps {
-  filters: TransactionFilters;
 }
 
 
@@ -68,8 +61,8 @@ const ChartHeader = ({ currentBalance }: { currentBalance: number }) => {
         <Typography variant="body2" sx={chartStyles.balanceLabel}>
           Current Balance
         </Typography>
-        <Typography 
-          variant="h5" 
+        <Typography
+          variant="h5"
           sx={{
             ...chartStyles.balanceAmount,
             color: isPositive ? 'success.main' : 'error.main',
@@ -83,14 +76,14 @@ const ChartHeader = ({ currentBalance }: { currentBalance: number }) => {
 };
 
 
-const ChartFooter = ({ 
-  dataLength, 
-  startDate, 
-  endDate 
-}: { 
-  dataLength: number; 
-  startDate: string; 
-  endDate: string 
+const ChartFooter = ({
+  dataLength,
+  startDate,
+  endDate
+}: {
+  dataLength: number;
+  startDate: string;
+  endDate: string
 }) => (
   <Box sx={chartStyles.footer}>
     <Typography variant="body2" color="text.secondary" sx={chartStyles.footerText}>
@@ -100,24 +93,26 @@ const ChartFooter = ({
 );
 
 
-export default function LedgerChart({ filters }: LedgerChartProps) {
-  const { data: filteredTransactions = [] } = useFilteredTransactions(filters);
+export default function LedgerChart() {
+  const { transactions } = useTransactionData();
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<any>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
 
-  const chartData = useMemo(() => {
-    const sortedTransactions = [...filteredTransactions].sort(
-      (a, b) => parseDateString(a.date || '').getTime() - parseDateString(b.date || '').getTime()
-    );
 
+  // Sort transactions by date
+  const sortedTransactions = [...transactions].sort(
+    (a, b) => parseDateString(a.date || '').getTime() - parseDateString(b.date || '').getTime()
+  );
+
+  const chartData = useMemo(() => {
     return sortedTransactions.reduce((acc: ChartDataPoint[], transaction, index) => {
       const previousBalance = index === 0 ? 0 : acc[acc.length - 1]?.balance || 0;
       const newBalance = previousBalance + transaction.amount;
       const dateObj = parseDateString(transaction.date || '');
-      
+
       const normalizedDate = new Date(dateObj);
       normalizedDate.setHours(0, 0, 0, 0);
       let timestamp = Math.floor(normalizedDate.getTime() / 1000);
@@ -136,7 +131,7 @@ export default function LedgerChart({ filters }: LedgerChartProps) {
 
       return acc;
     }, []);
-  }, [filteredTransactions]);
+  }, [sortedTransactions]);
 
   useEffect(() => {
     if (!chartContainerRef.current || chartData.length === 0) return;
@@ -232,12 +227,12 @@ export default function LedgerChart({ filters }: LedgerChartProps) {
     <Card>
       <CardContent>
         <ChartHeader currentBalance={currentBalance} />
-        
+
         <Box sx={chartStyles.chartWrapper}>
           <div ref={chartContainerRef} style={chartStyles.chartContainer} />
-          
-          <Box 
-            ref={tooltipRef} 
+
+          <Box
+            ref={tooltipRef}
             sx={chartStyles.tooltip}
             style={{ display: 'none' }}
           >
@@ -251,13 +246,13 @@ export default function LedgerChart({ filters }: LedgerChartProps) {
                     year: 'numeric',
                   })}
                 </Typography>
-                
+
                 <Typography variant="body2" sx={chartStyles.tooltipDescription} gutterBottom>
                   {tooltipData.description}
                 </Typography>
-                
-                <Typography 
-                  variant="body2" 
+
+                <Typography
+                  variant="body2"
                   sx={{
                     ...chartStyles.tooltipTransaction,
                     color: tooltipData.amount >= 0 ? 'success.main' : 'error.main',
@@ -265,7 +260,7 @@ export default function LedgerChart({ filters }: LedgerChartProps) {
                 >
                   Transaction: {tooltipData.amount >= 0 ? '+' : ''}{formatCurrency(tooltipData.amount)}
                 </Typography>
-                
+
                 <Typography variant="body1" sx={chartStyles.tooltipBalance}>
                   Balance: {formatCurrency(tooltipData.balance)}
                 </Typography>
@@ -273,11 +268,11 @@ export default function LedgerChart({ filters }: LedgerChartProps) {
             )}
           </Box>
         </Box>
-        
-        <ChartFooter 
-          dataLength={chartData.length} 
-          startDate={startDate} 
-          endDate={endDate} 
+
+        <ChartFooter
+          dataLength={chartData.length}
+          startDate={startDate}
+          endDate={endDate}
         />
       </CardContent>
     </Card>
