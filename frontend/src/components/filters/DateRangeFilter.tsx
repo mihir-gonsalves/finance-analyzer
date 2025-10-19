@@ -1,12 +1,14 @@
 // frontend/src/components/filters/DateRangeFilter.tsx
 import { TextField } from "@mui/material";
 
+
 interface DateRangeFilterProps {
   dateFrom: string;
   dateTo: string;
   onDateFromChange: (value: string) => void;
   onDateToChange: (value: string) => void;
 }
+
 
 export function DateRangeFilter({
   dateFrom,

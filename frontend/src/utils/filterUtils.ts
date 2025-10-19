@@ -1,6 +1,7 @@
 // frontend/src/utils/filterUtils.ts
 import type { TransactionFilters } from '../types/filters';
 
+
 export function getActiveFilterCount(filters: TransactionFilters): number {
   return Object.entries(filters).filter(([_, value]) => {
     if (Array.isArray(value)) {
@@ -10,9 +11,11 @@ export function getActiveFilterCount(filters: TransactionFilters): number {
   }).length;
 }
 
+
 export function hasActiveFilters(filters: TransactionFilters): boolean {
   return getActiveFilterCount(filters) > 0;
 }
+
 
 export function createEmptyFilters(): TransactionFilters {
   return {
@@ -25,6 +28,7 @@ export function createEmptyFilters(): TransactionFilters {
     searchTerm: '',
   };
 }
+
 
 // Deep equality check for filters
 export function areFiltersEqual(a: TransactionFilters, b: TransactionFilters): boolean {
@@ -42,12 +46,14 @@ export function areFiltersEqual(a: TransactionFilters, b: TransactionFilters): b
     areArraysEqual(a.accounts, b.accounts);
 }
 
+
 function areArraysEqual(a: string[], b: string[]): boolean {
   if (a.length !== b.length) return false;
   const sortedA = [...a].sort();
   const sortedB = [...b].sort();
   return sortedA.every((val, idx) => val === sortedB[idx]);
 }
+
 
 // Build URL params for backend filtering
 export function buildFilterParams(filters: TransactionFilters): URLSearchParams {

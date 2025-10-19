@@ -1,8 +1,9 @@
-// frontend/src/context/TransactionContext.tsx
+// frontend/src/context/TransactionContext.tsx - gives context to frontend whether filters are applied or not
 import React, { createContext, useContext } from "react";
 import { useFilteredOrAllTransactions } from "../hooks/useFilters";
 import type { Transaction } from "../hooks/useTransactions";
 import type { TransactionFilters } from "../types/filters";
+
 
 interface TransactionContextType {
   transactions: Transaction[];
@@ -10,12 +11,15 @@ interface TransactionContextType {
   error: Error | null;
 }
 
+
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
+
 
 interface TransactionProviderProps {
   filters: TransactionFilters;
   children: React.ReactNode;
 }
+
 
 export function TransactionProvider({ filters, children }: TransactionProviderProps) {
   const query = useFilteredOrAllTransactions(filters);
@@ -32,6 +36,7 @@ export function TransactionProvider({ filters, children }: TransactionProviderPr
     </TransactionContext.Provider>
   );
 }
+
 
 export function useTransactionData() {
   const context = useContext(TransactionContext);

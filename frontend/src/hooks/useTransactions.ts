@@ -4,10 +4,12 @@ import client from "../api/client";
 import type { TransactionFilters } from "../types/filters";
 import { buildFilterParams } from "../utils/filterUtils";
 
+
 export interface Category {
   id: number;
   name: string;
 }
+
 
 export interface Transaction {
   id: number;
@@ -18,6 +20,7 @@ export interface Transaction {
   account: string;
 }
 
+
 export interface CreateTransactionData {
   date: string;
   description: string;
@@ -25,6 +28,7 @@ export interface CreateTransactionData {
   amount: number;
   account: string;
 }
+
 
 export interface UpdateTransactionData {
   id: number;
@@ -35,9 +39,11 @@ export interface UpdateTransactionData {
   account?: string;
 }
 
+
 // =====================
 // READ Hooks
 // =====================
+
 
 // Fetch all transactions (no filters)
 export function useTransactions() {
@@ -50,6 +56,7 @@ export function useTransactions() {
     staleTime: 30000, // 30 seconds
   });
 }
+
 
 // Fetch filtered transactions - all filtering handled by backend
 export function useFilteredTransactions(filters: TransactionFilters) {
@@ -68,9 +75,11 @@ export function useFilteredTransactions(filters: TransactionFilters) {
   });
 }
 
+
 // =====================
 // WRITE Hooks (Mutations)
 // =====================
+
 
 // Create a new transaction
 export function useCreateTransaction() {
@@ -86,6 +95,7 @@ export function useCreateTransaction() {
   });
 }
 
+
 // Update a transaction
 export function useUpdateTransaction() {
   const queryClient = useQueryClient();
@@ -100,6 +110,7 @@ export function useUpdateTransaction() {
     },
   });
 }
+
 
 // Delete a transaction
 export function useDeleteTransaction() {

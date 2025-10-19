@@ -2,12 +2,14 @@
 import { Box, Typography, Chip, Button, IconButton } from "@mui/material";
 import { FilterList, Clear } from "@mui/icons-material";
 
+
 interface FiltersPanelHeaderProps {
   activeFilterCount: number;
   hasActiveFilters: boolean;
   onClearAll: () => void;
   onClose: () => void;
 }
+
 
 export function FiltersPanelHeader({
   activeFilterCount,

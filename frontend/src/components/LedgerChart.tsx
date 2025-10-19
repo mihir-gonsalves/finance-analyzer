@@ -7,6 +7,7 @@ import { chartStyles } from "../styles/charts";
 import { formatDateString, parseDateString } from "../utils/dateUtils";
 import { useTransactionData } from "../context/TransactionContext";
 
+
 interface ChartDataPoint {
   date: string;
   balance: number;
@@ -100,7 +101,6 @@ export default function LedgerChart() {
   const seriesRef = useRef<any>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
-
 
   // Sort transactions by date
   const sortedTransactions = [...transactions].sort(

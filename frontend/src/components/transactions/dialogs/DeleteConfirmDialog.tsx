@@ -1,12 +1,14 @@
 // frontend/src/components/transactions/dialogs/DeleteConfirmDialog.tsx
 import { Dialog, DialogTitle, DialogContent, DialogActions, Typography, Button, } from "@mui/material";
 
+
 interface DeleteConfirmDialogProps {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
   isLoading?: boolean;
 }
+
 
 export function DeleteConfirmDialog({
   open,

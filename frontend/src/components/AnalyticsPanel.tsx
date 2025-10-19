@@ -8,13 +8,16 @@ import { TopCategoriesList } from "./analytics/TopCategoriesList";
 import { QuickStatsView } from "./analytics/QuickStatsView";
 import { useTransactionData } from "../context/TransactionContext";
 
+
 type ViewMode = 'overview' | 'categories' | 'stats';
+
 
 const VIEW_CONFIG = {
   overview: { icon: DonutLarge, title: 'Spending Overview', next: 'categories' as ViewMode },
   categories: { icon: CategoryIcon, title: 'Top Categories', next: 'stats' as ViewMode },
   stats: { icon: Assessment, title: 'Quick Stats', next: 'overview' as ViewMode },
 };
+
 
 export default function AnalyticsPanel() {
   const [viewMode, setViewMode] = useState<ViewMode>('overview');

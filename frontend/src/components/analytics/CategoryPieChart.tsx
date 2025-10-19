@@ -4,10 +4,12 @@ import { Box, Typography, useTheme } from "@mui/material";
 import { formatCurrency } from "../../utils/analyticsUtils";
 import type { CategoryData } from "../../hooks/useSpendingAnalytics";
 
+
 interface CategoryPieChartProps {
   data: CategoryData[];
   totalSpent: number;
 }
+
 
 export function CategoryPieChart({ data, totalSpent }: CategoryPieChartProps) {
   const theme = useTheme();
@@ -52,7 +54,7 @@ export function CategoryPieChart({ data, totalSpent }: CategoryPieChartProps) {
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            data={data}
+            data={data} // ignore this - may come up as an error but it works perfectly
             cx="50%"
             cy="50%"
             innerRadius={90}

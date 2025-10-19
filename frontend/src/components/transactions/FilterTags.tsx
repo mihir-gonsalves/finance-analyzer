@@ -1,19 +1,15 @@
 // frontend/src/components/transactions/FilterTags.tsx
 import { Box, Chip } from "@mui/material";
-import {
-  AccountBalance,
-  Category,
-  CalendarMonth,
-  Search,
-  AttachMoney
-} from "@mui/icons-material";
+import { AccountBalance, Category, CalendarMonth, Search, AttachMoney } from "@mui/icons-material";
 import type { TransactionFilters } from "../../types/filters";
 import type { ReactElement } from "react";
+
 
 interface FilterTagsProps {
   filters: TransactionFilters;
   onRemove?: (filterKey: keyof TransactionFilters) => void;
 }
+
 
 interface TagConfig {
   key: string;
@@ -21,6 +17,7 @@ interface TagConfig {
   label: string;
   condition: boolean;
 }
+
 
 export function FilterTags({ filters, onRemove }: FilterTagsProps) {
   const tagConfigs: TagConfig[] = [

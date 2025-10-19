@@ -1,11 +1,13 @@
-// frontend/src/hooks/useFilterOptions.ts
+// frontend/src/hooks/useFilterOptions.ts - returns unique, alphabetically sorted categories and accounts
 import { useMemo } from 'react';
 import type { Transaction } from './useTransactions';
+
 
 export interface FilterOptions {
   categories: string[];
   accounts: string[];
 }
+
 
 export function useFilterOptions(transactions: Transaction[]): FilterOptions {
   return useMemo(() => {

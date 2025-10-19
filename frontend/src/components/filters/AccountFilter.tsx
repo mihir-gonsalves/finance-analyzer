@@ -1,11 +1,13 @@
 // frontend/src/components/filters/AccountFilter.tsx
 import { FormControl, InputLabel, Select, MenuItem, Chip, Box } from "@mui/material";
 
+
 interface AccountFilterProps {
   value: string[];
   options: string[];
   onChange: (value: string[]) => void;
 }
+
 
 export function AccountFilter({ value, options, onChange }: AccountFilterProps) {
   return (

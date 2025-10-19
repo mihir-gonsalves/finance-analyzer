@@ -4,10 +4,12 @@ import { Category as CategoryIcon } from "@mui/icons-material";
 import { CategoryPieChart } from "./CategoryPieChart";
 import type { CategoryData } from "../../hooks/useSpendingAnalytics";
 
+
 interface SpendingOverviewProps {
   chartData: CategoryData[];
   totalSpent: number;
 }
+
 
 export function SpendingOverview({ chartData, totalSpent }: SpendingOverviewProps) {
   if (chartData.length === 0) {

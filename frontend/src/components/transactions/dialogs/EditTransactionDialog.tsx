@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, } from "@mui/material";
 import type { Transaction, UpdateTransactionData } from "../../../hooks/useTransactions";
 
+
 interface EditTransactionDialogProps {
   open: boolean;
   transaction: Transaction | null;
@@ -10,6 +11,7 @@ interface EditTransactionDialogProps {
   onSave: (data: UpdateTransactionData) => void;
   isLoading?: boolean;
 }
+
 
 export function EditTransactionDialog({
   open,

@@ -5,7 +5,9 @@ import Header from "./components/Header.tsx";
 import Dashboard from "./pages/Dashboard";
 import { theme } from "./styles/theme.ts";
 
+
 const queryClient = new QueryClient();
+
 
 export default function App() {
   return (
