@@ -13,36 +13,36 @@ export default function Header() {
   };
 
   return (
-    <AppBar 
-      position="static" 
+    <AppBar
+      position="static"
       elevation={0}
-      sx={{ 
+      sx={{
         bgcolor: '#ffffff',
         borderBottom: '1px solid',
         borderColor: 'grey.200',
         color: 'text.primary'
       }}
     >
-      <Toolbar 
-        sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+      <Toolbar
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
           py: { sm: 1.5 }
         }}
       >
         {/* Left side - Logo/Brand */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <TrendingUp 
-            sx={{ 
-              color: 'primary.main', 
-              fontSize: { sm: 28 } 
-            }} 
+          <TrendingUp
+            sx={{
+              color: 'primary.main',
+              fontSize: { sm: 28 }
+            }}
           />
           {!isMobile && (
-            <Typography 
-              variant="h6"  
-              sx={{ 
+            <Typography
+              variant="h6"
+              sx={{
                 fontWeight: 700,
                 color: 'primary.main',
               }}
@@ -59,7 +59,7 @@ export default function Header() {
             edge="end"
             color="inherit"
             onClick={handleUserClick}
-            sx={{ 
+            sx={{
               border: '1px solid',
               borderColor: 'grey.300',
               '&:hover': {

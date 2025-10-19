@@ -57,11 +57,11 @@ export const theme = createTheme({
         },
       },
     },
-    
+
     MuiChip: { // filter tags
       defaultProps: {
         size: 'small',
-        color: 'primary', 
+        color: 'primary',
         variant: 'outlined',
       },
       styleOverrides: {

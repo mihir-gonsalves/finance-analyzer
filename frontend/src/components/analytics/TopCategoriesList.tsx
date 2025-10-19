@@ -21,11 +21,11 @@ export function TopCategoriesList({ categories, totalSpent }: TopCategoriesListP
 
   if (categories.length === 0) {
     return (
-      <Box 
-        display="flex" 
-        flexDirection="column" 
-        justifyContent="center" 
-        alignItems="center" 
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
         sx={{ height: '520px' }}
       >
         <CategoryIcon sx={{ fontSize: 48, color: 'grey.300', mb: 1 }} />
@@ -55,7 +55,7 @@ export function TopCategoriesList({ categories, totalSpent }: TopCategoriesListP
               <ListItemText
                 primary={category.name}
                 secondary={`${((category.value / totalSpent) * 100).toFixed(1)}% of total spending`}
-                primaryTypographyProps={{ 
+                primaryTypographyProps={{
                   fontWeight: 600,
                   variant: 'body1'
                 }}
@@ -64,8 +64,8 @@ export function TopCategoriesList({ categories, totalSpent }: TopCategoriesListP
                   color: 'text.secondary'
                 }}
               />
-              <Typography 
-                variant="h6" 
+              <Typography
+                variant="h6"
                 fontWeight="700"
                 color="text.primary"
               >

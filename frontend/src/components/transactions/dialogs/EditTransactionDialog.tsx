@@ -36,7 +36,7 @@ export function EditTransactionDialog({
 
   const handleSave = () => {
     if (!transaction) return;
-    
+
     const updateData: UpdateTransactionData = {
       id: transaction.id,
       date: editData.date,
@@ -47,7 +47,7 @@ export function EditTransactionDialog({
         ? categoryInput.split(",").map(cat => cat.trim()).filter(cat => cat.length > 0)
         : []
     };
-    
+
     onSave(updateData);
     handleClose();
   };
@@ -107,9 +107,9 @@ export function EditTransactionDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button 
-          onClick={handleSave} 
-          variant="contained" 
+        <Button
+          onClick={handleSave}
+          variant="contained"
           disabled={isLoading}
         >
           {isLoading ? 'Saving...' : 'Save'}

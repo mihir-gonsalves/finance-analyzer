@@ -34,7 +34,7 @@ export function CSVUploadDialog({
           <Alert severity="info">
             Upload transaction history from your bank or credit card. Currently supported: Discover Credit Card and Schwab Checking Account.
           </Alert>
-          
+
           {file && (
             <Box>
               <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -65,7 +65,7 @@ export function CSVUploadDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button 
+        <Button
           onClick={onSubmit}
           variant="contained"
           disabled={!file || !institution || isLoading}

@@ -2,18 +2,13 @@
 import { useState } from "react";
 import { Card, CardContent, Box, Button, Skeleton } from "@mui/material";
 import { DonutLarge, Category as CategoryIcon, Assessment } from "@mui/icons-material";
-import { useFilteredTransactions } from "../hooks/useTransactions";
 import { useSpendingAnalytics } from "../hooks/useSpendingAnalytics";
 import { SpendingOverview } from "./analytics/SpendingOverview";
 import { TopCategoriesList } from "./analytics/TopCategoriesList";
 import { QuickStatsView } from "./analytics/QuickStatsView";
-import type { TransactionFilters } from "../types/filters";
+import { useTransactionData } from "../context/TransactionContext";
 
 type ViewMode = 'overview' | 'categories' | 'stats';
-
-interface AnalyticsPanelProps {
-  filters: TransactionFilters;
-}
 
 const VIEW_CONFIG = {
   overview: { icon: DonutLarge, title: 'Spending Overview', next: 'categories' as ViewMode },
@@ -21,10 +16,10 @@ const VIEW_CONFIG = {
   stats: { icon: Assessment, title: 'Quick Stats', next: 'overview' as ViewMode },
 };
 
-export default function AnalyticsPanel({ filters }: AnalyticsPanelProps) {
+export default function AnalyticsPanel() {
   const [viewMode, setViewMode] = useState<ViewMode>('overview');
-  const { data: filteredTransactions = [], isLoading } = useFilteredTransactions(filters);
-  const analytics = useSpendingAnalytics(filteredTransactions);
+  const { transactions, isLoading } = useTransactionData();
+  const analytics = useSpendingAnalytics(transactions);
 
   const currentView = VIEW_CONFIG[viewMode];
   const Icon = currentView.icon;
@@ -71,16 +66,16 @@ export default function AnalyticsPanel({ filters }: AnalyticsPanelProps) {
             {currentView.title}
           </Button>
         </Box>
-        
+
         <Box sx={{ flex: 1, overflow: 'hidden' }}>
           {viewMode === 'overview' && (
-            <SpendingOverview 
-              chartData={analytics.chartData} 
-              totalSpent={analytics.totalSpent} 
+            <SpendingOverview
+              chartData={analytics.chartData}
+              totalSpent={analytics.totalSpent}
             />
           )}
           {viewMode === 'categories' && (
-            <TopCategoriesList 
+            <TopCategoriesList
               categories={analytics.chartData}
               totalSpent={analytics.totalSpent}
             />

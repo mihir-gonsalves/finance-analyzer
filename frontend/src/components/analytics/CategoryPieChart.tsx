@@ -64,8 +64,8 @@ export function CategoryPieChart({ data, totalSpent }: CategoryPieChartProps) {
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip 
-            content={<CustomTooltip />} 
+          <Tooltip
+            content={<CustomTooltip />}
             wrapperStyle={{ zIndex: 1000, pointerEvents: 'none' }}
           />
         </PieChart>

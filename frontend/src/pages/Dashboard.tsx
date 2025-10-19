@@ -1,6 +1,7 @@
 // frontend/src/pages/Dashboard.tsx
 import { useState } from "react";
 import { Container, Grid, Box, Fade, Collapse } from "@mui/material";
+import { TransactionProvider } from "../context/TransactionContext";
 import TransactionTable from "../components/TransactionTable";
 import AnalyticsPanel from "../components/AnalyticsPanel";
 import FiltersPanel from "../components/FiltersPanel";
@@ -20,11 +21,11 @@ export default function Dashboard() {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   return (
-    <>
-      <Container 
-        maxWidth="xl" 
-        sx={{ 
-          mt: { xs: 2, md: 3 }, 
+    <TransactionProvider filters={filters}>
+      <Container
+        maxWidth="xl"
+        sx={{
+          mt: { xs: 2, md: 3 },
           mb: 2.5,
           px: { xs: 2, sm: 3 }
         }}
@@ -39,15 +40,15 @@ export default function Dashboard() {
                     filters={filters}
                     onFiltersChange={(newFilters) => {
                       setFilters(newFilters);
-                      setFiltersOpen(false); // Close panel when apply is clicked
+                      setFiltersOpen(false);
                     }}
                     onClose={() => setFiltersOpen(false)}
                   />
                 </Collapse>
               </Grid>
 
-              {/* Left side - Transaction Table (responsive width) */}
-              <Grid size={{ xs: 12, lg: 8}}>
+              {/* Left side - Transaction Table */}
+              <Grid size={{ xs: 12, lg: 8 }}>
                 <TransactionTable
                   filters={filters}
                   filtersOpen={filtersOpen}
@@ -55,14 +56,14 @@ export default function Dashboard() {
                 />
               </Grid>
 
-              {/* Right side - Analytics (responsive width) */}
-              <Grid size={{ xs: 12, lg: 4}}>
-                <AnalyticsPanel filters={filters} />
+              {/* Right side - Analytics */}
+              <Grid size={{ xs: 12, lg: 4 }}>
+                <AnalyticsPanel />
               </Grid>
             </Grid>
           </Box>
         </Fade>
       </Container>
-    </>
+    </TransactionProvider>
   );
 }

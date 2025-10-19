@@ -20,22 +20,22 @@ export const chartStyles = {
     layout: {
       textColor: customPalette.slate[500],
       fontFamily: 'Inter, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-      fontSize: 12,   
-      background: { 
-        type: ColorType.Solid, 
-        color: '#fefefe' 
+      fontSize: 12,
+      background: {
+        type: ColorType.Solid,
+        color: '#fefefe'
       },
     },
     grid: {
-      vertLines: { 
-        color: customPalette.slate[200], 
-        style: LineStyle.Dashed, 
-        visible: true 
+      vertLines: {
+        color: customPalette.slate[200],
+        style: LineStyle.Dashed,
+        visible: true
       },
-      horzLines: { 
-        color: customPalette.slate[200], 
-        style: LineStyle.Dashed, 
-        visible: true 
+      horzLines: {
+        color: customPalette.slate[200],
+        style: LineStyle.Dashed,
+        visible: true
       },
     },
     rightPriceScale: {

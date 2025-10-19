@@ -22,7 +22,7 @@ export function TransactionDataGrid({
   onEdit,
   onDelete,
 }: TransactionDataGridProps) {
-  
+
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -70,7 +70,7 @@ export function TransactionDataGrid({
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Typography
-            sx={{ 
+            sx={{
               color: params.value < 0 ? 'error.main' : 'success.main'
             }}
             fontWeight="medium"
@@ -93,7 +93,7 @@ export function TransactionDataGrid({
       getActions: (params) => [
         <GridActionsCellItem
           key="edit"
-          icon={<Edit sx={{ color: 'primary.main' }} /> }
+          icon={<Edit sx={{ color: 'primary.main' }} />}
           label="Edit"
           onClick={() => onEdit(params.row)}
         />,

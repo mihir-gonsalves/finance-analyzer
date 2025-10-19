@@ -16,8 +16,8 @@ export function CategoryFilter({ value, options, onChange }: CategoryFilterProps
         value={value}
         label="Categories"
         onChange={(e) => {
-          const newValue = typeof e.target.value === 'string' 
-            ? e.target.value.split(',') 
+          const newValue = typeof e.target.value === 'string'
+            ? e.target.value.split(',')
             : e.target.value;
           onChange(newValue);
         }}

@@ -30,7 +30,7 @@ export const customPalette = {
     light: '#f87171',
     dark: '#dc2626',
   },
-  
+
   green: {
     main: '#22c55e',
     light: '#4ade80',

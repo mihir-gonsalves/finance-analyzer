@@ -49,15 +49,15 @@ export function TransactionTableHeader({ viewMode, filters, filtersOpen, onToggl
           '&:hover': {
             backgroundColor: 'transparent',
             color: theme.palette.primary.main,
-          },          
+          },
           gap: theme.spacing(1),
         })}
       >
         {viewMode === 'table' ? <TableChart /> : <ShowChart />}
         {viewMode === 'table' ? 'Ledger' : 'Chart'}
       </Button>
-      
-      <Box display="flex" gap={1.5}> 
+
+      <Box display="flex" gap={1.5}>
         <FilterTags filters={filters} />
         <Button
           variant={filtersOpen ? "contained" : "outlined"}
@@ -67,7 +67,7 @@ export function TransactionTableHeader({ viewMode, filters, filtersOpen, onToggl
           Filters
         </Button>
 
-        <Button 
+        <Button
           variant="contained"
           startIcon={<Add />}
           onClick={onAddTransaction}
@@ -92,7 +92,7 @@ export function TransactionTableHeader({ viewMode, filters, filtersOpen, onToggl
         >
           <MoreVert />
         </IconButton>
-        
+
         <Menu
           anchorEl={menuAnchor}
           open={Boolean(menuAnchor)}
@@ -100,7 +100,7 @@ export function TransactionTableHeader({ viewMode, filters, filtersOpen, onToggl
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <MenuItem 
+          <MenuItem
             onClick={handleCSVClick}
             sx={{
               gap: 1,
@@ -109,7 +109,7 @@ export function TransactionTableHeader({ viewMode, filters, filtersOpen, onToggl
               },
             }}
           >
-            <Upload/>
+            <Upload />
             Upload CSV
           </MenuItem>
         </Menu>
