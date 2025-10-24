@@ -1,6 +1,6 @@
-// frontend/src/components/transactions/dialogs/EditTransactionDialog.tsx
+// frontend/src/components/transactions/dialogs/EditTransactionDialog.tsx - form for editing existing transactions
 import { useState, useEffect } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from "@mui/material";
 import type { Transaction, UpdateTransactionData } from "../../../hooks/useTransactions";
 
 
@@ -21,23 +21,43 @@ export function EditTransactionDialog({
   isLoading = false,
 }: EditTransactionDialogProps) {
   const [editData, setEditData] = useState<Partial<Transaction>>({});
-  const [categoryInput, setCategoryInput] = useState("");
+  const [costCenterInput, setCostCenterInput] = useState("");
+  const [spendCategoryInput, setSpendCategoryInput] = useState("");
 
   useEffect(() => {
     if (transaction) {
       setEditData(transaction);
-      setCategoryInput(transaction.categories?.map(cat => cat.name).join(", ") || "");
+
+      // Extract cost center name (or empty string if Uncategorized)
+      if (transaction.cost_center) {
+        setCostCenterInput(transaction.cost_center.name === "Uncategorized" ? "" : transaction.cost_center.name);
+      } else {
+        setCostCenterInput("");
+      }
+
+      // Extract spend category names
+      const spendCatNames = transaction.spend_categories?.filter(cat => cat.name !== "Uncategorized").map(cat => cat.name).join(", ") || "";
+      setSpendCategoryInput(spendCatNames);
     }
   }, [transaction]);
 
   const handleClose = () => {
     setEditData({});
-    setCategoryInput("");
+    setCostCenterInput("");
+    setSpendCategoryInput("");
     onClose();
   };
 
   const handleSave = () => {
     if (!transaction) return;
+
+    // ALWAYS include cost_center_name (even if empty string)
+    const costCenterName = costCenterInput.trim();
+
+    // Parse spend categories
+    const spendCategoryNames = spendCategoryInput
+      ? spendCategoryInput.split(",").map(cat => cat.trim()).filter(cat => cat.length > 0)
+      : [];
 
     const updateData: UpdateTransactionData = {
       id: transaction.id,
@@ -45,12 +65,11 @@ export function EditTransactionDialog({
       description: editData.description,
       amount: editData.amount,
       account: editData.account,
-      category_names: categoryInput
-        ? categoryInput.split(",").map(cat => cat.trim()).filter(cat => cat.length > 0)
-        : []
+      cost_center_name: costCenterName, // ALWAYS INCLUDE (empty string defaults to Uncategorized)
+      spend_category_names: spendCategoryNames,
     };
 
-    onSave(updateData);
+    onSave(updateData as any);
     handleClose();
   };
 
@@ -87,16 +106,27 @@ export function EditTransactionDialog({
             onChange={(e) => setEditData(prev => ({ ...prev, account: e.target.value }))}
             fullWidth
           />
+
           <TextField
-            label="Categories (comma-separated)"
-            value={categoryInput}
-            onChange={(e) => setCategoryInput(e.target.value)}
+            label="Cost Center"
+            value={costCenterInput}
+            onChange={(e) => setCostCenterInput(e.target.value)}
             fullWidth
-            placeholder="e.g. restaurants, miami"
-            helperText="Enter multiple categories separated by commas"
+            placeholder="e.g. Living Expenses, Car, Meals"
+            helperText='Leave blank for "Uncategorized"'
+          />
+
+          <TextField
+            label="Spend Categories (comma-separated)"
+            value={spendCategoryInput}
+            onChange={(e) => setSpendCategoryInput(e.target.value)}
+            fullWidth
+            placeholder="e.g. Rent, Gas, Groceries"
+            helperText='Leave blank for "Uncategorized"'
             multiline
             maxRows={3}
           />
+
           <TextField
             label="Date"
             type="date"

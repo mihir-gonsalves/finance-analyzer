@@ -1,4 +1,4 @@
-// frontend/src/components/Header.tsx
+// frontend/src/components/Header.tsx - app header with title and navigation
 import { AppBar, Toolbar, Typography, IconButton, Box, useMediaQuery, useTheme } from "@mui/material";
 import { AccountCircle, TrendingUp } from "@mui/icons-material";
 

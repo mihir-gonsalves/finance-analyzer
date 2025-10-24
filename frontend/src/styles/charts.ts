@@ -1,4 +1,4 @@
-// frontend/src/styles/charts.ts
+// frontend/src/styles/charts.ts - chart-specific styling configurations
 import { customPalette } from './colors';
 import { ColorType, LineStyle } from 'lightweight-charts';
 

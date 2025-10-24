@@ -1,4 +1,4 @@
-// frontend/src/components/TransactionTable.tsx
+// frontend/src/components/TransactionTable.tsx - main transaction display (toggles between data grid and chart)
 import { useState, useRef } from "react";
 import { Card, CardContent, Box, Alert } from "@mui/material";
 import LedgerChart from "./LedgerChart";
@@ -12,17 +12,15 @@ import { DeleteConfirmDialog } from "./transactions/dialogs/DeleteConfirmDialog"
 import { CSVUploadDialog } from "./transactions/dialogs/CSVUploadDialog";
 import type { TransactionFilters } from "../types/filters";
 import { useTransactionData } from "../context/TransactionContext";
-
+import { exportTransactionsToCSV } from "../utils/exportUtils";
 
 type ViewMode = 'table' | 'chart';
-
 
 interface TransactionTableProps {
   filters: TransactionFilters;
   filtersOpen: boolean;
   onToggleFilters: () => void;
 }
-
 
 export default function TransactionTable({ filters, filtersOpen, onToggleFilters }: TransactionTableProps) {
   // Data hooks
@@ -111,6 +109,10 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
     );
   };
 
+  const handleExportCSV = () => {
+    exportTransactionsToCSV(filteredTransactions);
+  };
+
   if (error) {
     return (
       <Card>
@@ -135,6 +137,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
             onToggleFilters={onToggleFilters}
             onAddTransaction={handleAddTransaction}
             onCSVUpload={handleCSVUploadClick}
+            onExportCSV={handleExportCSV}
           />
 
           {/* Hidden file input */}

@@ -1,15 +1,15 @@
-// frontend/src/components/transactions/FilterTags.tsx
+// frontend/src/components/transactions/FilterTags.tsx - displays active filters as removable chips
 import { Box, Chip } from "@mui/material";
-import { AccountBalance, Category, CalendarMonth, Search, AttachMoney } from "@mui/icons-material";
+import { AccountBalance, Category, Business, CalendarMonth, Search, AttachMoney } from "@mui/icons-material";
+import { useSpendCategories, useCostCenters } from "../../hooks/useTransactions";
 import type { TransactionFilters } from "../../types/filters";
+import { formatDateString } from "../../utils/dateUtils";
 import type { ReactElement } from "react";
-
 
 interface FilterTagsProps {
   filters: TransactionFilters;
   onRemove?: (filterKey: keyof TransactionFilters) => void;
 }
-
 
 interface TagConfig {
   key: string;
@@ -18,8 +18,38 @@ interface TagConfig {
   condition: boolean;
 }
 
-
 export function FilterTags({ filters, onRemove }: FilterTagsProps) {
+  const { data: spendCategoriesData } = useSpendCategories();
+  const { data: costCentersData } = useCostCenters();
+
+  // FIXED: Extract the arrays from the response objects
+  const spendCategories = spendCategoriesData?.spend_categories || [];
+  const costCenters = costCentersData?.cost_centers || [];
+
+  // Helper to get spend category names from IDs
+  const getSpendCategoryLabel = () => {
+    if (filters.spend_category_ids.length === 0) return '';
+
+    if (filters.spend_category_ids.length === 1) {
+      const cat = spendCategories.find(c => c.id === filters.spend_category_ids[0]);
+      return cat?.name || 'Unknown';
+    }
+
+    return `${filters.spend_category_ids.length} spend categories`;
+  };
+
+  // Helper to get cost center names from IDs
+  const getCostCenterLabel = () => {
+    if (filters.cost_center_ids.length === 0) return '';
+
+    if (filters.cost_center_ids.length === 1) {
+      const cc = costCenters.find(c => c.id === filters.cost_center_ids[0]);
+      return cc?.name || 'Unknown';
+    }
+
+    return `${filters.cost_center_ids.length} cost centers`;
+  };
+
   const tagConfigs: TagConfig[] = [
     {
       key: 'accounts',
@@ -30,17 +60,21 @@ export function FilterTags({ filters, onRemove }: FilterTagsProps) {
       condition: filters.accounts.length > 0,
     },
     {
-      key: 'categories',
+      key: 'cost_center_ids',
+      icon: <Business />,
+      label: getCostCenterLabel(),
+      condition: filters.cost_center_ids.length > 0,
+    },
+    {
+      key: 'spend_category_ids',
       icon: <Category />,
-      label: filters.categories.length === 1
-        ? filters.categories[0]
-        : `${filters.categories.length} categories`,
-      condition: filters.categories.length > 0,
+      label: getSpendCategoryLabel(),
+      condition: filters.spend_category_ids.length > 0,
     },
     {
       key: 'dates',
       icon: <CalendarMonth />,
-      label: `Dates: ${filters.dateFrom || '...'} to ${filters.dateTo || '...'}`,
+      label: `Dates: ${formatDateString(filters.dateFrom) || '...'} to ${formatDateString(filters.dateTo) || '...'}`,
       condition: !!(filters.dateFrom || filters.dateTo),
     },
     {
@@ -52,7 +86,7 @@ export function FilterTags({ filters, onRemove }: FilterTagsProps) {
     {
       key: 'amount',
       icon: <AttachMoney />,
-      label: `$${filters.minAmount || '...'} to $${filters.maxAmount || '...'}`,
+      label: `${filters.minAmount || '...'} to ${filters.maxAmount || '...'}`,
       condition: !!(filters.minAmount || filters.maxAmount),
     },
   ];
@@ -62,15 +96,12 @@ export function FilterTags({ filters, onRemove }: FilterTagsProps) {
   if (activeTags.length === 0) return null;
 
   return (
-    <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+    <Box display="flex" alignItems="center" gap={0.75} flexWrap="wrap">
       {activeTags.map(({ key, icon, label }) => (
         <Chip
           key={key}
           icon={icon}
           label={label}
-          size="small"
-          color="primary"
-          variant="outlined"
           onDelete={onRemove ? () => onRemove(key as keyof TransactionFilters) : undefined}
         />
       ))}

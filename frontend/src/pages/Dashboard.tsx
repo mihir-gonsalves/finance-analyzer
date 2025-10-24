@@ -1,4 +1,4 @@
-// frontend/src/pages/Dashboard.tsx
+// frontend/src/pages/Dashboard.tsx - main app layout combining FiltersPanel, TransactionTable, and AnalyticsPanel
 import { useState } from "react";
 import { Container, Grid, Box, Fade, Collapse } from "@mui/material";
 import { TransactionProvider } from "../context/TransactionContext";
@@ -12,7 +12,8 @@ export default function Dashboard() {
   const [filters, setFilters] = useState<TransactionFilters>({
     dateFrom: '',
     dateTo: '',
-    categories: [],
+    spend_category_ids: [],
+    cost_center_ids: [],
     accounts: [],
     minAmount: '',
     maxAmount: '',

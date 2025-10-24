@@ -1,4 +1,4 @@
-// frontend/src/hooks/usePendingFilters.ts
+// frontend/src/hooks/usePendingFilters.ts - manages unsaved filter state before applying to avoid unnecessary API calls
 import { useState, useEffect, useCallback } from 'react';
 import type { TransactionFilters } from '../types/filters';
 import { areFiltersEqual } from '../utils/filterUtils';
@@ -14,7 +14,7 @@ export function usePendingFilters(appliedFilters: TransactionFilters) {
 
   const updateFilter = useCallback((
     field: keyof TransactionFilters,
-    value: string | string[]
+    value: string | string[] | number[]
   ) => {
     setPendingFilters(prev => ({ ...prev, [field]: value }));
   }, []);

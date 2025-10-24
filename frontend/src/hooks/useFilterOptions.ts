@@ -1,30 +1,78 @@
-// frontend/src/hooks/useFilterOptions.ts - returns unique, alphabetically sorted categories and accounts
+// frontend/src/hooks/useFilterOptions.ts - fetches and prepares filter dropdown options from backend metadata
 import { useMemo } from 'react';
-import type { Transaction } from './useTransactions';
+import { useCostCenters, useSpendCategories, useAccounts } from './useTransactions';
 
 
-export interface FilterOptions {
-  categories: string[];
-  accounts: string[];
+export interface SpendCategoryOption {
+  id: number;
+  name: string;
 }
 
 
-export function useFilterOptions(transactions: Transaction[]): FilterOptions {
-  return useMemo(() => {
-    // Extract all category names
-    const allCategoryNames = transactions.flatMap(t =>
-      t.categories ? t.categories.map(cat => cat.name) : []
-    );
-    const uniqueCategories = Array.from(new Set(allCategoryNames)).sort();
+export interface CostCenterOption {
+  id: number;
+  name: string;
+}
 
-    // Extract all account names
-    const uniqueAccounts = Array.from(
-      new Set(transactions.map(t => t.account).filter(Boolean))
-    ).sort();
+
+export interface FilterOptions {
+  spend_categories: SpendCategoryOption[];
+  cost_centers: CostCenterOption[];
+  accounts: string[];
+  isLoading: boolean;
+  error: Error | null;
+}
+
+
+/*
+ * Fetch and prepare filter options from metadata endpoints
+ * Replaces the old transaction-based extraction approach
+ */
+export function useFilterOptions(): FilterOptions {
+  const costCentersQuery = useCostCenters();
+  const spendCategoriesQuery = useSpendCategories();
+  const accountsQuery = useAccounts();
+
+  return useMemo(() => {
+    const isLoading =
+      costCentersQuery.isLoading ||
+      spendCategoriesQuery.isLoading ||
+      accountsQuery.isLoading;
+
+    const error =
+      costCentersQuery.error ||
+      spendCategoriesQuery.error ||
+      accountsQuery.error;
+
+    // Extract and sort cost centers
+    const cost_centers = (costCentersQuery.data?.cost_centers || [])
+      .map(cc => ({ id: cc.id, name: cc.name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    // Extract and sort spend categories
+    const spend_categories = (spendCategoriesQuery.data?.spend_categories || [])
+      .map(sc => ({ id: sc.id, name: sc.name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    // Accounts are already sorted from backend
+    const accounts = accountsQuery.data || [];
 
     return {
-      categories: uniqueCategories,
-      accounts: uniqueAccounts,
+      cost_centers,
+      spend_categories,
+      accounts,
+      isLoading,
+      error: error as Error | null,
     };
-  }, [transactions]);
+  }, [
+    costCentersQuery.data,
+    costCentersQuery.isLoading,
+    costCentersQuery.error,
+    spendCategoriesQuery.data,
+    spendCategoriesQuery.isLoading,
+    spendCategoriesQuery.error,
+    accountsQuery.data,
+    accountsQuery.isLoading,
+    accountsQuery.error,
+  ]);
 }

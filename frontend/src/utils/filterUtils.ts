@@ -1,7 +1,10 @@
-// frontend/src/utils/filterUtils.ts
+// frontend/src/utils/filterUtils.ts - filter operations (equality checks, URL param building, active filter counting)
 import type { TransactionFilters } from '../types/filters';
 
 
+/*
+ * Count how many filters are currently active
+ */
 export function getActiveFilterCount(filters: TransactionFilters): number {
   return Object.entries(filters).filter(([_, value]) => {
     if (Array.isArray(value)) {
@@ -12,16 +15,23 @@ export function getActiveFilterCount(filters: TransactionFilters): number {
 }
 
 
+/*
+ * Check if any filters are currently active
+ */
 export function hasActiveFilters(filters: TransactionFilters): boolean {
   return getActiveFilterCount(filters) > 0;
 }
 
 
+/*
+ * Create an empty filter object with all fields set to defaults
+ */
 export function createEmptyFilters(): TransactionFilters {
   return {
     dateFrom: '',
     dateTo: '',
-    categories: [],
+    spend_category_ids: [],
+    cost_center_ids: [],
     accounts: [],
     minAmount: '',
     maxAmount: '',
@@ -30,24 +40,31 @@ export function createEmptyFilters(): TransactionFilters {
 }
 
 
-// Deep equality check for filters
+/*
+ * Deep equality check for filters
+ */
 export function areFiltersEqual(a: TransactionFilters, b: TransactionFilters): boolean {
   // Compare primitive values
-  if (a.dateFrom !== b.dateFrom ||
+  if (
+    a.dateFrom !== b.dateFrom ||
     a.dateTo !== b.dateTo ||
     a.minAmount !== b.minAmount ||
     a.maxAmount !== b.maxAmount ||
-    a.searchTerm !== b.searchTerm) {
+    a.searchTerm !== b.searchTerm
+  ) {
     return false;
   }
 
   // Compare arrays
-  return areArraysEqual(a.categories, b.categories) &&
-    areArraysEqual(a.accounts, b.accounts);
+  return (
+    areNumberArraysEqual(a.spend_category_ids, b.spend_category_ids) &&
+    areNumberArraysEqual(a.cost_center_ids, b.cost_center_ids) &&
+    areStringArraysEqual(a.accounts, b.accounts)
+  );
 }
 
 
-function areArraysEqual(a: string[], b: string[]): boolean {
+function areStringArraysEqual(a: string[], b: string[]): boolean {
   if (a.length !== b.length) return false;
   const sortedA = [...a].sort();
   const sortedB = [...b].sort();
@@ -55,27 +72,135 @@ function areArraysEqual(a: string[], b: string[]): boolean {
 }
 
 
-// Build URL params for backend filtering
+function areNumberArraysEqual(a: number[], b: number[]): boolean {
+  if (a.length !== b.length) return false;
+  const sortedA = [...a].sort((x, y) => x - y);
+  const sortedB = [...b].sort((x, y) => x - y);
+  return sortedA.every((val, idx) => val === sortedB[idx]);
+}
+
+
+/*
+ * Build URL search params for backend filtering endpoint
+ * Maps frontend filter format to backend query parameters
+ * 
+ * Backend expects:
+ * - account: string[] (query param repeated for each account)
+ * - spend_category_ids: number[] (query param repeated)
+ * - cost_center_ids: number[] (query param repeated)
+ * - start: string (YYYY-MM-DD)
+ * - end: string (YYYY-MM-DD)
+ * - min_amount: number
+ * - max_amount: number
+ * - search: string
+ */
 export function buildFilterParams(filters: TransactionFilters): URLSearchParams {
   const params = new URLSearchParams();
 
-  // Array filters
-  filters.accounts.forEach(account => params.append('account', account));
-  filters.categories.forEach(category => {
-    const catValue = category === 'Uncategorized' ? '' : category;
-    params.append('category', catValue);
+  // Array filters - append each value separately
+  filters.accounts.forEach(account => {
+    if (account.trim()) {
+      params.append('account', account);
+    }
   });
 
-  // Date filters
-  if (filters.dateFrom) params.append('start', filters.dateFrom);
-  if (filters.dateTo) params.append('end', filters.dateTo);
+  filters.spend_category_ids.forEach(id => {
+    params.append('spend_category_ids', id.toString());
+  });
 
-  // Amount filters
-  if (filters.minAmount) params.append('minAmount', filters.minAmount);
-  if (filters.maxAmount) params.append('maxAmount', filters.maxAmount);
+  filters.cost_center_ids.forEach(id => {
+    params.append('cost_center_ids', id.toString());
+  });
+
+  // Date filters (YYYY-MM-DD format expected)
+  if (filters.dateFrom) {
+    params.append('start', filters.dateFrom);
+  }
+  if (filters.dateTo) {
+    params.append('end', filters.dateTo);
+  }
+
+  // Amount filters (convert to numbers)
+  if (filters.minAmount) {
+    const minAmount = parseFloat(filters.minAmount);
+    if (!isNaN(minAmount)) {
+      params.append('min_amount', minAmount.toString());
+    }
+  }
+  if (filters.maxAmount) {
+    const maxAmount = parseFloat(filters.maxAmount);
+    if (!isNaN(maxAmount)) {
+      params.append('max_amount', maxAmount.toString());
+    }
+  }
 
   // Search filter
-  if (filters.searchTerm) params.append('search', filters.searchTerm);
+  if (filters.searchTerm) {
+    params.append('search', filters.searchTerm);
+  }
+
+  // Default sorting (can be overridden by component)
+  params.append('sort_by', 'date');
+  params.append('sort_order', 'desc');
 
   return params;
+}
+
+
+/*
+ * Get a summary description of active filters for display
+ */
+export function getFilterSummary(filters: TransactionFilters): string[] {
+  const summary: string[] = [];
+
+  if (filters.accounts.length > 0) {
+    summary.push(`Accounts: ${filters.accounts.join(', ')}`);
+  }
+
+  if (filters.cost_center_ids.length > 0) {
+    summary.push(`Cost Centers: ${filters.cost_center_ids.length} selected`);
+  }
+
+  if (filters.spend_category_ids.length > 0) {
+    summary.push(`Categories: ${filters.spend_category_ids.length} selected`);
+  }
+
+  if (filters.dateFrom && filters.dateTo) {
+    summary.push(`Date: ${filters.dateFrom} to ${filters.dateTo}`);
+  } else if (filters.dateFrom) {
+    summary.push(`Date: From ${filters.dateFrom}`);
+  } else if (filters.dateTo) {
+    summary.push(`Date: Until ${filters.dateTo}`);
+  }
+
+  if (filters.minAmount && filters.maxAmount) {
+    summary.push(`Amount: $${filters.minAmount} - $${filters.maxAmount}`);
+  } else if (filters.minAmount) {
+    summary.push(`Amount: Min $${filters.minAmount}`);
+  } else if (filters.maxAmount) {
+    summary.push(`Amount: Max $${filters.maxAmount}`);
+  }
+
+  if (filters.searchTerm) {
+    summary.push(`Search: "${filters.searchTerm}"`);
+  }
+
+  return summary;
+}
+
+
+/*
+ * Clone filters to create a new independent copy
+ */
+export function cloneFilters(filters: TransactionFilters): TransactionFilters {
+  return {
+    dateFrom: filters.dateFrom,
+    dateTo: filters.dateTo,
+    spend_category_ids: [...filters.spend_category_ids],
+    cost_center_ids: [...filters.cost_center_ids],
+    accounts: [...filters.accounts],
+    minAmount: filters.minAmount,
+    maxAmount: filters.maxAmount,
+    searchTerm: filters.searchTerm,
+  };
 }

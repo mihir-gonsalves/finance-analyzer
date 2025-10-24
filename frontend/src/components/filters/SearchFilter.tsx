@@ -1,4 +1,4 @@
-// frontend/src/components/filters/SearchFilter.tsx
+// frontend/src/components/filters/SearchFilter.tsx - text search input for transaction descriptions
 import { TextField } from "@mui/material";
 
 

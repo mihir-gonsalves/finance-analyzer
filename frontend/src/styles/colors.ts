@@ -1,4 +1,4 @@
-// frontend/src/styles/colors.ts
+// frontend/src/styles/colors.ts - color palette and chart color schemes
 export const customPalette = {
   emerald: {
     main: '#059669',

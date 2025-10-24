@@ -1,4 +1,4 @@
-// styles/typography.ts
+// styles/typography.ts - font styles and text formatting
 export const typography = {
   fontFamily: 'Inter, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
 

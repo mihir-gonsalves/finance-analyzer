@@ -1,4 +1,4 @@
-// frontend/src/context/TransactionContext.tsx - gives context to frontend whether filters are applied or not
+// frontend/src/context/TransactionContext.tsx - react context providing filter state and whether filters are applied globally
 import React, { createContext, useContext } from "react";
 import { useFilteredOrAllTransactions } from "../hooks/useFilters";
 import type { Transaction } from "../hooks/useTransactions";
@@ -9,6 +9,7 @@ interface TransactionContextType {
   transactions: Transaction[];
   isLoading: boolean;
   error: Error | null;
+  appliedFilters: TransactionFilters;
 }
 
 
@@ -28,6 +29,7 @@ export function TransactionProvider({ filters, children }: TransactionProviderPr
     transactions: query.data ?? [],
     isLoading: query.isLoading,
     error: query.error as Error | null,
+    appliedFilters: filters,
   };
 
   return (

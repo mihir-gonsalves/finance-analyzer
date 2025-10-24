@@ -12,7 +12,7 @@ coverage/
 htmlcov/
 
 # SQLite database
-transactions.db
+*.db
 *.sqlite3
 
 # Logs

@@ -1,4 +1,4 @@
-// frontend/src/components/LedgerChart.tsx
+// frontend/src/components/LedgerChart.tsx - trading View lightweight chart visualization of transaction history
 import { useEffect, useRef, useMemo, useState } from "react";
 import { Card, CardContent, Typography, Box } from "@mui/material";
 import { createChart, BaselineSeries } from "lightweight-charts";

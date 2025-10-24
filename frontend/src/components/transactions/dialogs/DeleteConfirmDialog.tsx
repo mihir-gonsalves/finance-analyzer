@@ -1,4 +1,4 @@
-// frontend/src/components/transactions/dialogs/DeleteConfirmDialog.tsx
+// frontend/src/components/transactions/dialogs/DeleteConfirmDialog.tsx - confirmation dialog for deleting transactions
 import { Dialog, DialogTitle, DialogContent, DialogActions, Typography, Button, } from "@mui/material";
 
 
