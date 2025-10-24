@@ -1,12 +1,11 @@
-// frontend/src/components/transactions/TransactionDataGrid.tsx
+// frontend/src/components/transactions/TransactionDataGrid.tsx - MUI DataGrid ledger showing transaction rows
 import { useMemo } from "react";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import { Edit, Delete } from "@mui/icons-material";
-import { Box, Chip, Typography } from "@mui/material";
+import { Box, Chip, Typography, Tooltip } from "@mui/material";
 import { formatDateString } from "../../utils/dateUtils";
-import type { Transaction } from "../../hooks/useTransactions";
-
+import type { Transaction, SpendCategory } from "../../hooks/useTransactions";
 
 interface TransactionDataGridProps {
   transactions: Transaction[];
@@ -14,7 +13,6 @@ interface TransactionDataGridProps {
   onEdit: (transaction: Transaction) => void;
   onDelete: (id: number) => void;
 }
-
 
 export function TransactionDataGrid({
   transactions,
@@ -34,39 +32,115 @@ export function TransactionDataGrid({
     {
       field: 'date',
       headerName: 'Date',
-      width: 105,
-      valueFormatter: (value: string) => formatDateString(value),
+      width: 115,
+      renderCell: (params) => {
+        const formattedDate = formatDateString(params.value);
+        return (
+          <Tooltip title={formattedDate} placement="top-start">
+            <Typography>
+              {formattedDate}
+            </Typography>
+          </Tooltip>
+        );
+      },
     },
     {
       field: 'description',
       headerName: 'Description',
-      width: 240,
+      width: 200,
+      renderCell: (params) => {
+        const description = params.value as string;
+        return (
+          <Tooltip title={description} placement="top-start">
+            <Typography
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                width: '100%',
+              }}
+            >
+              {description}
+            </Typography>
+          </Tooltip>
+        );
+      },
     },
     {
       field: 'categories',
       headerName: 'Categories',
-      width: 275,
+      width: 300,
       renderCell: (params) => {
-        const categories = params.value || [];
-        if (categories.length === 0) {
-          return <Chip label="Uncategorized" />;
+        const transaction = params.row as Transaction;
+        const costCenter = transaction.cost_center;
+        const spendCategories: SpendCategory[] = transaction.spend_categories || [];
+
+        if (!costCenter && spendCategories.length === 0) {
+          return <Chip label="Uncategorized" size="small" />;
         }
+
+        const allCategories = [
+          ...(costCenter ? [costCenter.name] : []),
+          ...spendCategories.map(cat => cat.name)
+        ];
+        const tooltipText = allCategories.join(', ');
+
         return (
-          <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
-            {categories.map((category: { id: number; name: string }) => (
-              <Chip
-                key={category.id}
-                label={category.name}
-              />
-            ))}
-          </Box>
+          <Tooltip title={tooltipText} placement="top-start">
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 0.75,
+                flexWrap: 'nowrap',
+                overflow: 'hidden',
+                width: '100%',
+              }}
+            >
+              {costCenter && (
+                <Chip
+                  label={costCenter.name}
+                  size="small"
+                  sx={{
+                    color: 'secondary.main',
+                    borderColor: 'secondary.main',
+                    maxWidth: '151px',
+                    '& .MuiChip-label': {
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }
+                  }}
+                />
+              )}
+              {spendCategories.slice(0, 2).map((cat) => (
+                <Chip
+                  key={cat.id}
+                  label={cat.name}
+                  size="small"
+                  sx={{
+                    maxWidth: '151px',
+                    '& .MuiChip-label': {
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }
+                  }}
+                />
+              ))}
+              {spendCategories.length > 2 && (
+                <Chip
+                  label={`+${spendCategories.length - 2}`}
+                />
+              )}
+            </Box>
+          </Tooltip>
         );
       },
     },
     {
       field: 'amount',
       headerName: 'Amount',
-      width: 105,
+      width: 110,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Typography
@@ -83,7 +157,24 @@ export function TransactionDataGrid({
     {
       field: 'account',
       headerName: 'Account',
-      width: 105,
+      width: 108,
+      renderCell: (params) => {
+        const account = params.value as string;
+        return (
+          <Tooltip title={account} placement="top-start">
+            <Typography
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                width: '100%',
+              }}
+            >
+              {account}
+            </Typography>
+          </Tooltip>
+        );
+      },
     },
     {
       field: 'actions',
@@ -121,7 +212,7 @@ export function TransactionDataGrid({
       }}
       sx={{
         height: 569,
-        backgroundColor: '#ffffff', // need to figure out header bg color
+        backgroundColor: '#ffffff',
         '& .MuiDataGrid-row:hover': {
           backgroundColor: 'action.hover',
         },

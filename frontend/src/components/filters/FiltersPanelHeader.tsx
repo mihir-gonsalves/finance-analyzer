@@ -1,4 +1,4 @@
-// frontend/src/components/filters/FiltersPanelHeader.tsx
+// frontend/src/components/filters/FiltersPanelHeader.tsx - filter panel title and collapse/expand controls
 import { Box, Typography, Chip, Button, IconButton } from "@mui/material";
 import { FilterList, Clear } from "@mui/icons-material";
 

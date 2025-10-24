@@ -1,12 +1,11 @@
-// frontend/src/components/analytics/SpendingOverview.tsx
+// frontend/src/components/analytics/SpendingOverview.tsx - high-level spending summary cards
 import { Box, Typography } from "@mui/material";
-import { Category as CategoryIcon } from "@mui/icons-material";
 import { CategoryPieChart } from "./CategoryPieChart";
-import type { CategoryData } from "../../hooks/useSpendingAnalytics";
+import type { SpendCategoryData } from "../../hooks/useSpendingAnalytics";
 
 
 interface SpendingOverviewProps {
-  chartData: CategoryData[];
+  chartData: SpendCategoryData[];
   totalSpent: number;
 }
 
@@ -21,7 +20,6 @@ export function SpendingOverview({ chartData, totalSpent }: SpendingOverviewProp
         alignItems="center"
         sx={{ height: '520px' }}
       >
-        <CategoryIcon sx={{ fontSize: 48, color: 'grey.300', mb: 1 }} />
         <Typography color="text.secondary" variant="body2">
           No spending data available
         </Typography>
@@ -30,13 +28,7 @@ export function SpendingOverview({ chartData, totalSpent }: SpendingOverviewProp
   }
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      sx={{ height: '530px' }}
-    >
+    <Box sx={{ height: '563px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <CategoryPieChart data={chartData} totalSpent={totalSpent} />
     </Box>
   );

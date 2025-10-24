@@ -1,4 +1,4 @@
-// frontend/src/components/filters/FilterActions.tsx
+// frontend/src/components/filters/FilterActions.tsx - apply/Clear filter buttons
 import { Box, Button } from "@mui/material";
 
 

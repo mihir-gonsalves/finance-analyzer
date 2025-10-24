@@ -1,6 +1,6 @@
-// frontend/src/components/transactions/dialogs/AddTransactionDialog.tsx
+// frontend/src/components/transactions/dialogs/AddTransactionDialog.tsx - form for creating new transactions
 import { useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from "@mui/material";
 import { getTodayDateString } from "../../../utils/dateUtils";
 import type { CreateTransactionData } from "../../../hooks/useTransactions";
 
@@ -16,7 +16,7 @@ interface AddTransactionDialogProps {
 const INITIAL_STATE: CreateTransactionData = {
   date: getTodayDateString(),
   description: "",
-  category_names: [],
+  spend_category_names: [],
   amount: 0,
   account: "",
 };
@@ -29,22 +29,31 @@ export function AddTransactionDialog({
   isLoading = false,
 }: AddTransactionDialogProps) {
   const [transaction, setTransaction] = useState<CreateTransactionData>(INITIAL_STATE);
-  const [categoryInput, setCategoryInput] = useState("");
+  const [costCenterInput, setCostCenterInput] = useState("");
+  const [spendCategoryInput, setSpendCategoryInput] = useState("");
 
   const handleClose = () => {
     setTransaction(INITIAL_STATE);
-    setCategoryInput("");
+    setCostCenterInput("");
+    setSpendCategoryInput("");
     onClose();
   };
 
   const handleSave = () => {
+    // Parse cost center and spend categories from input
+    const costCenterName = costCenterInput.trim();
+    const spendCategoryNames = spendCategoryInput
+      ? spendCategoryInput.split(",").map(cat => cat.trim()).filter(cat => cat.length > 0)
+      : [];
+
+    // Send to backend with the structure it expects
     const finalTransaction = {
       ...transaction,
-      category_names: categoryInput
-        ? categoryInput.split(",").map(cat => cat.trim()).filter(cat => cat.length > 0)
-        : []
+      cost_center_name: costCenterName || undefined,
+      spend_category_names: spendCategoryNames,
     };
-    onSave(finalTransaction);
+
+    onSave(finalTransaction as any); // Backend will handle creation
     handleClose();
   };
 
@@ -78,16 +87,27 @@ export function AddTransactionDialog({
             fullWidth
             required
           />
+
           <TextField
-            label="Categories (comma-separated)"
-            value={categoryInput}
-            onChange={(e) => setCategoryInput(e.target.value)}
+            label="Cost Center"
+            value={costCenterInput}
+            onChange={(e) => setCostCenterInput(e.target.value)}
             fullWidth
-            placeholder="e.g. restaurants, miami"
-            helperText="Enter multiple categories separated by commas"
+            placeholder="e.g. Living Expenses, Car, Meals"
+            helperText='Leave blank for "Uncategorized"'
+          />
+
+          <TextField
+            label="Spend Categories (comma-separated)"
+            value={spendCategoryInput}
+            onChange={(e) => setSpendCategoryInput(e.target.value)}
+            fullWidth
+            placeholder="e.g. Rent, Gas, Groceries"
+            helperText='Leave blank for "Uncategorized"'
             multiline
             maxRows={3}
           />
+
           <TextField
             label="Date"
             type="date"

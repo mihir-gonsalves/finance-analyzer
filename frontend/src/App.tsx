@@ -1,4 +1,4 @@
-// frontend/src/App.tsx
+// frontend/src/App.tsx - root component with QueryClientProvider, ThemeProvider, Header, and Dashboard
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CssBaseline, Box, ThemeProvider } from "@mui/material";
 import Header from "./components/Header.tsx";

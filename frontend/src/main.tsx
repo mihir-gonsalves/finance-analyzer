@@ -1,3 +1,4 @@
+// frontend/src/main.tsx - react app entry point and DOM mounting
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 

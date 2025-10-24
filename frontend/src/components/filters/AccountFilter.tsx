@@ -1,4 +1,4 @@
-// frontend/src/components/filters/AccountFilter.tsx
+// frontend/src/components/filters/AccountFilter.tsx - multi-select dropdown for accounts
 import { FormControl, InputLabel, Select, MenuItem, Chip, Box } from "@mui/material";
 
 

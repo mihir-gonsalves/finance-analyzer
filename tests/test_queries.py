@@ -1,6 +1,6 @@
 import datetime
 
-from app.queries import (
+from app.crud.filtering import (
     get_all_transactions,
     get_transactions_by_account,
     get_transactions_by_date_range,

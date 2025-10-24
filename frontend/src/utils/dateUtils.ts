@@ -1,4 +1,4 @@
-// frontend/src/utils/dateUtils.ts - Utility functions for consistent date handling
+// frontend/src/utils/dateUtils.ts - date parsing, formatting, and manipulation utilities
 export function parseDateString(dateStr: string): Date {
   /*
    * Parses a date string in YYYY-MM-DD format into a Date object without timezone conversion.

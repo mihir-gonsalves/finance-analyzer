@@ -1,7 +1,6 @@
-// frontend/src/components/FiltersPanel.tsx
+// frontend/src/components/FiltersPanel.tsx - filter controls for transactions (dates, categories, amounts, search)
 import { Card, CardContent, Box, Divider, Alert } from "@mui/material";
 import { useState } from "react";
-import { useTransactions } from "../hooks/useTransactions";
 import { useFilterOptions } from "../hooks/useFilterOptions";
 import { usePendingFilters } from "../hooks/usePendingFilters";
 import { getActiveFilterCount, hasActiveFilters, createEmptyFilters } from "../utils/filterUtils";
@@ -9,15 +8,14 @@ import { validateFilters, sanitizeFilters, getValidationErrorMessage } from "../
 import { FiltersPanelHeader } from "./filters/FiltersPanelHeader";
 import { SearchFilter } from "./filters/SearchFilter";
 import { DateRangeFilter } from "./filters/DateRangeFilter";
-import { CategoryFilter } from "./filters/CategoryFilter";
+import { SpendCategoryFilter } from "./filters/SpendCategoryFilter";
+import { CostCenterFilter } from "./filters/CostCenterFilter";
 import { AccountFilter } from "./filters/AccountFilter";
 import { AmountRangeFilter } from "./filters/AmountRangeFilter";
 import { FilterActions } from "./filters/FilterActions";
 import type { TransactionFilters } from "../types/filters";
 
-
 export type { TransactionFilters };
-
 
 interface FiltersPanelProps {
   filters: TransactionFilters;
@@ -25,20 +23,10 @@ interface FiltersPanelProps {
   onClose: () => void;
 }
 
-
-export default function FiltersPanel({
-  filters,
-  onFiltersChange,
-  onClose
-}: FiltersPanelProps) {
-  const { data: transactions = [] } = useTransactions();
-  const { categories, accounts } = useFilterOptions(transactions);
-  const {
-    pendingFilters,
-    updateFilter,
-    reset,
-    hasUnsavedChanges
-  } = usePendingFilters(filters);
+export default function FiltersPanel({ filters, onFiltersChange, onClose }: FiltersPanelProps) {
+  // FIXED: useFilterOptions doesn't take any arguments
+  const { spend_categories, cost_centers, accounts } = useFilterOptions();
+  const { pendingFilters, updateFilter, reset, hasUnsavedChanges } = usePendingFilters(filters);
 
   const [validationError, setValidationError] = useState<string>("");
 
@@ -112,16 +100,21 @@ export default function FiltersPanel({
             />
           </Box>
 
-          {/* Categories and Accounts Row */}
+          {/* Cost Centers, Spend Categories and Accounts Row */}
           <Box
             display="grid"
-            gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr' }}
+            gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr 1fr' }}
             gap={2}
           >
-            <CategoryFilter
-              value={pendingFilters.categories}
-              options={categories}
-              onChange={(value) => updateFilter('categories', value)}
+            <CostCenterFilter
+              value={pendingFilters.cost_center_ids}
+              options={cost_centers}
+              onChange={(value) => updateFilter('cost_center_ids', value)}
+            />
+            <SpendCategoryFilter
+              value={pendingFilters.spend_category_ids}
+              options={spend_categories}
+              onChange={(value) => updateFilter('spend_category_ids', value)}
             />
             <AccountFilter
               value={pendingFilters.accounts}

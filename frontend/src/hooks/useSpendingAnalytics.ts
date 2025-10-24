@@ -1,71 +1,127 @@
-// frontend/src/hooks/useSpendingAnalytics.ts
+// frontend/src/hooks/useSpendingAnalytics.ts - quick client-side analytics calculations on already-fetched transactions
 import { useMemo } from 'react';
-import { calculateCategorySpending, calculateTotalSpent, calculateTotalIncome, filterValidExpenseCategories, filterIncome } from '../utils/analyticsUtils';
-import type { Transaction } from '../hooks/useTransactions';
+import {
+  calculateTotalExpenses,
+  calculateTotalIncome,
+  calculateNetBalance,
+  getExpenseCount,
+  getIncomeCount,
+  calculateAverageExpense,
+  groupExpensesByCostCenter,
+  groupExpensesBySpendCategory,
+  toChartData
+} from '../utils/analyticsUtils';
+import type { Transaction } from './useTransactions';
 
-
-export interface CategoryData {
+export interface SpendCategoryData {
   name: string;
   value: number;
 }
 
-
 export interface SpendingAnalytics {
-  categorySpending: Record<string, number>;
-  chartData: CategoryData[];
-  totalSpent: number;
+  // Spending breakdowns
+  costCenterSpending: Record<string, number>;
+  spendCategorySpending: Record<string, number>;
+
+  // Chart-ready data
+  costCenterChartData: SpendCategoryData[];
+  spendCategoryChartData: SpendCategoryData[];
+
+  // Financial totals
+  totalExpenses: number;
   totalIncome: number;
+  totalSpent: number; // Alias for totalExpenses
   netBalance: number;
+
+  // Statistics
   stats: {
     transactionCount: number;
-    categoryCount: number;
     expenseCount: number;
-    avgPerExpense: number;
+    incomeCount: number;
     paycheckCount: number;
+    avgExpense: number;
+    avgPerExpense: number; // Alias for avgExpense
+    avgIncome: number;
     avgPerPaycheck: number;
+    costCenterCount: number;
+    spendCategoryCount: number;
   };
 }
 
+/*
+ * Helper: Check if transaction has "paycheck" spend category
+ */
+function isPaycheck(transaction: Transaction): boolean {
+  if (!transaction.spend_categories || transaction.spend_categories.length === 0) {
+    return false;
+  }
+  return transaction.spend_categories.some(
+    cat => cat.name.toLowerCase() === 'paycheck'
+  );
+}
 
+/*
+ * Helper: Calculate paycheck statistics
+ */
+function calculatePaycheckStats(transactions: Transaction[]): { count: number; total: number; average: number } {
+  const paychecks = transactions.filter(t => t.amount > 0 && isPaycheck(t));
+  const count = paychecks.length;
+  const total = paychecks.reduce((sum, t) => sum + t.amount, 0);
+  const average = count > 0 ? total / count : 0;
+  
+  return { count, total, average };
+}
+
+/*
+ * Calculate spending analytics from a list of transactions
+ * 
+ * NOTE: For production dashboards with filters, prefer using the backend
+ * analytics API via useAnalytics hooks. This is for quick local calculations.
+ */
 export function useSpendingAnalytics(transactions: Transaction[]): SpendingAnalytics {
   return useMemo(() => {
-    const categorySpending = calculateCategorySpending(transactions);
-    const totalSpent = calculateTotalSpent(transactions);
+    // Calculate spending by dimensions
+    const costCenterSpending = groupExpensesByCostCenter(transactions);
+    const spendCategorySpending = groupExpensesBySpendCategory(transactions);
+
+    // Calculate financial totals
+    const totalExpenses = calculateTotalExpenses(transactions);
     const totalIncome = calculateTotalIncome(transactions);
+    const netBalance = calculateNetBalance(transactions);
 
-    const chartData: CategoryData[] = Object.entries(categorySpending)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
+    // Calculate statistics
+    const expenseCount = getExpenseCount(transactions);
+    const incomeCount = getIncomeCount(transactions);
+    const avgExpense = calculateAverageExpense(transactions);
+    const avgIncome = totalIncome / (incomeCount > 0 ? incomeCount : 1);
 
-    const expenseCount = transactions.filter(transaction => {
-      if (transaction.amount >= 0) return false;
-      if (transaction.categories.length === 0) return true;
-      return transaction.categories.some(cat =>
-        filterValidExpenseCategories([cat]).length > 0
-      );
-    }).length;
+    // Calculate paycheck-specific statistics
+    const paycheckStats = calculatePaycheckStats(transactions);
 
-    const paycheckCount = transactions.filter(transaction => {
-      if (transaction.amount <= 0) return false;
-      if (transaction.categories.length === 0) return true;
-      return transaction.categories.some(cat =>
-        filterIncome([cat]).length > 0
-      );
-    }).length;
+    // Prepare chart data (sorted by value descending)
+    const costCenterChartData = toChartData(costCenterSpending, true);
+    const spendCategoryChartData = toChartData(spendCategorySpending, true);
 
     return {
-      categorySpending,
-      chartData,
-      totalSpent,
+      costCenterSpending,
+      spendCategorySpending,
+      costCenterChartData,
+      spendCategoryChartData,
+      totalExpenses,
       totalIncome,
-      netBalance: totalIncome - totalSpent,
+      totalSpent: totalExpenses, // Alias for easier access
+      netBalance,
       stats: {
         transactionCount: transactions.length,
-        categoryCount: Object.keys(categorySpending).length,
         expenseCount,
-        avgPerExpense: expenseCount > 0 ? totalSpent / expenseCount : 0,
-        paycheckCount,
-        avgPerPaycheck: paycheckCount > 0 ? totalIncome / paycheckCount : 0,
+        incomeCount,
+        paycheckCount: paycheckStats.count,
+        avgExpense,
+        avgPerExpense: avgExpense, // Alias
+        avgIncome,
+        avgPerPaycheck: paycheckStats.average,
+        costCenterCount: Object.keys(costCenterSpending).length,
+        spendCategoryCount: Object.keys(spendCategorySpending).length,
       }
     };
   }, [transactions]);

@@ -1,4 +1,4 @@
-// frontend/src/api/client.ts - configures Axios client to make HTTP requests and handle responses with backend API
+// frontend/src/api/client.ts - configures Axios HTTP client with base URL and default settings
 import axios from "axios";
 
 const client = axios.create({

@@ -3,10 +3,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import init_db
-from .api import transactions
+
+from app.api.transactions import router as transactions_router
+from app.api.analytics import router as analytics_router
 
 
-app = FastAPI(title="Transactions API")
+app = FastAPI(title="Budgeting API")
 
 
 # Allow cross-origin requests (for React frontend)
@@ -29,5 +31,6 @@ app.add_middleware(
 init_db()
 
 
-# Attach the transactions router
-app.include_router(transactions.router)
+# Include routers
+app.include_router(transactions_router)
+app.include_router(analytics_router)

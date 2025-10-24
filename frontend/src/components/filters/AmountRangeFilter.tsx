@@ -1,4 +1,4 @@
-// frontend/src/components/filters/AmountRangeFilter.tsx
+// frontend/src/components/filters/AmountRangeFilter.tsx - min/max amount input fields
 import { TextField } from "@mui/material";
 
 
@@ -19,7 +19,7 @@ export function AmountRangeFilter({
   return (
     <>
       <TextField
-        label="Min Amount"
+        label="Minimum Amount"
         type="number"
         value={minAmount}
         onChange={(e) => onMinAmountChange(e.target.value)}
@@ -29,7 +29,7 @@ export function AmountRangeFilter({
       />
 
       <TextField
-        label="Max Amount"
+        label="Maximum Amount"
         type="number"
         value={maxAmount}
         onChange={(e) => onMaxAmountChange(e.target.value)}

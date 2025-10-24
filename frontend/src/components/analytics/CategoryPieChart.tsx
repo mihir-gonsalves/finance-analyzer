@@ -1,12 +1,12 @@
-// frontend/src/components/analytics/CategoryPieChart.tsx
+// frontend/src/components/analytics/CategoryPieChart.tsx - pie chart showing spending by category/cost center
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Box, Typography, useTheme } from "@mui/material";
 import { formatCurrency } from "../../utils/analyticsUtils";
-import type { CategoryData } from "../../hooks/useSpendingAnalytics";
+import type { SpendCategoryData } from "../../hooks/useSpendingAnalytics";
 
 
 interface CategoryPieChartProps {
-  data: CategoryData[];
+  data: SpendCategoryData[];
   totalSpent: number;
 }
 
@@ -84,13 +84,12 @@ export function CategoryPieChart({ data, totalSpent }: CategoryPieChartProps) {
       >
         <Typography
           variant="h4"
-          fontWeight="700"
           color="primary.main"
           sx={{ letterSpacing: '-0.02em' }}
         >
           {formatCurrency(totalSpent)}
         </Typography>
-        <Typography variant="body1" color="text.secondary" fontWeight="500">
+        <Typography color="text.secondary" fontWeight="600">
           Total Spent
         </Typography>
       </Box>

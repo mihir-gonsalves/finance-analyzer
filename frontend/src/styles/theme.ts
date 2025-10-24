@@ -1,4 +1,4 @@
-// frontend/src/styles/theme.ts
+// frontend/src/styles/theme.ts - MUI theme configuration (colors, typography, spacing)
 import { createTheme } from "@mui/material/styles";
 import { customPalette } from './colors';
 import { typography } from "./typography";

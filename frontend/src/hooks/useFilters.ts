@@ -1,10 +1,10 @@
-// frontend/src/hooks/useFilters.ts
+// frontend/src/hooks/useFilters.ts - smart hook that switches between all/filtered transactions based on active filters
 import type { TransactionFilters } from "../types/filters";
 import { hasActiveFilters } from "../utils/filterUtils";
 import { useTransactions, useFilteredTransactions } from "./useTransactions";
 
 
-/**
+/*
  * Smart hook that returns all transactions if no filters are applied,
  * otherwise returns filtered transactions
  */
