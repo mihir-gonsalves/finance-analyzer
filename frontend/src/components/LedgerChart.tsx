@@ -6,6 +6,7 @@ import type { IChartApi, Time } from "lightweight-charts";
 import { chartStyles } from "../styles/charts";
 import { formatDateString, parseDateString } from "../utils/dateUtils";
 import { useTransactionData } from "../context/TransactionContext";
+import { commonStyles } from "../styles";
 
 
 interface ChartDataPoint {
@@ -36,13 +37,13 @@ const formatCurrency = (amount: number): string => {
 
 
 const EmptyState = () => (
-  <Card>
+  <Card sx={commonStyles.card.default}>
     <CardContent>
       <Typography variant="h6" gutterBottom sx={chartStyles.headerTitle}>
         Account Balance Over Time
       </Typography>
-      <Box sx={chartStyles.emptyState}>
-        <Typography sx={chartStyles.tooltipDescription}>
+      <Box sx={commonStyles.emptyState.container}>
+        <Typography sx={commonStyles.emptyState.description}>
           No transaction data available
         </Typography>
       </Box>
@@ -224,7 +225,7 @@ export default function LedgerChart() {
   const endDate = chartData[chartData.length - 1]?.date;
 
   return (
-    <Card>
+    <Card sx={commonStyles.card.default}>
       <CardContent>
         <ChartHeader currentBalance={currentBalance} />
 
@@ -250,6 +251,8 @@ export default function LedgerChart() {
                 <Typography variant="body2" sx={chartStyles.tooltipDescription} gutterBottom>
                   {tooltipData.description}
                 </Typography>
+
+                {/* cost center chip goes here */}
 
                 <Typography
                   variant="body2"

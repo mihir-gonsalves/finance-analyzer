@@ -1,5 +1,6 @@
 // frontend/src/components/filters/SpendCategoryFilter.tsx - multi-select dropdown for spend categories
 import { FormControl, InputLabel, Select, MenuItem, Chip, Box } from "@mui/material";
+import { layoutStyles, commonStyles } from "../../styles";
 
 
 interface SpendCategoryOption {
@@ -34,11 +35,16 @@ export function SpendCategoryFilter({ value, options, onChange }: SpendCategoryF
           selected.length === 0 ? (
             <Box sx={{ color: 'text.secondary' }}>All Spend Categories</Box>
           ) : (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            <Box sx={{ ...layoutStyles.flex.wrap, gap: 0.5 }}>
               {selected.map((id) => {
                 const option = options.find(opt => opt.id === id);
                 return option ? (
-                  <Chip key={id} label={option.name} size="small" />
+                  <Chip
+                    key={id}
+                    label={option.name}
+                    size="small"
+                    sx={commonStyles.chip.default}
+                  />
                 ) : null;
               })}
             </Box>

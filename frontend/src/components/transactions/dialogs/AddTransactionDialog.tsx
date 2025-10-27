@@ -1,7 +1,9 @@
 // frontend/src/components/transactions/dialogs/AddTransactionDialog.tsx - form for creating new transactions
 import { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from "@mui/material";
+import { Add } from "@mui/icons-material";
 import { getTodayDateString } from "../../../utils/dateUtils";
+import { layoutStyles, commonStyles } from "../../../styles";
 import type { CreateTransactionData } from "../../../hooks/useTransactions";
 
 
@@ -40,20 +42,18 @@ export function AddTransactionDialog({
   };
 
   const handleSave = () => {
-    // Parse cost center and spend categories from input
     const costCenterName = costCenterInput.trim();
     const spendCategoryNames = spendCategoryInput
       ? spendCategoryInput.split(",").map(cat => cat.trim()).filter(cat => cat.length > 0)
       : [];
 
-    // Send to backend with the structure it expects
     const finalTransaction = {
       ...transaction,
       cost_center_name: costCenterName || undefined,
       spend_category_names: spendCategoryNames,
     };
 
-    onSave(finalTransaction as any); // Backend will handle creation
+    onSave(finalTransaction as any);
     handleClose();
   };
 
@@ -61,9 +61,12 @@ export function AddTransactionDialog({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Add New Transaction</DialogTitle>
-      <DialogContent>
-        <Box display="flex" flexDirection="column" gap={2} mt={1}>
+      <DialogTitle sx={commonStyles.dialog.title}>
+        <Add sx={{ fontSize: 20 }} />
+        Add New Transaction
+      </DialogTitle>
+      <DialogContent sx={commonStyles.dialog.content}>
+        <Box sx={layoutStyles.dialogLayout.form}>
           <TextField
             label="Description"
             value={transaction.description}
@@ -71,22 +74,25 @@ export function AddTransactionDialog({
             fullWidth
             required
           />
-          <TextField
-            label="Amount"
-            type="number"
-            value={transaction.amount || ""}
-            onChange={(e) => setTransaction(prev => ({ ...prev, amount: Number(e.target.value) }))}
-            fullWidth
-            required
-            helperText="Use negative values for expenses, positive for income"
-          />
-          <TextField
-            label="Account"
-            value={transaction.account}
-            onChange={(e) => setTransaction(prev => ({ ...prev, account: e.target.value }))}
-            fullWidth
-            required
-          />
+
+          <Box sx={layoutStyles.dialogLayout.formRow}>
+            <TextField
+              label="Amount"
+              type="number"
+              value={transaction.amount || ""}
+              onChange={(e) => setTransaction(prev => ({ ...prev, amount: Number(e.target.value) }))}
+              fullWidth
+              required
+              helperText="Use negative values for expenses"
+            />
+            <TextField
+              label="Account"
+              value={transaction.account}
+              onChange={(e) => setTransaction(prev => ({ ...prev, account: e.target.value }))}
+              fullWidth
+              required
+            />
+          </Box>
 
           <TextField
             label="Cost Center"
@@ -119,7 +125,7 @@ export function AddTransactionDialog({
           />
         </Box>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={commonStyles.dialog.actions}>
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           onClick={handleSave}

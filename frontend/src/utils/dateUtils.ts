@@ -1,9 +1,11 @@
 // frontend/src/utils/dateUtils.ts - date parsing, formatting, and manipulation utilities
+
+
+/*
+ * Parses a date string in YYYY-MM-DD format into a Date object without timezone conversion.
+ * Falls back to using the native Date parser if parsing fails.
+ */
 export function parseDateString(dateStr: string): Date {
-  /*
-   * Parses a date string in YYYY-MM-DD format into a Date object without timezone conversion.
-   * Falls back to using the native Date parser if parsing fails.
-   */
   if (!dateStr) return new Date();
 
   const [yearStr, monthStr, dayStr] = dateStr.split('T')[0].split('-');
@@ -20,11 +22,11 @@ export function parseDateString(dateStr: string): Date {
 }
 
 
+/*
+ * Formats a date string into a human-readable string using Intl.DateTimeFormat.
+ * Returns the original string if formatting fails.
+ */
 export function formatDateString(
-  /*
-   * Formats a date string into a human-readable string using Intl.DateTimeFormat.
-   * Returns the original string if formatting fails.
-   */
   dateStr: string,
   options?: Intl.DateTimeFormatOptions
 ): string {
@@ -46,10 +48,10 @@ export function formatDateString(
 }
 
 
+/*
+ * Returns today's date in YYYY-MM-DD format.
+ */
 export function getTodayDateString(): string {
-  /*
-   * Returns today's date in YYYY-MM-DD format.
-   */
   const today = new Date();
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, '0');

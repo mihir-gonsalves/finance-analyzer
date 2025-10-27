@@ -6,6 +6,8 @@ import { Edit, Delete } from "@mui/icons-material";
 import { Box, Chip, Typography, Tooltip } from "@mui/material";
 import { formatDateString } from "../../utils/dateUtils";
 import type { Transaction, SpendCategory } from "../../hooks/useTransactions";
+import { layoutStyles, commonStyles, combineStyles } from "../../styles";
+
 
 interface TransactionDataGridProps {
   transactions: Transaction[];
@@ -13,6 +15,7 @@ interface TransactionDataGridProps {
   onEdit: (transaction: Transaction) => void;
   onDelete: (id: number) => void;
 }
+
 
 export function TransactionDataGrid({
   transactions,
@@ -76,7 +79,7 @@ export function TransactionDataGrid({
         const spendCategories: SpendCategory[] = transaction.spend_categories || [];
 
         if (!costCenter && spendCategories.length === 0) {
-          return <Chip label="Uncategorized" size="small" />;
+          return <Chip label="Uncategorized" size="small" sx={commonStyles.chip.default} />;
         }
 
         const allCategories = [
@@ -87,29 +90,19 @@ export function TransactionDataGrid({
 
         return (
           <Tooltip title={tooltipText} placement="top-start">
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 0.75,
-                flexWrap: 'nowrap',
-                overflow: 'hidden',
-                width: '100%',
-              }}
-            >
+            <Box sx={{ ...layoutStyles.flex.row, gap: 0.75, flexWrap: 'nowrap', overflow: 'hidden', width: '100%' }}>
               {costCenter && (
                 <Chip
                   label={costCenter.name}
                   size="small"
-                  sx={{
-                    color: 'secondary.main',
-                    borderColor: 'secondary.main',
-                    maxWidth: '151px',
-                    '& .MuiChip-label': {
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
+                  sx={combineStyles(
+                    commonStyles.chip.default,
+                    commonStyles.chip.category,
+                    {
+                      color: 'secondary.main',
+                      borderColor: 'secondary.main',
                     }
-                  }}
+                  )}
                 />
               )}
               {spendCategories.slice(0, 2).map((cat) => (
@@ -117,19 +110,17 @@ export function TransactionDataGrid({
                   key={cat.id}
                   label={cat.name}
                   size="small"
-                  sx={{
-                    maxWidth: '151px',
-                    '& .MuiChip-label': {
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }
-                  }}
+                  sx={combineStyles(
+                    commonStyles.chip.default,
+                    commonStyles.chip.category
+                  )}
                 />
               ))}
               {spendCategories.length > 2 && (
                 <Chip
                   label={`+${spendCategories.length - 2}`}
+                  size="small"
+                  sx={commonStyles.chip.default}
                 />
               )}
             </Box>
@@ -142,12 +133,12 @@ export function TransactionDataGrid({
       headerName: 'Amount',
       width: 110,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={layoutStyles.flex.row}>
           <Typography
             sx={{
-              color: params.value < 0 ? 'error.main' : 'success.main'
+              color: params.value < 0 ? 'error.main' : 'success.main',
+              fontWeight: 'medium'
             }}
-            fontWeight="medium"
           >
             {params.value < 0 ? '-' : '+'}{formatCurrency(params.value)}
           </Typography>
@@ -210,17 +201,7 @@ export function TransactionDataGrid({
           sortModel: [{ field: 'date', sort: 'desc' }],
         },
       }}
-      sx={{
-        height: 569,
-        backgroundColor: '#ffffff',
-        '& .MuiDataGrid-row:hover': {
-          backgroundColor: 'action.hover',
-        },
-        '& .MuiDataGrid-cell': {
-          display: 'flex',
-          alignItems: 'center',
-        },
-      }}
+      sx={layoutStyles.dataDisplay.table}
       disableRowSelectionOnClick
       disableColumnMenu
     />

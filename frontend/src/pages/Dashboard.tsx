@@ -5,6 +5,7 @@ import { TransactionProvider } from "../context/TransactionContext";
 import TransactionTable from "../components/TransactionTable";
 import AnalyticsPanel from "../components/AnalyticsPanel";
 import FiltersPanel from "../components/FiltersPanel";
+import { layoutStyles } from "../styles";
 import type { TransactionFilters } from "../types/filters";
 
 
@@ -26,15 +27,11 @@ export default function Dashboard() {
     <TransactionProvider filters={filters}>
       <Container
         maxWidth="xl"
-        sx={{
-          mt: { xs: 2, md: 3 },
-          mb: 2.5,
-          px: { xs: 2, sm: 3 }
-        }}
+        sx={layoutStyles.dashboard.container}
       >
         <Fade in timeout={600}>
           <Box>
-            <Grid container spacing={{ xs: 2, md: 3 }}>
+            <Grid container spacing={layoutStyles.spacing.sectionGap}>
               {/* Filters Panel with smooth transition */}
               <Grid size={{ xs: 12 }}>
                 <Collapse in={filtersOpen} timeout={300} unmountOnExit>

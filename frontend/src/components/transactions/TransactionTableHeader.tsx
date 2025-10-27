@@ -1,9 +1,10 @@
 // frontend/src/components/transactions/TransactionTableHeader.tsx - active filter tags and action buttons (add, upload, export)
 import { Box, IconButton, Tooltip, Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
-import { TableChart, ShowChart, FilterList, Add, MoreVert, Upload, FileDownload } from "@mui/icons-material";
+import { TableChart, Timeline, FilterList, Add, MoreVert, Upload, FileDownload } from "@mui/icons-material";
 import { FilterTags } from "./FilterTags";
 import type { TransactionFilters } from "../../types/filters";
 import { useState } from "react";
+import { commonStyles, layoutStyles, conditionalStyle } from "../../styles";
 
 
 interface TransactionTableHeaderProps {
@@ -51,30 +52,37 @@ export function TransactionTableHeader({
 
   return (
     <Box mb={2}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" >
-          <Tooltip title={viewMode === 'table' ? 'Switch to Chart' : 'Switch to Table'}>
-            <IconButton onClick={onToggleView} color="primary">
-              {viewMode === 'table' ? <TableChart /> : <ShowChart />}
-            </IconButton>
-          </Tooltip>
+      <Box sx={layoutStyles.flex.rowBetween}>
+        <Tooltip title={viewMode === 'table' ? 'Switch to Chart' : 'Switch to Table'}>
+          <IconButton onClick={onToggleView} color="primary" sx={commonStyles.button.icon}>
+            {viewMode === 'table' ? <TableChart /> : <Timeline />}
+          </IconButton>
+        </Tooltip>
 
-        <Box display="flex" gap={2}>
+        <Box sx={{ ...layoutStyles.flex.row, gap: 2 }}>
           <FilterTags filters={filters} />
 
           <Tooltip title={filtersOpen ? 'Hide Filters' : 'Show Filters'}>
-            <IconButton onClick={onToggleFilters} color={filtersOpen ? 'primary' : 'default'}>
-              <FilterList />
+            <IconButton
+              onClick={onToggleFilters}
+              sx={conditionalStyle(
+                filtersOpen,
+                commonStyles.button.iconActive,
+                commonStyles.button.icon
+              )}
+            >
+              <FilterList sx={{ color: 'primary.main' }} />
             </IconButton>
           </Tooltip>
 
           <Tooltip title="Add Transaction">
-            <IconButton onClick={onAddTransaction} color="primary">
+            <IconButton onClick={onAddTransaction} color="primary" sx={commonStyles.button.icon}>
               <Add />
             </IconButton>
           </Tooltip>
 
           <Tooltip title="More Options">
-            <IconButton onClick={handleMenuClick} color="primary">
+            <IconButton onClick={handleMenuClick} color="primary" sx={commonStyles.button.icon}>
               <MoreVert />
             </IconButton>
           </Tooltip>

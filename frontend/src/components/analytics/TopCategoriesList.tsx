@@ -2,16 +2,20 @@
 import { Box, List, ListItem, ListItemText, Typography, Divider, useTheme, LinearProgress } from "@mui/material";
 import { Category as CategoryIcon } from "@mui/icons-material";
 import { formatCurrency } from "../../utils/analyticsUtils";
+import { commonStyles, layoutStyles } from "../../styles";
+
 
 export interface SpendCategoryData {
   name: string;
   value: number;
 }
 
+
 interface TopCategoriesListProps {
   categories: SpendCategoryData[];
   totalSpent: number;
 }
+
 
 export function TopCategoriesList({ categories, totalSpent }: TopCategoriesListProps) {
   const theme = useTheme();
@@ -25,18 +29,12 @@ export function TopCategoriesList({ categories, totalSpent }: TopCategoriesListP
 
   if (categories.length === 0) {
     return (
-      <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-        sx={{ height: '520px' }}
-      >
-        <CategoryIcon sx={{ fontSize: 64, color: 'grey.300', mb: 2 }} />
-        <Typography color="text.secondary" variant="body1" fontWeight="500">
+      <Box sx={{ ...commonStyles.emptyState.container, height: '520px' }}>
+        <CategoryIcon sx={commonStyles.emptyState.icon} />
+        <Typography sx={commonStyles.emptyState.title} variant="body1">
           No spending data available
         </Typography>
-        <Typography color="text.secondary" variant="body2">
+        <Typography sx={commonStyles.emptyState.description}>
           Start categorizing transactions to see analytics
         </Typography>
       </Box>
@@ -44,7 +42,7 @@ export function TopCategoriesList({ categories, totalSpent }: TopCategoriesListP
   }
 
   return (
-    <Box sx={{ height: '553px', overflow: 'auto' }}>
+    <Box sx={layoutStyles.dataDisplay.scrollable}>
       <List disablePadding>
         {categories.map((category, index) => {
           const percentage = (category.value / totalSpent) * 100;
@@ -54,19 +52,10 @@ export function TopCategoriesList({ categories, totalSpent }: TopCategoriesListP
             <Box key={`${category.name}-${index}`}>
               <ListItem
                 disableGutters
-                sx={{
-                  py: 2.5,
-                  px: 1,
-                  flexDirection: 'column',
-                  alignItems: 'stretch',
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                    borderRadius: 1,
-                  }
-                }}
+                sx={commonStyles.listItem.default}
               >
-                {/* Top Row: Dot, Name, Amount */}
-                <Box display="flex" alignItems="center" mb={1}>
+                {/* Category row */}
+                <Box sx={layoutStyles.analytics.categoryRow}>
                   <Box
                     sx={{
                       width: 12,
@@ -88,34 +77,33 @@ export function TopCategoriesList({ categories, totalSpent }: TopCategoriesListP
                   />
                   <Typography
                     variant="h6"
-                    fontWeight="700"
-                    color="text.primary"
+                    sx={commonStyles.typography.valueNeutral}
                   >
                     {formatCurrency(category.value)}
                   </Typography>
                 </Box>
 
-                {/* Bottom Row: Progress Bar */}
-                <Box display="flex" alignItems="center" gap={1.5} sx={{ pl: 3 }}>
+                {/* Progress row */}
+                <Box sx={layoutStyles.analytics.progressRow}>
                   <LinearProgress
                     variant="determinate"
                     value={percentage}
                     sx={{
+                      ...(commonStyles.progress.bar ?? {}), // handles “possibly null”
                       flex: 1,
-                      height: 8,
-                      borderRadius: 4,
-                      bgcolor: 'grey.200',
                       '& .MuiLinearProgress-bar': {
+                        ...((commonStyles.progress.bar as Record<string, unknown>)['& .MuiLinearProgress-bar'] as object),
                         bgcolor: color,
-                        borderRadius: 4,
-                      }
+                      },
                     }}
                   />
                   <Typography
                     variant="body2"
-                    color="text.secondary"
-                    fontWeight="500"
-                    sx={{ minWidth: '45px', textAlign: 'right' }}
+                    sx={{
+                      ...commonStyles.typography.label,
+                      minWidth: '45px',
+                      textAlign: 'right'
+                    }}
                   >
                     {percentage.toFixed(1)}%
                   </Typography>

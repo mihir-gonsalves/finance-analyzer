@@ -1,5 +1,6 @@
-// frontend/src/components/filters/FilterActions.tsx - apply/Clear filter buttons
+// frontend/src/components/filters/FilterActions.tsx - apply/clear filter buttons
 import { Box, Button } from "@mui/material";
+import { layoutStyles } from "../../styles";
 
 
 interface FilterActionsProps {
@@ -15,7 +16,7 @@ export function FilterActions({
   onApply,
 }: FilterActionsProps) {
   return (
-    <Box display="flex" gap={2} justifyContent="flex-end">
+    <Box sx={layoutStyles.filterPanel.actions}>
       <Button
         onClick={onReset}
         disabled={!hasUnsavedChanges}

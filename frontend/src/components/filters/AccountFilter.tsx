@@ -1,5 +1,6 @@
 // frontend/src/components/filters/AccountFilter.tsx - multi-select dropdown for accounts
 import { FormControl, InputLabel, Select, MenuItem, Chip, Box } from "@mui/material";
+import { layoutStyles, commonStyles } from "../../styles";
 
 
 interface AccountFilterProps {
@@ -27,9 +28,14 @@ export function AccountFilter({ value, options, onChange }: AccountFilterProps) 
           selected.length === 0 ? (
             <Box sx={{ color: 'text.secondary' }}>All Accounts</Box>
           ) : (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            <Box sx={{ ...layoutStyles.flex.wrap, gap: 0.5 }}>
               {selected.map((value) => (
-                <Chip key={value} label={value} size="small" />
+                <Chip
+                  key={value}
+                  label={value}
+                  size="small"
+                  sx={commonStyles.chip.default}
+                />
               ))}
             </Box>
           )

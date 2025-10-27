@@ -2,6 +2,7 @@
 import { Box, Typography } from "@mui/material";
 import { CategoryPieChart } from "./CategoryPieChart";
 import type { SpendCategoryData } from "../../hooks/useSpendingAnalytics";
+import { commonStyles } from "../../styles";
 
 
 interface SpendingOverviewProps {
@@ -13,14 +14,8 @@ interface SpendingOverviewProps {
 export function SpendingOverview({ chartData, totalSpent }: SpendingOverviewProps) {
   if (chartData.length === 0) {
     return (
-      <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-        sx={{ height: '520px' }}
-      >
-        <Typography color="text.secondary" variant="body2">
+      <Box sx={{ ...commonStyles.emptyState.container, height: '520px' }}>
+        <Typography sx={commonStyles.emptyState.description}>
           No spending data available
         </Typography>
       </Box>

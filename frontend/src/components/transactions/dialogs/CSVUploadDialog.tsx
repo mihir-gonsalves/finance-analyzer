@@ -1,6 +1,7 @@
 // frontend/src/components/transactions/dialogs/CSVUploadDialog.tsx - dialog for uploading CSV files from financial institutions
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Alert, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, } from "@mui/material";
 import { FileUpload, Upload } from "@mui/icons-material";
+import { commonStyles, layoutStyles } from "../../../styles";
 
 
 interface CSVUploadDialogProps {
@@ -23,7 +24,6 @@ export function CSVUploadDialog({
   onSubmit,
   isLoading = false,
 }: CSVUploadDialogProps) {
-  // Get help text based on selected institution
   const getFormatDescription = () => {
     switch (institution) {
       case 'discover':
@@ -39,21 +39,19 @@ export function CSVUploadDialog({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        <Box display="flex" alignItems="center" gap={1}>
-          <FileUpload />
-          Upload CSV File
-        </Box>
+      <DialogTitle sx={commonStyles.dialog.title}>
+        <FileUpload />
+        Upload CSV File
       </DialogTitle>
-      <DialogContent>
-        <Box display="flex" flexDirection="column" gap={3} mt={1}>
+      <DialogContent sx={commonStyles.dialog.content}>
+        <Box sx={layoutStyles.dialogLayout.form}>
           <Alert severity="info">
             Upload transaction history from your bank, credit card, or a custom export from this app.
           </Alert>
 
           {file && (
             <Box>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
+              <Typography variant="body2" sx={commonStyles.typography.label} gutterBottom>
                 Selected file:
               </Typography>
               <Typography variant="body1" fontWeight="medium">
@@ -82,13 +80,13 @@ export function CSVUploadDialog({
           )}
 
           <Alert severity="warning">
-            {institution === 'custom' 
+            {institution === 'custom'
               ? 'Re-uploading edited transactions will create duplicates. Consider deleting the old transactions first.'
               : 'Duplicate transactions may be created if you upload the same file multiple times.'}
           </Alert>
         </Box>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={commonStyles.dialog.actions}>
         <Button onClick={onClose}>Cancel</Button>
         <Button
           onClick={onSubmit}

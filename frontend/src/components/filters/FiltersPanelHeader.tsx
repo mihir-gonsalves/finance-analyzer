@@ -1,6 +1,7 @@
 // frontend/src/components/filters/FiltersPanelHeader.tsx - filter panel title and collapse/expand controls
 import { Box, Typography, Chip, Button, IconButton } from "@mui/material";
 import { FilterList, Clear } from "@mui/icons-material";
+import { layoutStyles, commonStyles } from "../../styles";
 
 
 interface FiltersPanelHeaderProps {
@@ -18,8 +19,8 @@ export function FiltersPanelHeader({
   onClose,
 }: FiltersPanelHeaderProps) {
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-      <Box display="flex" alignItems="center" gap={1}>
+    <Box sx={layoutStyles.flex.rowBetween} mb={3}>
+      <Box sx={{ ...layoutStyles.flex.row, gap: 1 }}>
         <FilterList sx={{ color: 'primary.main' }} />
         <Typography variant="h6" fontWeight="600">
           Filters
@@ -34,7 +35,7 @@ export function FiltersPanelHeader({
         )}
       </Box>
 
-      <Box display="flex" alignItems="center" gap={1}>
+      <Box sx={{ ...layoutStyles.flex.row, gap: 1 }}>
         {hasActiveFilters && (
           <Button
             onClick={onClearAll}
@@ -51,14 +52,7 @@ export function FiltersPanelHeader({
         <IconButton
           onClick={onClose}
           size="small"
-          sx={{
-            border: '1px solid',
-            borderColor: 'divider',
-            '&:hover': {
-              borderColor: 'primary.main',
-              bgcolor: 'primary.50',
-            },
-          }}
+          sx={commonStyles.button.icon}
         >
           <Clear />
         </IconButton>

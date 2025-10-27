@@ -1,15 +1,18 @@
 // frontend/src/components/transactions/FilterTags.tsx - displays active filters as removable chips
 import { Box, Chip } from "@mui/material";
-import { AccountBalance, Category, Business, CalendarMonth, Search, AttachMoney } from "@mui/icons-material";
+import { AccountBalance, Category, BusinessCenter, CalendarMonth, Search, AttachMoney } from "@mui/icons-material";
 import { useSpendCategories, useCostCenters } from "../../hooks/useTransactions";
 import type { TransactionFilters } from "../../types/filters";
 import { formatDateString } from "../../utils/dateUtils";
 import type { ReactElement } from "react";
+import { layoutStyles, commonStyles } from "../../styles";
+
 
 interface FilterTagsProps {
   filters: TransactionFilters;
   onRemove?: (filterKey: keyof TransactionFilters) => void;
 }
+
 
 interface TagConfig {
   key: string;
@@ -18,15 +21,14 @@ interface TagConfig {
   condition: boolean;
 }
 
+
 export function FilterTags({ filters, onRemove }: FilterTagsProps) {
   const { data: spendCategoriesData } = useSpendCategories();
   const { data: costCentersData } = useCostCenters();
 
-  // FIXED: Extract the arrays from the response objects
   const spendCategories = spendCategoriesData?.spend_categories || [];
   const costCenters = costCentersData?.cost_centers || [];
 
-  // Helper to get spend category names from IDs
   const getSpendCategoryLabel = () => {
     if (filters.spend_category_ids.length === 0) return '';
 
@@ -38,7 +40,6 @@ export function FilterTags({ filters, onRemove }: FilterTagsProps) {
     return `${filters.spend_category_ids.length} spend categories`;
   };
 
-  // Helper to get cost center names from IDs
   const getCostCenterLabel = () => {
     if (filters.cost_center_ids.length === 0) return '';
 
@@ -61,7 +62,7 @@ export function FilterTags({ filters, onRemove }: FilterTagsProps) {
     },
     {
       key: 'cost_center_ids',
-      icon: <Business />,
+      icon: <BusinessCenter />,
       label: getCostCenterLabel(),
       condition: filters.cost_center_ids.length > 0,
     },
@@ -96,13 +97,14 @@ export function FilterTags({ filters, onRemove }: FilterTagsProps) {
   if (activeTags.length === 0) return null;
 
   return (
-    <Box display="flex" alignItems="center" gap={0.75} flexWrap="wrap">
+    <Box sx={{ ...layoutStyles.flex.row, gap: 0.75, flexWrap: 'wrap' }}>
       {activeTags.map(({ key, icon, label }) => (
         <Chip
           key={key}
           icon={icon}
           label={label}
           onDelete={onRemove ? () => onRemove(key as keyof TransactionFilters) : undefined}
+          sx={commonStyles.chip.filter}
         />
       ))}
     </Box>

@@ -1,5 +1,6 @@
 // frontend/src/components/filters/CostCenterFilter.tsx - multi-select dropdown for cost centers
 import { FormControl, InputLabel, Select, MenuItem, Chip, Box } from "@mui/material";
+import { layoutStyles, commonStyles } from "../../styles";
 
 
 interface CostCenterOption {
@@ -33,11 +34,16 @@ export function CostCenterFilter({ value, options, onChange }: CostCenterFilterP
           selected.length === 0 ? (
             <Box sx={{ color: 'text.secondary' }}>All Cost Centers</Box>
           ) : (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            <Box sx={{ ...layoutStyles.flex.wrap, gap: 0.5 }}>
               {selected.map((id) => {
                 const option = options.find(opt => opt.id === id);
                 return option ? (
-                  <Chip key={id} label={option.name} size="small" />
+                  <Chip
+                    key={id}
+                    label={option.name}
+                    size="small"
+                    sx={commonStyles.chip.default}
+                  />
                 ) : null;
               })}
             </Box>
