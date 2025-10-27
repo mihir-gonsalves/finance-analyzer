@@ -1,6 +1,8 @@
 // frontend/src/components/transactions/dialogs/EditTransactionDialog.tsx - form for editing existing transactions
 import { useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from "@mui/material";
+import { Edit } from "@mui/icons-material";
+import { layoutStyles, commonStyles } from "../../../styles";
 import type { Transaction, UpdateTransactionData } from "../../../hooks/useTransactions";
 
 
@@ -28,14 +30,12 @@ export function EditTransactionDialog({
     if (transaction) {
       setEditData(transaction);
 
-      // Extract cost center name (or empty string if Uncategorized)
       if (transaction.cost_center) {
         setCostCenterInput(transaction.cost_center.name === "Uncategorized" ? "" : transaction.cost_center.name);
       } else {
         setCostCenterInput("");
       }
 
-      // Extract spend category names
       const spendCatNames = transaction.spend_categories?.filter(cat => cat.name !== "Uncategorized").map(cat => cat.name).join(", ") || "";
       setSpendCategoryInput(spendCatNames);
     }
@@ -51,10 +51,7 @@ export function EditTransactionDialog({
   const handleSave = () => {
     if (!transaction) return;
 
-    // ALWAYS include cost_center_name (even if empty string)
     const costCenterName = costCenterInput.trim();
-
-    // Parse spend categories
     const spendCategoryNames = spendCategoryInput
       ? spendCategoryInput.split(",").map(cat => cat.trim()).filter(cat => cat.length > 0)
       : [];
@@ -65,7 +62,7 @@ export function EditTransactionDialog({
       description: editData.description,
       amount: editData.amount,
       account: editData.account,
-      cost_center_name: costCenterName, // ALWAYS INCLUDE (empty string defaults to Uncategorized)
+      cost_center_name: costCenterName,
       spend_category_names: spendCategoryNames,
     };
 
@@ -84,28 +81,34 @@ export function EditTransactionDialog({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Edit Transaction</DialogTitle>
-      <DialogContent>
-        <Box display="flex" flexDirection="column" gap={2} mt={1}>
+      <DialogTitle sx={commonStyles.dialog.title}>
+        <Edit sx={{ fontSize: 20 }} />
+        Edit Transaction
+      </DialogTitle>
+      <DialogContent sx={commonStyles.dialog.content}>
+        <Box sx={layoutStyles.dialogLayout.form}>
           <TextField
             label="Description"
             value={editData.description || ""}
             onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
             fullWidth
           />
-          <TextField
-            label="Amount"
-            type="number"
-            value={formatAmount(editData.amount || "")}
-            onChange={(e) => setEditData(prev => ({ ...prev, amount: Number(e.target.value) }))}
-            fullWidth
-          />
-          <TextField
-            label="Account"
-            value={editData.account || ""}
-            onChange={(e) => setEditData(prev => ({ ...prev, account: e.target.value }))}
-            fullWidth
-          />
+
+          <Box sx={layoutStyles.dialogLayout.formRow}>
+            <TextField
+              label="Amount"
+              type="number"
+              value={formatAmount(editData.amount || "")}
+              onChange={(e) => setEditData(prev => ({ ...prev, amount: Number(e.target.value) }))}
+              fullWidth
+            />
+            <TextField
+              label="Account"
+              value={editData.account || ""}
+              onChange={(e) => setEditData(prev => ({ ...prev, account: e.target.value }))}
+              fullWidth
+            />
+          </Box>
 
           <TextField
             label="Cost Center"
@@ -137,7 +140,7 @@ export function EditTransactionDialog({
           />
         </Box>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={commonStyles.dialog.actions}>
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           onClick={handleSave}

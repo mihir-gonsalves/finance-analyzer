@@ -13,10 +13,12 @@ import {
 } from '../utils/analyticsUtils';
 import type { Transaction } from './useTransactions';
 
+
 export interface SpendCategoryData {
   name: string;
   value: number;
 }
+
 
 export interface SpendingAnalytics {
   // Spending breakdowns
@@ -48,6 +50,7 @@ export interface SpendingAnalytics {
   };
 }
 
+
 /*
  * Helper: Check if transaction has "paycheck" spend category
  */
@@ -60,6 +63,7 @@ function isPaycheck(transaction: Transaction): boolean {
   );
 }
 
+
 /*
  * Helper: Calculate paycheck statistics
  */
@@ -71,6 +75,7 @@ function calculatePaycheckStats(transactions: Transaction[]): { count: number; t
   
   return { count, total, average };
 }
+
 
 /*
  * Calculate spending analytics from a list of transactions

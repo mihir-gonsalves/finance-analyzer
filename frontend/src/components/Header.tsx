@@ -1,14 +1,14 @@
 // frontend/src/components/Header.tsx - app header with title and navigation
 import { AppBar, Toolbar, Typography, IconButton, Box, useMediaQuery, useTheme } from "@mui/material";
-import { AccountCircle, TrendingUp } from "@mui/icons-material";
+import { AccountCircle, SavedSearch } from "@mui/icons-material";
+import { commonStyles, layoutStyles } from "../styles";
 
 
 export default function Header() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // will have to eventually setup mobile view
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleUserClick = () => {
-    // TODO: Add user settings functionality
     console.log("User settings clicked");
   };
 
@@ -25,18 +25,16 @@ export default function Header() {
     >
       <Toolbar
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          ...layoutStyles.flex.rowBetween,
           py: { sm: 1.5 }
         }}
       >
-        {/* Left side - Logo/Brand */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <TrendingUp
+        {/* Logo/Brand */}
+        <Box sx={{ ...layoutStyles.flex.row, gap: 1.5 }}>
+          <SavedSearch
             sx={{
               color: 'primary.main',
-              fontSize: { sm: 28 }
+              fontSize: { sm: 36 }
             }}
           />
           {!isMobile && (
@@ -47,26 +45,19 @@ export default function Header() {
                 color: 'primary.main',
               }}
             >
-              Finance Analyzer
+              Spend Analyzer
             </Typography>
           )}
         </Box>
 
-        {/* Right side - User controls */}
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        {/* User controls */}
+        <Box sx={layoutStyles.flex.row}>
           <IconButton
             size="large"
             edge="end"
             color="inherit"
             onClick={handleUserClick}
-            sx={{
-              border: '1px solid',
-              borderColor: 'grey.300',
-              '&:hover': {
-                borderColor: 'primary.main',
-                bgcolor: 'primary.50'
-              }
-            }}
+            sx={commonStyles.button.icon}
           >
             <AccountCircle sx={{ color: 'text.secondary' }} />
           </IconButton>

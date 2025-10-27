@@ -13,9 +13,12 @@ import { CostCenterFilter } from "./filters/CostCenterFilter";
 import { AccountFilter } from "./filters/AccountFilter";
 import { AmountRangeFilter } from "./filters/AmountRangeFilter";
 import { FilterActions } from "./filters/FilterActions";
+import { layoutStyles, commonStyles } from "../styles";
 import type { TransactionFilters } from "../types/filters";
 
+
 export type { TransactionFilters };
+
 
 interface FiltersPanelProps {
   filters: TransactionFilters;
@@ -23,18 +26,14 @@ interface FiltersPanelProps {
   onClose: () => void;
 }
 
+
 export default function FiltersPanel({ filters, onFiltersChange, onClose }: FiltersPanelProps) {
-  // FIXED: useFilterOptions doesn't take any arguments
   const { spend_categories, cost_centers, accounts } = useFilterOptions();
   const { pendingFilters, updateFilter, reset, hasUnsavedChanges } = usePendingFilters(filters);
-
   const [validationError, setValidationError] = useState<string>("");
 
   const handleApply = () => {
-    // Sanitize filters first
     const sanitized = sanitizeFilters(pendingFilters);
-
-    // Validate filters
     const validation = validateFilters(sanitized);
 
     if (!validation.isValid) {
@@ -42,10 +41,7 @@ export default function FiltersPanel({ filters, onFiltersChange, onClose }: Filt
       return;
     }
 
-    // Clear any previous errors
     setValidationError("");
-
-    // Apply filters
     onFiltersChange(sanitized);
   };
 
@@ -64,7 +60,7 @@ export default function FiltersPanel({ filters, onFiltersChange, onClose }: Filt
   const hasFilters = hasActiveFilters(filters);
 
   return (
-    <Card sx={{ mb: 3 }}>
+    <Card sx={{ ...commonStyles.card.elevated, mb: 1}}>
       <CardContent>
         <FiltersPanelHeader
           activeFilterCount={activeFilterCount}
@@ -81,13 +77,9 @@ export default function FiltersPanel({ filters, onFiltersChange, onClose }: Filt
           </Alert>
         )}
 
-        <Box display="flex" flexDirection="column" gap={3}>
+        <Box sx={layoutStyles.filterPanel.container}>
           {/* Search and Date Range Row */}
-          <Box
-            display="grid"
-            gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr 1fr' }}
-            gap={2}
-          >
+          <Box sx={layoutStyles.filterPanel.row}>
             <SearchFilter
               value={pendingFilters.searchTerm}
               onChange={(value) => updateFilter('searchTerm', value)}
@@ -101,11 +93,7 @@ export default function FiltersPanel({ filters, onFiltersChange, onClose }: Filt
           </Box>
 
           {/* Cost Centers, Spend Categories and Accounts Row */}
-          <Box
-            display="grid"
-            gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr 1fr' }}
-            gap={2}
-          >
+          <Box sx={layoutStyles.filterPanel.row}>
             <CostCenterFilter
               value={pendingFilters.cost_center_ids}
               options={cost_centers}
@@ -124,11 +112,7 @@ export default function FiltersPanel({ filters, onFiltersChange, onClose }: Filt
           </Box>
 
           {/* Amount Range Row */}
-          <Box
-            display="grid"
-            gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr' }}
-            gap={2}
-          >
+          <Box sx={layoutStyles.grid.twoColumn}>
             <AmountRangeFilter
               minAmount={pendingFilters.minAmount}
               maxAmount={pendingFilters.maxAmount}

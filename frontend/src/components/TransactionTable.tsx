@@ -13,8 +13,11 @@ import { CSVUploadDialog } from "./transactions/dialogs/CSVUploadDialog";
 import type { TransactionFilters } from "../types/filters";
 import { useTransactionData } from "../context/TransactionContext";
 import { exportTransactionsToCSV } from "../utils/exportUtils";
+import { commonStyles, layoutStyles } from "../styles";
+
 
 type ViewMode = 'table' | 'chart';
+
 
 interface TransactionTableProps {
   filters: TransactionFilters;
@@ -22,47 +25,28 @@ interface TransactionTableProps {
   onToggleFilters: () => void;
 }
 
+
 export default function TransactionTable({ filters, filtersOpen, onToggleFilters }: TransactionTableProps) {
-  // Data hooks
   const { transactions: filteredTransactions, isLoading, error } = useTransactionData();
   const deleteMutation = useDeleteTransaction();
   const updateMutation = useUpdateTransaction();
   const createMutation = useCreateTransaction();
   const csvUploadMutation = useCSVUpload();
 
-  // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // View state
   const [viewMode, setViewMode] = useState<ViewMode>('table');
 
-  // Dialog state
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editTransaction, setEditTransaction] = useState<Transaction | null>(null);
   const [deleteTransactionId, setDeleteTransactionId] = useState<number | null>(null);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [csvInstitution, setCsvInstitution] = useState("");
 
-  // Handlers
-  const handleAddTransaction = () => {
-    setAddDialogOpen(true);
-  };
-
-  const handleSaveAdd = (transaction: CreateTransactionData) => {
-    createMutation.mutate(transaction);
-  };
-
-  const handleEdit = (transaction: Transaction) => {
-    setEditTransaction(transaction);
-  };
-
-  const handleSaveEdit = (data: UpdateTransactionData) => {
-    updateMutation.mutate(data);
-  };
-
-  const handleDelete = (id: number) => {
-    setDeleteTransactionId(id);
-  };
+  const handleAddTransaction = () => setAddDialogOpen(true);
+  const handleSaveAdd = (transaction: CreateTransactionData) => createMutation.mutate(transaction);
+  const handleEdit = (transaction: Transaction) => setEditTransaction(transaction);
+  const handleSaveEdit = (data: UpdateTransactionData) => updateMutation.mutate(data);
+  const handleDelete = (id: number) => setDeleteTransactionId(id);
 
   const handleConfirmDelete = () => {
     if (deleteTransactionId) {
@@ -72,9 +56,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
     }
   };
 
-  const handleCSVUploadClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleCSVUploadClick = () => fileInputRef.current?.click();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -109,13 +91,11 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
     );
   };
 
-  const handleExportCSV = () => {
-    exportTransactionsToCSV(filteredTransactions);
-  };
+  const handleExportCSV = () => exportTransactionsToCSV(filteredTransactions);
 
   if (error) {
     return (
-      <Card>
+      <Card sx={commonStyles.card.default}>
         <CardContent>
           <Alert severity="error">
             Error loading transactions. Please check your connection.
@@ -127,7 +107,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
 
   return (
     <>
-      <Card>
+      <Card sx={commonStyles.card.elevated}>
         <CardContent>
           <TransactionTableHeader
             viewMode={viewMode}
@@ -140,7 +120,6 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
             onExportCSV={handleExportCSV}
           />
 
-          {/* Hidden file input */}
           <input
             type="file"
             ref={fileInputRef}
@@ -148,9 +127,8 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
             accept=".csv"
             style={{ display: 'none' }}
           />
-
           {viewMode === 'table' ? (
-            <Box sx={{ height: 560 }}>
+            <Box sx={layoutStyles.dataDisplay.chartContainer}>
               <TransactionDataGrid
                 transactions={filteredTransactions}
                 isLoading={isLoading}
@@ -159,14 +137,13 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
               />
             </Box>
           ) : (
-            <Box sx={{ height: 560 }}>
+            <Box sx={layoutStyles.dataDisplay.chartContainer}>
               <LedgerChart />
             </Box>
           )}
         </CardContent>
       </Card>
 
-      {/* Dialogs */}
       <AddTransactionDialog
         open={addDialogOpen}
         onClose={() => setAddDialogOpen(false)}
