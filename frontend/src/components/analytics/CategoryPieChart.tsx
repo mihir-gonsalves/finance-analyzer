@@ -3,6 +3,7 @@ import { PieChart } from "@mui/x-charts/PieChart";
 import { Box, Typography, useTheme } from "@mui/material";
 import { formatCurrency } from "../../utils/analyticsUtils";
 import type { SpendCategoryData } from "../../hooks/useSpendingAnalytics";
+import { chartsTooltipClasses } from '@mui/x-charts/ChartsTooltip';
 
 
 interface CategoryPieChartProps {
@@ -47,6 +48,33 @@ export function CategoryPieChart({ data, totalSpent }: CategoryPieChartProps) {
         ]}
         hideLegend
         margin={{ top: 0, bottom: 0, left: 0, right: 0 }}
+        slotProps={{
+          tooltip: {
+            sx: {
+              [`& .${chartsTooltipClasses.paper}`]: {
+                backgroundColor: '#ffffff',
+                border: '1px solid',
+                borderColor: 'grey.200',
+                borderRadius: 2,
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06)',
+                padding: '12px',
+              },
+              [`& .${chartsTooltipClasses.table}`]: {
+                borderSpacing: '0px',
+              },
+              [`& .${chartsTooltipClasses.labelCell}`]: {
+                color: 'text.secondary',
+                fontSize: '0.8rem',
+                fontWeight: 500,
+              },
+              [`& .${chartsTooltipClasses.valueCell}`]: {
+                color: 'text.primary',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+              },
+            },
+          },
+        }}
       />
       <Box
         position="absolute"

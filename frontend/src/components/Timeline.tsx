@@ -1,4 +1,4 @@
-// frontend/src/components/LedgerChart.tsx - trading View lightweight chart visualization of transaction history
+// frontend/src/components/Timeline.tsx - trading View lightweight chart visualization of transaction history
 import { useEffect, useRef, useMemo, useState } from "react";
 import { Card, CardContent, Typography, Box } from "@mui/material";
 import { createChart, BaselineSeries } from "lightweight-charts";
@@ -9,7 +9,7 @@ import { useTransactionData } from "../context/TransactionContext";
 import { commonStyles } from "../styles";
 
 
-interface ChartDataPoint {
+interface TimelineDataPoint {
   date: string;
   balance: number;
   amount: number;
@@ -52,7 +52,7 @@ const EmptyState = () => (
 );
 
 
-const ChartHeader = ({ currentBalance }: { currentBalance: number }) => {
+const TimelineHeader = ({ currentBalance }: { currentBalance: number }) => {
   const isPositive = currentBalance >= 0;
   return (
     <Box sx={chartStyles.header}>
@@ -78,7 +78,7 @@ const ChartHeader = ({ currentBalance }: { currentBalance: number }) => {
 };
 
 
-const ChartFooter = ({
+const TimelineFooter = ({
   dataLength,
   startDate,
   endDate
@@ -95,10 +95,10 @@ const ChartFooter = ({
 );
 
 
-export default function LedgerChart() {
+export default function Timeline() {
   const { transactions } = useTransactionData();
-  const chartContainerRef = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<IChartApi | null>(null);
+  const timelineContainerRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<any>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
@@ -108,8 +108,8 @@ export default function LedgerChart() {
     (a, b) => parseDateString(a.date || '').getTime() - parseDateString(b.date || '').getTime()
   );
 
-  const chartData = useMemo(() => {
-    return sortedTransactions.reduce((acc: ChartDataPoint[], transaction, index) => {
+  const timelineData = useMemo(() => {
+    return sortedTransactions.reduce((acc: TimelineDataPoint[], transaction, index) => {
       const previousBalance = index === 0 ? 0 : acc[acc.length - 1]?.balance || 0;
       const newBalance = previousBalance + transaction.amount;
       const dateObj = parseDateString(transaction.date || '');
@@ -135,37 +135,37 @@ export default function LedgerChart() {
   }, [sortedTransactions]);
 
   useEffect(() => {
-    if (!chartContainerRef.current || chartData.length === 0) return;
+    if (!timelineContainerRef.current || timelineData.length === 0) return;
 
-    const chart = createChart(chartContainerRef.current, {
+    const timeline = createChart(timelineContainerRef.current, {
       ...chartStyles.chartConfig,
-      width: chartContainerRef.current.clientWidth,
+      width: timelineContainerRef.current.clientWidth,
     });
 
-    const series = chart.addSeries(BaselineSeries, chartStyles.seriesConfig);
+    const series = timeline.addSeries(BaselineSeries, chartStyles.seriesConfig);
 
-    const seriesData = chartData.map(d => ({
+    const seriesData = timelineData.map(d => ({
       time: d.time as Time,
       value: d.balance,
     }));
 
     series.setData(seriesData);
-    chart.timeScale().fitContent();
+    timeline.timeScale().fitContent();
 
-    chartRef.current = chart;
+    timelineRef.current = timeline;
     seriesRef.current = series;
 
     const handleResize = () => {
-      if (chartContainerRef.current) {
-        chart.applyOptions({
-          width: chartContainerRef.current.clientWidth,
+      if (timelineContainerRef.current) {
+        timeline.applyOptions({
+          width: timelineContainerRef.current.clientWidth,
         });
       }
     };
 
     window.addEventListener('resize', handleResize);
 
-    chart.subscribeCrosshairMove((param) => {
+    timeline.subscribeCrosshairMove((param) => {
       if (!param.time || !tooltipRef.current) {
         setTooltipData(null);
         if (tooltipRef.current) {
@@ -174,7 +174,7 @@ export default function LedgerChart() {
         return;
       }
 
-      const dataPoint = chartData.find(d => d.time === param.time);
+      const dataPoint = timelineData.find(d => d.time === param.time);
       if (dataPoint) {
         setTooltipData({
           date: dataPoint.date,
@@ -184,8 +184,8 @@ export default function LedgerChart() {
         });
 
         const coordinate = param.point;
-        if (coordinate && chartContainerRef.current) {
-          const container = chartContainerRef.current.getBoundingClientRect();
+        if (coordinate && timelineContainerRef.current) {
+          const container = timelineContainerRef.current.getBoundingClientRect();
           const tooltip = tooltipRef.current;
 
           let left = coordinate.x + 15;
@@ -212,25 +212,25 @@ export default function LedgerChart() {
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      chart.remove();
+      timeline.remove();
     };
-  }, [chartData]);
+  }, [timelineData]);
 
-  if (chartData.length === 0) {
+  if (timelineData.length === 0) {
     return <EmptyState />;
   }
 
-  const currentBalance = chartData[chartData.length - 1]?.balance || 0;
-  const startDate = chartData[0]?.date;
-  const endDate = chartData[chartData.length - 1]?.date;
+  const currentBalance = timelineData[timelineData.length - 1]?.balance || 0;
+  const startDate = timelineData[0]?.date;
+  const endDate = timelineData[timelineData.length - 1]?.date;
 
   return (
     <Card sx={commonStyles.card.default}>
       <CardContent>
-        <ChartHeader currentBalance={currentBalance} />
+        <TimelineHeader currentBalance={currentBalance} />
 
         <Box sx={chartStyles.chartWrapper}>
-          <div ref={chartContainerRef} style={chartStyles.chartContainer} />
+          <div ref={timelineContainerRef} style={chartStyles.chartContainer} />
 
           <Box
             ref={tooltipRef}
@@ -272,8 +272,8 @@ export default function LedgerChart() {
           </Box>
         </Box>
 
-        <ChartFooter
-          dataLength={chartData.length}
+        <TimelineFooter
+          dataLength={timelineData.length}
           startDate={startDate}
           endDate={endDate}
         />

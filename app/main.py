@@ -8,7 +8,7 @@ from app.api.transactions import router as transactions_router
 from app.api.analytics import router as analytics_router
 
 
-app = FastAPI(title="Budgeting API")
+app = FastAPI(title="Spending API")
 
 
 # Allow cross-origin requests (for React frontend)

@@ -171,7 +171,7 @@ export function TransactionDataGrid({
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
-      width: 90,
+      width: 80,
       getActions: (params) => [
         <GridActionsCellItem
           key="edit"

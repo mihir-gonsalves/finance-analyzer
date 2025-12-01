@@ -1,155 +1,171 @@
-// frontend/src/styles/charts.ts - chart-specific styling configurations
-import { customPalette } from './colors';
-import { ColorType, LineStyle } from 'lightweight-charts';
+// frontend/src/styles/charts.ts - Chart configurations and styles
+import type { SxProps, Theme } from '@mui/material';
+import type { DeepPartial, ChartOptions, BaselineSeriesPartialOptions } from 'lightweight-charts';
 
 
 export const chartStyles = {
-  colors: {
-    primary: customPalette.emerald.main,
-    primaryLight: customPalette.emerald.light,
-    accent: customPalette.amber.main,
-    gridStroke: customPalette.slate[200],
-    textPrimary: customPalette.slate[800],
-    textSecondary: customPalette.slate[500],
-    background: '#fefefe',
-  },
+  // Chart container and wrapper
+  chartWrapper: {
+    position: 'relative',
+    height: 389,
+    mb: 4,
+  } as SxProps<Theme>,
 
-  // Chart configuration
-  chartConfig: {
-    height: 380,
-    layout: {
-      textColor: customPalette.slate[500],
-      fontFamily: 'Inter, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-      fontSize: 12,
-      background: {
-        type: ColorType.Solid,
-        color: '#fefefe'
-      },
-    },
-    grid: {
-      vertLines: {
-        color: customPalette.slate[200],
-        style: LineStyle.Dashed,
-        visible: true
-      },
-      horzLines: {
-        color: customPalette.slate[200],
-        style: LineStyle.Dashed,
-        visible: true
-      },
-    },
-    rightPriceScale: {
-      borderColor: customPalette.slate[200],
-    },
-    timeScale: {
-      borderColor: customPalette.slate[200],
-    },
-  },
+  chartContainer: {
+    width: '100%',
+    height: '410px',
+  } as React.CSSProperties,
 
-  // Series configuration
-  seriesConfig: {
-    baseValue: { type: 'price' as const, price: 0 },
-    topLineColor: customPalette.emerald.main,
-    topFillColor1: 'rgba(16, 185, 129, 0.28)',
-    topFillColor2: 'rgba(16, 185, 129, 0.05)',
-    bottomLineColor: 'rgba(239, 83, 80, 1)',
-    bottomFillColor1: 'rgba(239, 83, 80, 0.05)',
-    bottomFillColor2: 'rgba(239, 83, 80, 0.28)',
-    priceLineVisible: false,
-    crosshairMarkerVisible: true,
-    crosshairMarkerRadius: 3,
-    crosshairMarkerBorderColor: 'black',
-    crosshairMarkerBackgroundColor: 'white',
-  },
-
-  // Component styles
+  // Header styles
   header: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     mb: 2,
-  },
+  } as SxProps<Theme>,
 
   headerTitle: {
-    color: customPalette.slate[800],
     fontWeight: 600,
-  },
+    color: 'text.primary',
+  } as SxProps<Theme>,
 
   balanceDisplay: {
-    textAlign: 'right' as const,
-    background: '#ffffff',
-    borderRadius: 1,
-    padding: 2,
-    border: `1px solid ${customPalette.slate[200]}`,
-  },
+    textAlign: 'right',
+  } as SxProps<Theme>,
 
   balanceLabel: {
-    color: customPalette.slate[500],
-    fontWeight: 500,
-  },
+    color: 'text.secondary',
+    fontSize: '0.875rem',
+    mb: 0.5,
+  } as SxProps<Theme>,
 
   balanceAmount: {
     fontWeight: 700,
     letterSpacing: '-0.02em',
-  },
+  } as SxProps<Theme>,
 
-  chartWrapper: {
-    position: 'relative' as const,
-    height: 393,
-  },
-
-  chartContainer: {
-    width: '100%',
-  },
-
-  tooltip: {
-    position: 'absolute' as const,
-    pointerEvents: 'none' as const,
-    padding: 2,
-    border: `1px solid ${customPalette.slate[100]}`,
-    borderRadius: 1,
-    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05)',
-    background: 'linear-gradient(135deg, #ffffff 0%, #fefefe 100%)',
-    bgcolor: '#fefefe',
-    zIndex: 10,
-  },
-
-  tooltipDate: {
-    color: customPalette.slate[800],
-    fontWeight: 600,
-  },
-
-  tooltipDescription: {
-    color: customPalette.slate[500],
-  },
-
-  tooltipTransaction: {
-    fontWeight: 500,
-  },
-
-  tooltipBalance: {
-    mt: 1.5,
-    color: customPalette.slate[800],
-    fontSize: '1.1rem',
-    fontWeight: 600,
-  },
-
+  // Footer styles
   footer: {
     borderTop: '1px solid',
     borderColor: 'grey.200',
     background: 'grey.50',
     p: 2,
     mx: -2,
-    mb: -2.8,
-  },
+    mb: -3.45,
+    mt: 4.35,
+  } as SxProps<Theme>,
 
   footerText: {
-    lineHeight: 1.2,
-  },
+    fontSize: '0.875rem',
+  } as SxProps<Theme>,
 
-  emptyState: {
-    textAlign: 'center' as const,
-    py: 10,
-    color: customPalette.slate[500],
-  },
+  // Tooltip styles (for custom tooltips like Timeline)
+  tooltip: {
+    position: 'absolute',
+    display: 'none',
+    padding: '12px 16px',
+    backgroundColor: '#ffffff',
+    border: '1px solid',
+    borderColor: 'grey.200',
+    borderRadius: 2,
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06)',
+    pointerEvents: 'none',
+    zIndex: 1000,
+    minWidth: '220px',
+    maxWidth: '280px',
+  } as SxProps<Theme>,
+
+  tooltipDate: {
+    fontWeight: 600,
+    color: 'text.primary',
+    fontSize: '0.875rem',
+    mb: 0.5,
+  } as SxProps<Theme>,
+
+  tooltipDescription: {
+    color: 'text.secondary',
+    fontSize: '0.8rem',
+    mb: 1,
+    wordWrap: 'break-word',
+  } as SxProps<Theme>,
+
+  tooltipTransaction: {
+    fontWeight: 500,
+    fontSize: '0.8rem',
+    mb: 0.5,
+  } as SxProps<Theme>,
+
+  tooltipBalance: {
+    fontWeight: 700,
+    color: 'primary.main',
+    fontSize: '0.9rem',
+    mt: 1,
+    pt: 1,
+    borderTop: '1px solid',
+    borderColor: 'grey.200',
+  } as SxProps<Theme>,
+
+  // Lightweight Charts configuration
+  chartConfig: {
+    layout: {
+      background: { color: 'transparent' },
+      textColor: '#64748b',
+      fontSize: 12,
+      fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    },
+    grid: {
+      vertLines: { color: 'rgba(203, 213, 225, 0.3)' },
+      horzLines: { color: 'rgba(203, 213, 225, 0.3)' },
+    },
+    crosshair: {
+      mode: 1,
+      vertLine: {
+        color: '#059669',
+        width: 1,
+        style: 3,
+        labelBackgroundColor: '#059669',
+      },
+      horzLine: {
+        color: '#059669',
+        width: 1,
+        style: 3,
+        labelBackgroundColor: '#059669',
+      },
+    },
+    timeScale: {
+      borderColor: '#e2e8f0',
+      timeVisible: true,
+      secondsVisible: false,
+      fixLeftEdge: true,
+      fixRightEdge: true,
+    },
+    rightPriceScale: {
+      borderColor: '#e2e8f0',
+    },
+    handleScale: {
+      axisPressedMouseMove: {
+        time: true,
+        price: true,
+      },
+    },
+    handleScroll: {
+      vertTouchDrag: true,
+    },
+  } as DeepPartial<ChartOptions>,
+
+  seriesConfig: {
+    baseValue: { type: 'price', price: 0 },
+    topLineColor: '#10b981',
+    topFillColor1: 'rgba(16, 185, 129, 0.28)',
+    topFillColor2: 'rgba(16, 185, 129, 0.05)',
+    bottomLineColor: '#ef4444',
+    bottomFillColor1: 'rgba(239, 68, 68, 0.28)',
+    bottomFillColor2: 'rgba(239, 68, 68, 0.05)',
+    lineWidth: 2,
+    priceFormat: {
+      type: 'price',
+      precision: 2,
+      minMove: 0.01,
+    },
+  } as DeepPartial<BaselineSeriesPartialOptions>,
 };

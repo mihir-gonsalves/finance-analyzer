@@ -1,7 +1,7 @@
 // frontend/src/components/AnalyticsPanel.tsx - dashboard analytics (pie charts, top categories, stats)
 import { useState } from "react";
 import { Card, CardContent, Box, Button, Skeleton } from "@mui/material";
-import { DonutLarge, Category as CategoryIcon, Equalizer } from "@mui/icons-material";
+import { DonutLarge, CategoryRounded as CategoryIcon, AutoAwesomeRounded } from "@mui/icons-material";
 import { useSpendingAnalytics } from "../hooks/useSpendingAnalytics";
 import { SpendingOverview } from "./analytics/SpendingOverview";
 import { TopCategoriesList } from "./analytics/TopCategoriesList";
@@ -16,7 +16,7 @@ type ViewMode = 'overview' | 'categories' | 'stats';
 const VIEW_CONFIG = {
   overview: { icon: DonutLarge, title: 'Cost Center Overview', next: 'categories' as ViewMode },
   categories: { icon: CategoryIcon, title: 'Top Spend Categories', next: 'stats' as ViewMode },
-  stats: { icon: Equalizer, title: 'Quick Stats', next: 'overview' as ViewMode },
+  stats: { icon: AutoAwesomeRounded, title: 'Quick Stats', next: 'overview' as ViewMode },
 };
 
 

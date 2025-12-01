@@ -149,7 +149,7 @@ export const layoutStyles = {
   // Data display
   dataDisplay: {
     table: {
-      height: 569,
+      height: 570,
       backgroundColor: '#ffffff',
       '& .MuiDataGrid-row:hover': {
         backgroundColor: 'action.hover',
@@ -162,11 +162,13 @@ export const layoutStyles = {
 
     chartContainer: {
       position: 'relative',
-      height: 560,
+      height: 561,
     } as SxProps<Theme>,
 
+    // Top Spend Categories
     scrollable: {
-      height: '553px',
+      mt: 1.22,
+      height: '570px',
       overflow: 'auto',
       '&::-webkit-scrollbar': {
         width: '8px',
@@ -196,7 +198,7 @@ export const layoutStyles = {
     categoryRow: {
       display: 'flex',
       alignItems: 'center',
-      mb: 1.5,
+      mb: 2.15,
     } as SxProps<Theme>,
 
     progressRow: {
