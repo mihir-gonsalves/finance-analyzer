@@ -91,10 +91,11 @@ Arbitrary items that don't fit in the buckets above
 ## Key Design Decisions
 
 - **Todo**
-- **Local-first**: Manually upload CSV files rather than connecting to bank APIs
+- **Local first**: Manually upload CSV files rather than connecting to financial institution APIs
 - **SQLite**: Simple file-based database suitable for personal use
-- **Standardized transaction format**: All bank CSV formats parsed into consistent Transaction model
-- **Category field optional**: Some banks don't provide categories, users can add manually
+- **Standardized transaction format**: All institution CSV formats parsed into a singular, consistent Transaction model
+- **Category field optional**: Some institutions don't provide categories, users can add manually
+- **Frontend analysis**: Data (todo: add pagination for large txn history) is fetched from db on startup and client-side performs analysis
 
 
 ## Architecture
@@ -109,16 +110,12 @@ Arbitrary items that don't fit in the buckets above
 
 Core modules:
 - `app/models.py`: SQLAlchemy Transaction model
-- `app/parsers.py`: CSV parsing logic for different bank formats
-- `app/loaders.py`: Data loading functions to move parsed data into database
-- `app/crud/summaries.py` - sets up the R in CRUD for enhanced summaries
-- `app/crud/filtering.py`: sets up the R in CRUD for enhanced filtering functions
-- `app/crud/totals.py` - sets up the R in CRUD for enhanced totaling functions
-- `app/crud/crud.py`: Create, Update, Delete operations
+- `app/parsers.py`: CSV parsing logic for different institution formats
+- `app/loaders.py`: Data loading functions to move parsed CSV data into database
 - `app/database.py`: Database connection and initialization
 - `app/schemas.py`: Pydantic models for API validation
-- `app/api/transactions/*.py`: Transaction CRUD and filtering FastAPI endpoints
-- `app/api/analytics/*.py`: Analytics and reporting FastAPI endpoints
+- `app/api/transactions.py`: Backend api endpoints for transaction crud, filtering, etc.
+- `app/crud/operations.py`: Database CRUD operations
 
 
 ### Frontend (React/TypeScript)
@@ -141,7 +138,6 @@ Core modules:
 - `frontend/src/hooks/useFilters.ts` - smart hook that switches between all/filtered transactions based on active filters
 - `frontend/src/hooks/useFilterOptions.ts` - fetches and prepares filter dropdown options from backend metadata
 - `frontend/src/hooks/useCSVUpload.ts` - handles CSV file uploads with institution selection
-- `frontend/src/hooks/useAnalytics.ts` - fetches analytics from backend API (totals, trends, time-series, top spending)
 - `frontend/src/context/TransactionContext.tsx` - react context providing filter state and whether filters are applied globally
 - `frontend/src/components/Header.tsx` - app header with title and navigation
 - `frontend/src/components/TransactionTable.tsx` - main transaction display (toggles between data grid and chart)

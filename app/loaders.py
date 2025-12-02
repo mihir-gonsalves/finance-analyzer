@@ -1,8 +1,10 @@
 # app/loaders.py - takes parsed .csv data and loads it into DB
 from sqlalchemy.orm import Session
+
+from typing import List, Dict, Any, Optional
+
 from .database import SessionLocal, init_db
 from .models import Transaction, CostCenter, SpendCategory
-from typing import List, Dict, Any, Optional
 
 
 def get_or_create_cost_center(db: Session, name: Optional[str]) -> CostCenter:
@@ -69,11 +71,11 @@ def save_transactions(transactions: List[Dict[str, Any]], db_session: Optional[S
         transactions: List of transaction dictionaries with keys:
             - date: datetime.date
             - description: str
-            - amount: float
-            - account: str
             - cost_center: str or None (cost center name)
             - spend_categories: list[str] (spend category names, can be empty)
-        
+            - amount: float
+            - account: str
+
         db_session: Optional SQLAlchemy session. If None, creates a new session.
     
     Raises:
@@ -96,12 +98,12 @@ def save_transactions(transactions: List[Dict[str, Any]], db_session: Optional[S
             
             # Create transaction
             db_transaction = Transaction(
-                date=t["date"],
-                description=t["description"],
-                amount=t["amount"],
-                account=t["account"],
-                cost_center=cost_center,
-                spend_categories=spend_categories
+                date = t["date"],
+                description = t["description"],
+                cost_center = cost_center,
+                spend_categories = spend_categories,
+                amount = t["amount"],
+                account = t["account"],
             )
             
             db_session.add(db_transaction)
@@ -113,6 +115,6 @@ def save_transactions(transactions: List[Dict[str, Any]], db_session: Optional[S
         raise
     
     finally:
-        # Only close if we created the session
+        # Only close if session is created
         if own_session:
             db_session.close()
