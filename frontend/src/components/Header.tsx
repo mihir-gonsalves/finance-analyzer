@@ -1,6 +1,6 @@
 // frontend/src/components/Header.tsx - app header with title and navigation
 import { AppBar, Toolbar, Typography, IconButton, Box, useMediaQuery, useTheme } from "@mui/material";
-import { AccountCircle, SavedSearch } from "@mui/icons-material";
+import { AccountCircle, SavedSearchRounded } from "@mui/icons-material";
 import { commonStyles, layoutStyles } from "../styles";
 
 
@@ -31,7 +31,7 @@ export default function Header() {
       >
         {/* Logo/Brand */}
         <Box sx={{ ...layoutStyles.flex.row, gap: 1.5 }}>
-          <SavedSearch
+          <SavedSearchRounded
             sx={{
               color: 'primary.main',
               fontSize: { sm: 36 }

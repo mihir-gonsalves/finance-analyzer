@@ -3,7 +3,6 @@ import { createTheme } from "@mui/material/styles";
 import { customPalette } from './colors';
 import { typography } from "./typography";
 
-
 export const theme = createTheme({
   palette: {
     mode: 'light',
@@ -58,7 +57,7 @@ export const theme = createTheme({
       },
     },
 
-    MuiChip: { // filter tags
+    MuiChip: {
       defaultProps: {
         size: 'small',
         color: 'primary',
@@ -107,12 +106,54 @@ export const theme = createTheme({
       }
     },
 
+    // Standard MUI Tooltip (used in DataGrid, buttons, etc.) - not used in charts
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: '#ffffff',
+          color: customPalette.slate[800],
+          border: `1px solid ${customPalette.slate[200]}`,
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06)',
+          fontSize: '0.875rem',
+          fontWeight: 500,
+          padding: '8px 12px',
+          borderRadius: 12,
+        },
+        arrow: {
+          color: '#ffffff',
+          '&::before': {
+            border: `1px solid ${customPalette.slate[200]}`,
+          },
+        },
+      },
+    },
+
+    MuiAutocomplete: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: '#ffffff',
+        },
+        listbox: {
+          backgroundColor: '#ffffff',
+        },
+      },
+    },
+
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: '#ffffff',
+        },
+      },
+    },
+
+    // dropdowns
     MuiPaper: {
       styleOverrides: {
         root: {
           backgroundColor: '#ffffff',
-        }
-      }
-    }
+        },
+      },
+    },
   },
 });

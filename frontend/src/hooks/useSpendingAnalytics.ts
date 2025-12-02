@@ -72,7 +72,7 @@ function calculatePaycheckStats(transactions: Transaction[]): { count: number; t
   const count = paychecks.length;
   const total = paychecks.reduce((sum, t) => sum + t.amount, 0);
   const average = count > 0 ? total / count : 0;
-  
+
   return { count, total, average };
 }
 
@@ -125,8 +125,8 @@ export function useSpendingAnalytics(transactions: Transaction[]): SpendingAnaly
         avgPerExpense: avgExpense, // Alias
         avgIncome,
         avgPerPaycheck: paycheckStats.average,
-        costCenterCount: Object.keys(costCenterSpending).length,
-        spendCategoryCount: Object.keys(spendCategorySpending).length,
+        costCenterCount: Object.keys(costCenterSpending).length + 1,
+        spendCategoryCount: Object.keys(spendCategorySpending).length + 1,
       }
     };
   }, [transactions]);

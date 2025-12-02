@@ -1,6 +1,6 @@
 // frontend/src/components/transactions/TransactionTableHeader.tsx - active filter tags and action buttons (add, upload, export)
 import { Box, IconButton, Tooltip, Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
-import { TableChart, Timeline, FilterList, Add, MoreVert, Upload, FileDownload } from "@mui/icons-material";
+import { TableChart, Timeline, EqualizerRounded, FilterList, Add, MoreVert, Upload, FileDownload } from "@mui/icons-material";
 import { FilterTags } from "./FilterTags";
 import type { TransactionFilters } from "../../types/filters";
 import { useState } from "react";
@@ -8,7 +8,7 @@ import { commonStyles, layoutStyles, conditionalStyle } from "../../styles";
 
 
 interface TransactionTableHeaderProps {
-  viewMode: 'table' | 'chart';
+  viewMode: 'table' | 'timeline' | 'barchart';
   filters: TransactionFilters;
   filtersOpen: boolean;
   onToggleView: () => void;
@@ -50,12 +50,34 @@ export function TransactionTableHeader({
     onExportCSV();
   };
 
+  const getViewIcon = () => {
+    switch (viewMode) {
+      case 'table':
+        return <TableChart />;
+      case 'timeline':
+        return <Timeline />;
+      case 'barchart':
+        return <EqualizerRounded />;
+    }
+  };
+
+  const getViewTooltip = () => {
+    switch (viewMode) {
+      case 'table':
+        return 'Switch to Timeline';
+      case 'timeline':
+        return 'Switch to Bar Chart';
+      case 'barchart':
+        return 'Switch to Table';
+    }
+  };
+
   return (
     <Box mb={2}>
       <Box sx={layoutStyles.flex.rowBetween}>
-        <Tooltip title={viewMode === 'table' ? 'Switch to Chart' : 'Switch to Table'}>
+        <Tooltip title={getViewTooltip()}>
           <IconButton onClick={onToggleView} color="primary" sx={commonStyles.button.icon}>
-            {viewMode === 'table' ? <TableChart /> : <Timeline />}
+            {getViewIcon()}
           </IconButton>
         </Tooltip>
 

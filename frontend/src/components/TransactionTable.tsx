@@ -1,7 +1,8 @@
-// frontend/src/components/TransactionTable.tsx - main transaction display (toggles between data grid and chart)
+// frontend/src/components/TransactionTable.tsx - main transaction display (toggles between data grid, timeline, and bar chart)
 import { useState, useRef } from "react";
 import { Card, CardContent, Box, Alert } from "@mui/material";
-import LedgerChart from "./LedgerChart";
+import Timeline from "./Timeline";
+import MoMBarChart from "./MoMBarChart";
 import { useDeleteTransaction, useUpdateTransaction, useCreateTransaction, type Transaction, type CreateTransactionData, type UpdateTransactionData, } from "../hooks/useTransactions";
 import { useCSVUpload } from "../hooks/useCSVUpload";
 import { TransactionTableHeader } from "./transactions/TransactionTableHeader";
@@ -16,7 +17,7 @@ import { exportTransactionsToCSV } from "../utils/exportUtils";
 import { commonStyles, layoutStyles } from "../styles";
 
 
-type ViewMode = 'table' | 'chart';
+type ViewMode = 'table' | 'timeline' | 'barchart';
 
 
 interface TransactionTableProps {
@@ -41,6 +42,14 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
   const [deleteTransactionId, setDeleteTransactionId] = useState<number | null>(null);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [csvInstitution, setCsvInstitution] = useState("");
+
+  const handleToggleView = () => {
+    setViewMode(prev => {
+      if (prev === 'table') return 'timeline';
+      if (prev === 'timeline') return 'barchart';
+      return 'table';
+    });
+  };
 
   const handleAddTransaction = () => setAddDialogOpen(true);
   const handleSaveAdd = (transaction: CreateTransactionData) => createMutation.mutate(transaction);
@@ -113,7 +122,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
             viewMode={viewMode}
             filters={filters}
             filtersOpen={filtersOpen}
-            onToggleView={() => setViewMode(prev => prev === 'table' ? 'chart' : 'table')}
+            onToggleView={handleToggleView}
             onToggleFilters={onToggleFilters}
             onAddTransaction={handleAddTransaction}
             onCSVUpload={handleCSVUploadClick}
@@ -136,9 +145,13 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
                 onDelete={handleDelete}
               />
             </Box>
+          ) : viewMode === 'timeline' ? (
+            <Box sx={layoutStyles.dataDisplay.chartContainer}>
+              <Timeline />
+            </Box>
           ) : (
             <Box sx={layoutStyles.dataDisplay.chartContainer}>
-              <LedgerChart />
+              <MoMBarChart />
             </Box>
           )}
         </CardContent>

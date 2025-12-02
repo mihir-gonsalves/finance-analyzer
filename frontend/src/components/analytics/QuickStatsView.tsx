@@ -82,13 +82,13 @@ export function QuickStatsView({ analytics }: QuickStatsViewProps) {
         variant="h6"
         color={color}
       >
-        {typeof value === 'number' ? formatCurrency(value) : value}
+        {value}
       </Typography>
     </Box>
   );
 
   return (
-    <Box sx={{ ...layoutStyles.flex.column, gap: 2, mt: 1.25 }}>
+    <Box sx={{ ...layoutStyles.flex.column, gap: 2, mt: 1.2 }}>
       {/* Primary Financial Stats */}
       <StatCard
         icon={TrendingUpIcon}
@@ -114,16 +114,16 @@ export function QuickStatsView({ analytics }: QuickStatsViewProps) {
       <Divider sx={{ my: 0.5 }} />
 
       {/* Secondary Stats */}
-      <Box sx={{ ...layoutStyles.flex.column, gap: 2.5 }}>
+      <Box sx={{ ...layoutStyles.flex.column, gap: 2.1 }}>
         <StatRow
           label="Avg. Paycheck"
-          value={stats.avgPerPaycheck}
+          value={formatCurrency(stats.avgPerPaycheck)}
           color="success.main"
         />
 
         <StatRow
           label="Avg. Expense"
-          value={stats.avgPerExpense}
+          value={formatCurrency(stats.avgPerExpense)}
           color="error.main"
         />
 
@@ -135,6 +135,16 @@ export function QuickStatsView({ analytics }: QuickStatsViewProps) {
         <StatRow
           label="Expenses"
           value={stats.expenseCount}
+        />
+
+        <StatRow
+          label="No. Cost Centers"
+          value={stats.costCenterCount}
+        />
+
+        <StatRow
+          label="No. Spend Categories"
+          value={stats.spendCategoryCount}
         />
       </Box>
     </Box>

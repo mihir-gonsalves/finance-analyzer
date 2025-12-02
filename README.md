@@ -1,11 +1,11 @@
 ## Project Overview
 
-This is a personal budget analyzer built with a FastAPI backend and React frontend. Users can upload CSV files from their bank/credit card accounts to analyze their transactions. 
+This is a personal spending analyzer built with a FastAPI backend and React frontend. Users can upload CSV files from their bank/credit card accounts to analyze their transactions. 
 
-Note: This is not meant to be a net worth calculator. This is only to help users create budgets and manage cash.
+Note: This is not meant to be a net worth calculator/tracker. This is designed to help users view their spending habits so they can make informed decisions when planning future budgets and managing cash.
 
 
-## Budgeting Guide
+## Spending Tracking Guide
 
 - Todo
 
@@ -145,7 +145,7 @@ Core modules:
 - `frontend/src/context/TransactionContext.tsx` - react context providing filter state and whether filters are applied globally
 - `frontend/src/components/Header.tsx` - app header with title and navigation
 - `frontend/src/components/TransactionTable.tsx` - main transaction display (toggles between data grid and chart)
-- `frontend/src/components/LedgerChart.tsx` - trading View lightweight chart visualization of transaction history
+- `frontend/src/components/Timeline.tsx` - trading View lightweight chart visualization of transaction history
 - `frontend/src/components/FiltersPanel.tsx` - filter controls for transactions (dates, categories, amounts, search)
 - `frontend/src/components/AnalyticsPanel.tsx` - dashboard analytics (pie charts, top categories, stats)
 - `frontend/src/components/transactions/TransactionDataGrid.tsx` - MUI DataGrid ledger showing transaction rows
