@@ -6,9 +6,9 @@ from sqlalchemy.orm import declarative_base, relationship
 Base = declarative_base()
 
 
-# -------------------------
+# ============================================
 # Association Table
-# -------------------------
+# ============================================
 
 
 transaction_spend_categories = Table(
@@ -19,15 +19,13 @@ transaction_spend_categories = Table(
 )
 
 
-# -------------------------
+# ============================================
 # Cost Center Model
-# -------------------------
+# ============================================
 
 
 class CostCenter(Base):
-    """
-    Top-level grouping for spending (e.g., 'Meals', 'Gifts', 'Entertainment')
-    """
+    """Top-level grouping for spending (e.g., 'Meals', 'Car', 'Health & Wellness')"""
     __tablename__ = "cost_centers"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -43,9 +41,9 @@ class CostCenter(Base):
         return f"<CostCenter(id={self.id}, name={self.name})>"
 
 
-# -------------------------
+# ============================================
 # Spend Category Model
-# -------------------------
+# ============================================
 
 
 class SpendCategory(Base):
@@ -69,15 +67,13 @@ class SpendCategory(Base):
         return f"<SpendCategory(id={self.id}, name={self.name})>"
 
 
-# -------------------------
+# ============================================
 # Transaction Model
-# -------------------------
+# ============================================
 
 
 class Transaction(Base):
-    """
-    A financial transaction linked optionally to one cost center and multiple spend categories.
-    """
+    """A financial transaction linked optionally to one cost center and multiple spend categories."""
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True, index=True)

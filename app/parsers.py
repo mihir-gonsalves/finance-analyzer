@@ -8,17 +8,16 @@ def clean_header(header):
     """Clean header string by removing all whitespace, newlines, BOM, and special characters."""
     if not header:
         return ""
-    # Remove BOM (Byte Order Mark) character that appears at start of some CSV files
+    
+    # Remove BOM character that appears at start of some CSV files
     cleaned = header.replace('\ufeff', '').replace('\ufffe', '')
+    
     # Remove all types of whitespace including newlines, carriage returns, tabs, etc.
     return ''.join(cleaned.split()).strip()
 
 
 def validate_headers(expected_headers, actual_headers, source_name):
-    """
-    Validate that all expected headers are present in the CSV.
-    Normalizes headers by removing all whitespace for comparison.
-    """
+    """Validate that all expected headers are present in the CSV. Normalizes headers by removing all whitespace for comparison."""
     # Create normalized versions for comparison
     normalized_actual = {clean_header(h): h for h in actual_headers if h}
     normalized_expected = {clean_header(h): h for h in expected_headers}
@@ -63,8 +62,6 @@ def load_discover_csv(file_path: str):
     - Description: Transaction description
     - Amount: Transaction amount (positive = expense, negative = credit)
     - Category: Discover's category (maps to cost_center)
-    
-    Note: Headers may contain BOM characters and hidden newlines - we normalize them.
     """
     transactions = []
     
@@ -116,10 +113,10 @@ def load_discover_csv(file_path: str):
             transactions.append({
                 "date": datetime.strptime(row[date_header].strip(), "%m/%d/%Y").date(),
                 "description": row[desc_header].strip(),
+                "cost_center": cost_center,
+                "spend_categories": [],  # Empty by default - user can categorize later
                 "amount": amount,
                 "account": "Discover",
-                "cost_center": cost_center,
-                "spend_categories": []  # Empty by default - user can categorize later
             })
     
     return transactions
@@ -155,7 +152,7 @@ def load_schwab_csv(file_path: str):
         # Create a mapping from cleaned headers to original headers
         header_mapping = {clean_header(h): h for h in original_headers}
         
-        # Expected headers (normalized) - only validate the ones we need
+        # Expected headers (normalized) - only validate the ones needed
         expected_normalized = {
             clean_header("Date"): "Date",
             clean_header("Description"): "Description",
@@ -207,7 +204,7 @@ def load_schwab_csv(file_path: str):
 
 def load_custom_csv(file_path: str):
     """
-    Parse custom export CSV format from this application.
+    Parse custom export CSV format from this app.
     
     Expected columns:
     - Date: Transaction date (YYYY-MM-DD)
@@ -218,7 +215,7 @@ def load_custom_csv(file_path: str):
     - Spend Categories: Comma-separated list of spend category names
     
     This format is used for exporting and re-importing transactions after bulk editing.
-    Spend categories should be comma-separated (e.g., "Restaurant, Girlfriend").
+    Spend categories should be comma-separated (e.g., "Restaurant, Night Life").
     """
     transactions = []
     
@@ -334,29 +331,5 @@ def parse_csv(file_path: str, institution: str):
         return load_schwab_csv(file_path)
     elif institution == "custom":
         return load_custom_csv(file_path)
-    else:
-        raise ValueError(f"No parser available for institution: {institution}")
-    """
-    Route to the correct parser based on institution name.
-    
-    Args:
-        file_path: Path to the CSV file
-        institution: Institution name (e.g., 'discover', 'schwab')
-    
-    Returns:
-        List of transaction dictionaries with keys:
-        - date: datetime.date
-        - description: str
-        - amount: float (negative = expense, positive = income/credit)
-        - account: str
-        - cost_center: str or None (maps to cost center name)
-        - spend_categories: list[str] (empty by default, user categorizes later)
-    """
-    institution = institution.lower().strip()
-    
-    if institution == "discover":
-        return load_discover_csv(file_path)
-    elif institution in ["schwab", "schwab checking"]:
-        return load_schwab_csv(file_path)
     else:
         raise ValueError(f"No parser available for institution: {institution}")

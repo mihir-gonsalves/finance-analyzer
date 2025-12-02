@@ -29,7 +29,7 @@ export function useCSVUpload() {
       formData.append('file', file);
       formData.append('institution', institution);
 
-      const res = await client.post('/transactions/meta/upload-csv', formData, {
+      const res = await client.post('/transactions/upload-csv', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

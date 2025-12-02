@@ -125,8 +125,8 @@ export function useSpendingAnalytics(transactions: Transaction[]): SpendingAnaly
         avgPerExpense: avgExpense, // Alias
         avgIncome,
         avgPerPaycheck: paycheckStats.average,
-        costCenterCount: Object.keys(costCenterSpending).length + 1,
-        spendCategoryCount: Object.keys(spendCategorySpending).length + 1,
+        costCenterCount: Object.keys(costCenterSpending).length,
+        spendCategoryCount: Object.keys(spendCategorySpending).length,
       }
     };
   }, [transactions]);

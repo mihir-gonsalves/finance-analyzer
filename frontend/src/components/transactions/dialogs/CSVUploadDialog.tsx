@@ -46,7 +46,7 @@ export function CSVUploadDialog({
       <DialogContent sx={commonStyles.dialog.content}>
         <Box sx={layoutStyles.dialogLayout.form}>
           <Alert severity="info">
-            Upload transaction history from your bank, credit card, or a custom export from this app.
+            Upload transaction history from your financial institution of choice or a custom export from this app.
           </Alert>
 
           {file && (

@@ -64,7 +64,7 @@ export function useCostCenters() {
   return useQuery<{ cost_centers: CostCenter[]; count: number }>({
     queryKey: ["cost_centers"],
     queryFn: async () => {
-      const res = await client.get("/transactions/meta/cost_centers");
+      const res = await client.get("/transactions/cost_centers");
       return res.data;
     },
     staleTime: 60000, // 1 minute
@@ -77,7 +77,7 @@ export function useSpendCategories() {
   return useQuery<{ spend_categories: SpendCategory[]; count: number }>({
     queryKey: ["spend_categories"],
     queryFn: async () => {
-      const res = await client.get("/transactions/meta/spend_categories");
+      const res = await client.get("/transactions/spend_categories");
       return res.data;
     },
     staleTime: 60000, // 1 minute
@@ -90,7 +90,7 @@ export function useAccounts() {
   return useQuery<string[]>({
     queryKey: ["accounts"],
     queryFn: async () => {
-      const res = await client.get("/transactions/meta/metadata/accounts");
+      const res = await client.get("/transactions/accounts");
       return res.data;
     },
     staleTime: 60000, // 1 minute
@@ -103,7 +103,7 @@ export function useDateRange() {
   return useQuery<{ earliest: string | null; latest: string | null; has_data: boolean }>({
     queryKey: ["date_range"],
     queryFn: async () => {
-      const res = await client.get("/transactions/meta/metadata/date-range");
+      const res = await client.get("/transactions/date-range");
       return res.data;
     },
     staleTime: 300000, // 5 minutes
@@ -121,7 +121,7 @@ export function useTransactions() {
   return useQuery<Transaction[]>({
     queryKey: ["transactions"],
     queryFn: async () => {
-      const res = await client.get("/transactions");
+      const res = await client.get("/transactions/");
       return res.data.transactions; // Backend returns { transactions: [...], count: N }
     },
     staleTime: 30000, // 30 seconds
@@ -130,16 +130,14 @@ export function useTransactions() {
 
 
 // Fetch filtered transactions - backend handles all filtering
-export function useFilteredTransactions(filters: TransactionFilters, enabled: boolean = true) {
-  return useQuery<Transaction[]>({
+export function useFilteredTransactions(filters: TransactionFilters) {
+  return useQuery({
     queryKey: ["transactions", "filtered", filters],
     queryFn: async () => {
       const params = buildFilterParams(filters);
-      const res = await client.get(`/transactions/filter?${params.toString()}`);
-      return res.data.transactions; // Backend returns { transactions: [...], count: N, pagination: {...} }
+      const res = await client.get(`/transactions/filter?${params}`);
+      return res.data.transactions;
     },
-    staleTime: 30000, // 30 seconds
-    enabled: enabled, // Allow external control of when to fetch
   });
 }
 
@@ -154,7 +152,7 @@ export function useCreateTransaction() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (txn: CreateTransactionData) => {
-      const res = await client.post("/transactions", txn);
+      const res = await client.post("/transactions/", txn);
       return res.data;
     },
     onSuccess: () => {

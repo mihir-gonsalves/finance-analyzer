@@ -1,12 +1,13 @@
 # app/schemas.py - pydantic enforces data integrity by enabling type checking into Python's more lax OOP
 from pydantic import BaseModel, Field, field_validator
+
 import datetime
 from typing import Optional, List
 
 
-# ---------------------
-# COST CENTER SCHEMAS  
-# ---------------------
+# ============================================
+# COST CENTER SCHEMAS
+# ============================================
 
 
 class CostCenterBase(BaseModel):
@@ -31,9 +32,9 @@ class CostCenterWithID(CostCenterBase):
         from_attributes = True
 
 
-# ---------------------
+# ============================================
 # SPEND CATEGORY SCHEMAS
-# ---------------------
+# ============================================
 
 
 class SpendCategoryBase(BaseModel):
@@ -58,9 +59,9 @@ class SpendCategoryWithID(SpendCategoryBase):
         from_attributes = True
 
 
-# ---------------------
+# ============================================
 # TRANSACTION SCHEMAS
-# ---------------------
+# ============================================
 
 
 class TransactionBase(BaseModel):
@@ -100,10 +101,10 @@ class TransactionCreate(TransactionBase):
 class TransactionUpdate(BaseModel):
     date: Optional[datetime.date] = None
     description: Optional[str] = Field(default=None, min_length=1, max_length=200)
-    amount: Optional[float] = None
-    account: Optional[str] = Field(default=None, min_length=1, max_length=50)
     cost_center_name: Optional[str] = None
     spend_category_names: Optional[List[str]] = None
+    amount: Optional[float] = None
+    account: Optional[str] = Field(default=None, min_length=1, max_length=50)
 
     @field_validator("description", "account", mode="before")
     @classmethod
@@ -135,23 +136,14 @@ class TransactionWithID(TransactionBase):
         from_attributes = True
 
 
-# ---------------------
+# ============================================
 # RESPONSE WRAPPERS
-# ---------------------
-
-
-class PaginationMetadata(BaseModel):
-    limit: Optional[int] = None
-    offset: Optional[int] = None
-    total: int
-    returned: int
-    has_more: bool
+# ============================================
 
 
 class TransactionListResponse(BaseModel):
     transactions: List[TransactionWithID]
     count: int
-    pagination: Optional[PaginationMetadata] = None
 
 
 class CostCenterListResponse(BaseModel):
@@ -162,33 +154,3 @@ class CostCenterListResponse(BaseModel):
 class SpendCategoryListResponse(BaseModel):
     spend_categories: List[SpendCategoryWithID]
     count: int
-
-
-# ---------------------
-# BULK OPERATION SCHEMAS
-# ---------------------
-
-
-class BulkUpdateRequest(BaseModel):
-    transaction_ids: List[int] = Field(min_length=1)
-    update_data: TransactionUpdate
-
-
-class BulkUpdateResult(BaseModel):
-    updated: List[int]
-    failed: List[dict]
-    total_requested: int
-    total_updated: int
-    total_failed: int
-
-
-class BulkDeleteRequest(BaseModel):
-    transaction_ids: List[int] = Field(min_length=1)
-
-
-class BulkDeleteResult(BaseModel):
-    deleted: List[int]
-    failed: List[dict]
-    total_requested: int
-    total_deleted: int
-    total_failed: int
