@@ -2,7 +2,6 @@
 import { AppBar, Toolbar, Typography, IconButton, Box, useMediaQuery, useTheme } from "@mui/material";
 import { AccountCircle, SavedSearchRounded } from "@mui/icons-material";
 import { commonStyles, layoutStyles } from "../styles";
-import { SPACING, BORDER_RADIUS } from "../styles/constants";
 
 const HEADER_STYLES = {
   appBar: {

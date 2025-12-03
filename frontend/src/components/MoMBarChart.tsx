@@ -19,14 +19,6 @@ interface CostCenterData {
   percentage: string;
 }
 
-interface MonthlyData {
-  monthKey: string;
-  month: string;
-  costCenters: Record<string, number>;
-  total: number;
-  date: Date;
-}
-
 // ========================
 // CONSTANTS
 // ========================
@@ -201,7 +193,7 @@ function ChartFooter({ maxTotal, avgTotal }: ChartFooterProps) {
       p: SPACING.md,
       mx: -2,
       mb: -3.45,
-      mt: 4.45,
+      mt: 4.6,
     }}>
       <Typography variant="body2" color="text.secondary">
         Peak spending: {formatCurrency(maxTotal)} • Average: {formatCurrency(avgTotal)}

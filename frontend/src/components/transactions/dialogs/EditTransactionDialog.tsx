@@ -2,12 +2,19 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from "@mui/material";
 import { Edit } from "@mui/icons-material";
+import { 
+  DIALOG_CONFIG, 
+  BUTTON_TEXT, 
+  FIELD_LABELS, 
+  PLACEHOLDERS, 
+  HELPER_TEXT,
+  parseSpendCategories,
+  getCostCenterInput,
+  getSpendCategoryInput,
+  formatAmountForInput 
+} from "../../../utils/dialogUtils";
 import { layoutStyles, commonStyles } from "../../../styles";
 import type { Transaction, UpdateTransactionData } from "../../../hooks/useTransactions";
-
-// ========================
-// TYPE DEFINITIONS
-// ========================
 
 interface EditTransactionDialogProps {
   open: boolean;
@@ -16,85 +23,6 @@ interface EditTransactionDialogProps {
   onSave: (data: UpdateTransactionData) => void;
   isLoading?: boolean;
 }
-
-// ========================
-// CONSTANTS
-// ========================
-
-const DIALOG_CONFIG = {
-  MAX_WIDTH: "sm" as const,
-  FULL_WIDTH: true,
-} as const;
-
-const TEXT = {
-  TITLE: "Edit Transaction",
-  CANCEL: "Cancel",
-  SUBMIT: "Save",
-  LOADING: "Saving...",
-} as const;
-
-const FIELD_LABELS = {
-  DESCRIPTION: "Description",
-  AMOUNT: "Amount",
-  ACCOUNT: "Account",
-  COST_CENTER: "Cost Center",
-  SPEND_CATEGORIES: "Spend Categories (comma-separated)",
-  DATE: "Date",
-} as const;
-
-const PLACEHOLDERS = {
-  COST_CENTER: "e.g. Living Expenses, Car, Meals",
-  SPEND_CATEGORIES: "e.g. Rent, Gas, Groceries",
-} as const;
-
-const HELPER_TEXT = {
-  COST_CENTER: 'Leave blank for "Uncategorized"',
-  SPEND_CATEGORIES: 'Leave blank for "Uncategorized"',
-} as const;
-
-const UNCATEGORIZED = "Uncategorized";
-const ICON_SIZE = 20;
-const MULTILINE_MAX_ROWS = 3;
-const AMOUNT_DECIMAL_PLACES = 2;
-
-// ========================
-// UTILITY FUNCTIONS
-// ========================
-
-const formatAmount = (amount: number | string): string => {
-  if (typeof amount === "number") {
-    return amount.toFixed(AMOUNT_DECIMAL_PLACES);
-  }
-  return amount;
-};
-
-const parseSpendCategories = (input: string): string[] => {
-  if (!input.trim()) return [];
-  return input
-    .split(",")
-    .map(cat => cat.trim())
-    .filter(cat => cat.length > 0);
-};
-
-const getCostCenterInput = (transaction: Transaction | null): string => {
-  if (!transaction?.cost_center) return "";
-  if (transaction.cost_center.name === UNCATEGORIZED) return "";
-  return transaction.cost_center.name;
-};
-
-const getSpendCategoryInput = (transaction: Transaction | null): string => {
-  if (!transaction?.spend_categories) return "";
-  
-  const names = transaction.spend_categories
-    .filter(cat => cat.name !== UNCATEGORIZED)
-    .map(cat => cat.name);
-  
-  return names.join(", ");
-};
-
-// ========================
-// MAIN COMPONENT
-// ========================
 
 export function EditTransactionDialog({
   open,
@@ -107,12 +35,11 @@ export function EditTransactionDialog({
   const [costCenterInput, setCostCenterInput] = useState("");
   const [spendCategoryInput, setSpendCategoryInput] = useState("");
 
-  // Initialize form data when transaction changes
   useEffect(() => {
     if (transaction) {
       setEditData(transaction);
-      setCostCenterInput(getCostCenterInput(transaction));
-      setSpendCategoryInput(getSpendCategoryInput(transaction));
+      setCostCenterInput(getCostCenterInput(transaction.cost_center));
+      setSpendCategoryInput(getSpendCategoryInput(transaction.spend_categories));
     }
   }, [transaction]);
 
@@ -126,17 +53,14 @@ export function EditTransactionDialog({
   const handleSave = () => {
     if (!transaction) return;
 
-    const costCenterName = costCenterInput.trim();
-    const spendCategoryNames = parseSpendCategories(spendCategoryInput);
-
     const updateData: UpdateTransactionData = {
       id: transaction.id,
       date: editData.date,
       description: editData.description,
       amount: editData.amount,
       account: editData.account,
-      cost_center_name: costCenterName,
-      spend_category_names: spendCategoryNames,
+      cost_center_name: costCenterInput.trim(),
+      spend_category_names: parseSpendCategories(spendCategoryInput),
     };
 
     onSave(updateData);
@@ -147,24 +71,17 @@ export function EditTransactionDialog({
     setEditData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Don't render if no transaction
   if (!transaction) return null;
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth={DIALOG_CONFIG.MAX_WIDTH}
-      fullWidth={DIALOG_CONFIG.FULL_WIDTH}
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth={DIALOG_CONFIG.MAX_WIDTH} fullWidth>
       <DialogTitle sx={commonStyles.dialog.title}>
-        <Edit sx={{ fontSize: ICON_SIZE }} />
-        {TEXT.TITLE}
+        <Edit sx={{ fontSize: 20 }} />
+        Edit Transaction
       </DialogTitle>
 
       <DialogContent sx={commonStyles.dialog.content}>
         <Box sx={layoutStyles.dialogLayout.form}>
-          {/* Description */}
           <TextField
             label={FIELD_LABELS.DESCRIPTION}
             value={editData.description || ""}
@@ -172,12 +89,11 @@ export function EditTransactionDialog({
             fullWidth
           />
 
-          {/* Amount and Account Row */}
           <Box sx={layoutStyles.dialogLayout.formRow}>
             <TextField
               label={FIELD_LABELS.AMOUNT}
               type="number"
-              value={formatAmount(editData.amount || "")}
+              value={formatAmountForInput(editData.amount || "")}
               onChange={(e) => handleFieldChange('amount', Number(e.target.value))}
               fullWidth
             />
@@ -189,7 +105,6 @@ export function EditTransactionDialog({
             />
           </Box>
 
-          {/* Cost Center */}
           <TextField
             label={FIELD_LABELS.COST_CENTER}
             value={costCenterInput}
@@ -199,7 +114,6 @@ export function EditTransactionDialog({
             helperText={HELPER_TEXT.COST_CENTER}
           />
 
-          {/* Spend Categories */}
           <TextField
             label={FIELD_LABELS.SPEND_CATEGORIES}
             value={spendCategoryInput}
@@ -208,10 +122,9 @@ export function EditTransactionDialog({
             placeholder={PLACEHOLDERS.SPEND_CATEGORIES}
             helperText={HELPER_TEXT.SPEND_CATEGORIES}
             multiline
-            maxRows={MULTILINE_MAX_ROWS}
+            maxRows={3}
           />
 
-          {/* Date */}
           <TextField
             label={FIELD_LABELS.DATE}
             type="date"
@@ -224,15 +137,9 @@ export function EditTransactionDialog({
       </DialogContent>
 
       <DialogActions sx={commonStyles.dialog.actions}>
-        <Button onClick={handleClose}>
-          {TEXT.CANCEL}
-        </Button>
-        <Button
-          onClick={handleSave}
-          variant="contained"
-          disabled={isLoading}
-        >
-          {isLoading ? TEXT.LOADING : TEXT.SUBMIT}
+        <Button onClick={handleClose}>{BUTTON_TEXT.CANCEL}</Button>
+        <Button onClick={handleSave} variant="contained" disabled={isLoading}>
+          {isLoading ? BUTTON_TEXT.LOADING : BUTTON_TEXT.SUBMIT}
         </Button>
       </DialogActions>
     </Dialog>

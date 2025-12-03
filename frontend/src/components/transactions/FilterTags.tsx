@@ -13,7 +13,6 @@ import type { TransactionFilters } from "../../types/filters";
 import { formatDateString } from "../../utils/dateUtils";
 import type { ReactElement } from "react";
 import { layoutStyles, commonStyles } from "../../styles";
-import { SPACING } from "../../styles/constants";
 
 // ========================
 // TYPE DEFINITIONS

@@ -1,11 +1,6 @@
 // frontend/src/components/filters/CostCenterFilter.tsx
-import { FormControl, InputLabel, Select, MenuItem, Chip, Box } from "@mui/material";
-import { layoutStyles, commonStyles } from "../../styles";
-import { SPACING } from "../../styles/constants";
-
-// ========================
-// TYPE DEFINITIONS
-// ========================
+import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { MultiSelectChips, parseMultiSelectValue } from "../../utils/selectUtils";
 
 interface CostCenterOption {
   id: number;
@@ -18,81 +13,28 @@ interface CostCenterFilterProps {
   onChange: (value: number[]) => void;
 }
 
-// ========================
-// CONSTANTS
-// ========================
-
-const LABELS = {
-  INPUT: "Cost Centers",
-  PLACEHOLDER: "All Cost Centers",
-} as const;
-
-// ========================
-// UTILITY FUNCTIONS
-// ========================
-
-const parseSelectValue = (value: string | number[]): number[] => {
-  return typeof value === 'string' ? [parseInt(value)] : value;
-};
-
-const findOptionById = (options: CostCenterOption[], id: number): CostCenterOption | undefined => {
-  return options.find(opt => opt.id === id);
-};
-
-// ========================
-// SUB-COMPONENTS
-// ========================
-
-interface RenderValueProps {
-  selected: number[];
-  options: CostCenterOption[];
-}
-
-function RenderValue({ selected, options }: RenderValueProps) {
-  if (selected.length === 0) {
-    return <Box sx={{ color: 'text.secondary' }}>{LABELS.PLACEHOLDER}</Box>;
-  }
-
-  return (
-    <Box sx={{ ...layoutStyles.flex.wrap, gap: SPACING.xs }}>
-      {selected.map((id) => {
-        const option = findOptionById(options, id);
-        return option ? (
-          <Chip
-            key={id}
-            label={option.name}
-            size="small"
-            sx={commonStyles.chip.default}
-          />
-        ) : null;
-      })}
-    </Box>
-  );
-}
-
-// ========================
-// MAIN COMPONENT
-// ========================
-
 export function CostCenterFilter({ value, options, onChange }: CostCenterFilterProps) {
-  const handleChange = (newValue: string | number[]) => {
-    onChange(parseSelectValue(newValue));
-  };
+  const getLabel = (id: string | number) => 
+    options.find(opt => opt.id === Number(id))?.name || String(id);
 
   return (
     <FormControl size="small" fullWidth>
-      <InputLabel>{LABELS.INPUT}</InputLabel>
+      <InputLabel>Cost Centers</InputLabel>
       <Select
         multiple
         value={value}
-        label={LABELS.INPUT}
-        onChange={(e) => handleChange(e.target.value)}
-        renderValue={(selected) => <RenderValue selected={selected} options={options} />}
+        label="Cost Centers"
+        onChange={(e) => onChange(parseMultiSelectValue(e.target.value))}
+        renderValue={(selected) => (
+          <MultiSelectChips 
+            selected={selected} 
+            getLabel={getLabel} 
+            placeholder="All Cost Centers" 
+          />
+        )}
       >
-        {options.map((costCenter) => (
-          <MenuItem key={costCenter.id} value={costCenter.id}>
-            {costCenter.name}
-          </MenuItem>
+        {options.map((cc) => (
+          <MenuItem key={cc.id} value={cc.id}>{cc.name}</MenuItem>
         ))}
       </Select>
     </FormControl>

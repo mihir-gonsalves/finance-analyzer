@@ -1,36 +1,18 @@
 // frontend/src/utils/exportUtils.ts
 import type { Transaction } from '../hooks/useTransactions';
 
-// ========================
-// CONSTANTS
-// ========================
+const CSV_HEADERS = ['Date', 'Description', 'Amount', 'Account', 'Cost Center', 'Spend Categories'];
+const UNCATEGORIZED = 'Uncategorized';
 
-const CSV_CONFIG = {
-  HEADERS: ['Date', 'Description', 'Amount', 'Account', 'Cost Center', 'Spend Categories'],
-  MIME_TYPE: 'text/csv;charset=utf-8;',
-  FILENAME_PREFIX: 'transactions',
-  UNCATEGORIZED: 'Uncategorized',
-} as const;
-
-// ========================
-// UTILITY FUNCTIONS
-// ========================
-
-/**
- * Escape quotes in CSV values
- */
 function escapeCSVValue(value: string): string {
   return `"${value.replace(/"/g, '""')}"`;
 }
 
-/**
- * Format transaction row for CSV
- */
 function formatTransactionRow(txn: Transaction): string[] {
-  const costCenter = txn.cost_center?.name || CSV_CONFIG.UNCATEGORIZED;
-  const spendCategories = txn.spend_categories && txn.spend_categories.length > 0
+  const costCenter = txn.cost_center?.name || UNCATEGORIZED;
+  const spendCategories = txn.spend_categories?.length
     ? txn.spend_categories.map(cat => cat.name).join(', ')
-    : CSV_CONFIG.UNCATEGORIZED;
+    : UNCATEGORIZED;
 
   return [
     txn.date,
@@ -42,19 +24,13 @@ function formatTransactionRow(txn: Transaction): string[] {
   ];
 }
 
-/**
- * Generate CSV filename with timestamp
- */
 function generateFilename(): string {
   const timestamp = new Date().toISOString().split('T')[0];
-  return `${CSV_CONFIG.FILENAME_PREFIX}_${timestamp}.csv`;
+  return `transactions_${timestamp}.csv`;
 }
 
-/**
- * Create and trigger download of CSV file
- */
 function downloadCSV(csvContent: string, filename: string): void {
-  const blob = new Blob([csvContent], { type: CSV_CONFIG.MIME_TYPE });
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
 
@@ -67,30 +43,17 @@ function downloadCSV(csvContent: string, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
-// ========================
-// MAIN EXPORT FUNCTION
-// ========================
-
-/**
- * Export transactions to CSV file
- * Downloads a CSV file containing all transaction data
- */
 export function exportTransactionsToCSV(transactions: Transaction[]): void {
   if (transactions.length === 0) {
     alert('No transactions to export');
     return;
   }
 
-  // Convert transactions to CSV rows
   const rows = transactions.map(formatTransactionRow);
-
-  // Combine headers and rows
   const csvContent = [
-    CSV_CONFIG.HEADERS.join(','),
+    CSV_HEADERS.join(','),
     ...rows.map(row => row.join(','))
   ].join('\n');
 
-  // Generate filename and trigger download
-  const filename = generateFilename();
-  downloadCSV(csvContent, filename);
+  downloadCSV(csvContent, generateFilename());
 }
