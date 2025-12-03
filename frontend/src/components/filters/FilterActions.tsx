@@ -1,7 +1,10 @@
-// frontend/src/components/filters/FilterActions.tsx - apply/clear filter buttons
+// frontend/src/components/filters/FilterActions.tsx
 import { Box, Button } from "@mui/material";
 import { layoutStyles } from "../../styles";
 
+// ========================
+// TYPE DEFINITIONS
+// ========================
 
 interface FilterActionsProps {
   hasUnsavedChanges: boolean;
@@ -9,6 +12,25 @@ interface FilterActionsProps {
   onApply: () => void;
 }
 
+// ========================
+// CONSTANTS
+// ========================
+
+const BUTTON_CONFIG = {
+  RESET: {
+    LABEL: "Reset",
+    VARIANT: "outlined" as const,
+  },
+  APPLY: {
+    LABEL: "Apply Filters",
+    VARIANT: "contained" as const,
+  },
+  SIZE: "small" as const,
+} as const;
+
+// ========================
+// MAIN COMPONENT
+// ========================
 
 export function FilterActions({
   hasUnsavedChanges,
@@ -20,18 +42,19 @@ export function FilterActions({
       <Button
         onClick={onReset}
         disabled={!hasUnsavedChanges}
-        variant="outlined"
-        size="small"
+        variant={BUTTON_CONFIG.RESET.VARIANT}
+        size={BUTTON_CONFIG.SIZE}
       >
-        Reset
+        {BUTTON_CONFIG.RESET.LABEL}
       </Button>
+      
       <Button
         onClick={onApply}
         disabled={!hasUnsavedChanges}
-        variant="contained"
-        size="small"
+        variant={BUTTON_CONFIG.APPLY.VARIANT}
+        size={BUTTON_CONFIG.SIZE}
       >
-        Apply Filters
+        {BUTTON_CONFIG.APPLY.LABEL}
       </Button>
     </Box>
   );

@@ -2,18 +2,19 @@
 import { useMemo } from 'react';
 import { useCostCenters, useSpendCategories, useAccounts } from './useTransactions';
 
+// ========================
+// TYPE DEFINITIONS
+// ========================
 
 export interface SpendCategoryOption {
   id: number;
   name: string;
 }
 
-
 export interface CostCenterOption {
   id: number;
   name: string;
 }
-
 
 export interface FilterOptions {
   spend_categories: SpendCategoryOption[];
@@ -23,10 +24,13 @@ export interface FilterOptions {
   error: Error | null;
 }
 
+// ========================
+// HOOK
+// ========================
 
-/*
+/**
  * Fetch and prepare filter options from metadata endpoints
- * Replaces the old transaction-based extraction approach
+ * Handles loading states and errors from multiple queries
  */
 export function useFilterOptions(): FilterOptions {
   const costCentersQuery = useCostCenters();

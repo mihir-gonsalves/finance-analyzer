@@ -1,8 +1,35 @@
-// frontend/src/components/Header.tsx - app header with title and navigation
+// frontend/src/components/Header.tsx
 import { AppBar, Toolbar, Typography, IconButton, Box, useMediaQuery, useTheme } from "@mui/material";
 import { AccountCircle, SavedSearchRounded } from "@mui/icons-material";
 import { commonStyles, layoutStyles } from "../styles";
+import { SPACING, BORDER_RADIUS } from "../styles/constants";
 
+const HEADER_STYLES = {
+  appBar: {
+    bgcolor: '#ffffff',
+    borderBottom: '1px solid',
+    borderColor: 'grey.200',
+    color: 'text.primary',
+  },
+  
+  toolbar: {
+    py: { sm: 1.5 },
+  },
+  
+  logo: {
+    color: 'primary.main',
+    fontSize: { sm: 36 },
+  },
+  
+  title: {
+    fontWeight: 700,
+    color: 'primary.main',
+  },
+  
+  logoContainer: {
+    gap: 1.5,
+  },
+} as const;
 
 export default function Header() {
   const theme = useTheme();
@@ -13,44 +40,19 @@ export default function Header() {
   };
 
   return (
-    <AppBar
-      position="static"
-      elevation={0}
-      sx={{
-        bgcolor: '#ffffff',
-        borderBottom: '1px solid',
-        borderColor: 'grey.200',
-        color: 'text.primary'
-      }}
-    >
-      <Toolbar
-        sx={{
-          ...layoutStyles.flex.rowBetween,
-          py: { sm: 1.5 }
-        }}
-      >
-        {/* Logo/Brand */}
-        <Box sx={{ ...layoutStyles.flex.row, gap: 1.5 }}>
-          <SavedSearchRounded
-            sx={{
-              color: 'primary.main',
-              fontSize: { sm: 36 }
-            }}
-          />
+    <AppBar position="static" elevation={0} sx={HEADER_STYLES.appBar}>
+      <Toolbar sx={{ ...layoutStyles.flex.rowBetween, ...HEADER_STYLES.toolbar }}>
+        {/* Logo & Brand */}
+        <Box sx={{ ...layoutStyles.flex.row, ...HEADER_STYLES.logoContainer }}>
+          <SavedSearchRounded sx={HEADER_STYLES.logo} />
           {!isMobile && (
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 700,
-                color: 'primary.main',
-              }}
-            >
+            <Typography variant="h6" sx={HEADER_STYLES.title}>
               Spend Analyzer
             </Typography>
           )}
         </Box>
 
-        {/* User controls */}
+        {/* User Controls */}
         <Box sx={layoutStyles.flex.row}>
           <IconButton
             size="large"

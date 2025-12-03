@@ -1,10 +1,13 @@
-// frontend/src/components/transactions/dialogs/EditTransactionDialog.tsx - form for editing existing transactions
+// frontend/src/components/transactions/dialogs/EditTransactionDialog.tsx
 import { useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import { layoutStyles, commonStyles } from "../../../styles";
 import type { Transaction, UpdateTransactionData } from "../../../hooks/useTransactions";
 
+// ========================
+// TYPE DEFINITIONS
+// ========================
 
 interface EditTransactionDialogProps {
   open: boolean;
@@ -14,6 +17,84 @@ interface EditTransactionDialogProps {
   isLoading?: boolean;
 }
 
+// ========================
+// CONSTANTS
+// ========================
+
+const DIALOG_CONFIG = {
+  MAX_WIDTH: "sm" as const,
+  FULL_WIDTH: true,
+} as const;
+
+const TEXT = {
+  TITLE: "Edit Transaction",
+  CANCEL: "Cancel",
+  SUBMIT: "Save",
+  LOADING: "Saving...",
+} as const;
+
+const FIELD_LABELS = {
+  DESCRIPTION: "Description",
+  AMOUNT: "Amount",
+  ACCOUNT: "Account",
+  COST_CENTER: "Cost Center",
+  SPEND_CATEGORIES: "Spend Categories (comma-separated)",
+  DATE: "Date",
+} as const;
+
+const PLACEHOLDERS = {
+  COST_CENTER: "e.g. Living Expenses, Car, Meals",
+  SPEND_CATEGORIES: "e.g. Rent, Gas, Groceries",
+} as const;
+
+const HELPER_TEXT = {
+  COST_CENTER: 'Leave blank for "Uncategorized"',
+  SPEND_CATEGORIES: 'Leave blank for "Uncategorized"',
+} as const;
+
+const UNCATEGORIZED = "Uncategorized";
+const ICON_SIZE = 20;
+const MULTILINE_MAX_ROWS = 3;
+const AMOUNT_DECIMAL_PLACES = 2;
+
+// ========================
+// UTILITY FUNCTIONS
+// ========================
+
+const formatAmount = (amount: number | string): string => {
+  if (typeof amount === "number") {
+    return amount.toFixed(AMOUNT_DECIMAL_PLACES);
+  }
+  return amount;
+};
+
+const parseSpendCategories = (input: string): string[] => {
+  if (!input.trim()) return [];
+  return input
+    .split(",")
+    .map(cat => cat.trim())
+    .filter(cat => cat.length > 0);
+};
+
+const getCostCenterInput = (transaction: Transaction | null): string => {
+  if (!transaction?.cost_center) return "";
+  if (transaction.cost_center.name === UNCATEGORIZED) return "";
+  return transaction.cost_center.name;
+};
+
+const getSpendCategoryInput = (transaction: Transaction | null): string => {
+  if (!transaction?.spend_categories) return "";
+  
+  const names = transaction.spend_categories
+    .filter(cat => cat.name !== UNCATEGORIZED)
+    .map(cat => cat.name);
+  
+  return names.join(", ");
+};
+
+// ========================
+// MAIN COMPONENT
+// ========================
 
 export function EditTransactionDialog({
   open,
@@ -26,18 +107,12 @@ export function EditTransactionDialog({
   const [costCenterInput, setCostCenterInput] = useState("");
   const [spendCategoryInput, setSpendCategoryInput] = useState("");
 
+  // Initialize form data when transaction changes
   useEffect(() => {
     if (transaction) {
       setEditData(transaction);
-
-      if (transaction.cost_center) {
-        setCostCenterInput(transaction.cost_center.name === "Uncategorized" ? "" : transaction.cost_center.name);
-      } else {
-        setCostCenterInput("");
-      }
-
-      const spendCatNames = transaction.spend_categories?.filter(cat => cat.name !== "Uncategorized").map(cat => cat.name).join(", ") || "";
-      setSpendCategoryInput(spendCatNames);
+      setCostCenterInput(getCostCenterInput(transaction));
+      setSpendCategoryInput(getSpendCategoryInput(transaction));
     }
   }, [transaction]);
 
@@ -52,9 +127,7 @@ export function EditTransactionDialog({
     if (!transaction) return;
 
     const costCenterName = costCenterInput.trim();
-    const spendCategoryNames = spendCategoryInput
-      ? spendCategoryInput.split(",").map(cat => cat.trim()).filter(cat => cat.length > 0)
-      : [];
+    const spendCategoryNames = parseSpendCategories(spendCategoryInput);
 
     const updateData: UpdateTransactionData = {
       id: transaction.id,
@@ -66,88 +139,100 @@ export function EditTransactionDialog({
       spend_category_names: spendCategoryNames,
     };
 
-    onSave(updateData as any);
+    onSave(updateData);
     handleClose();
   };
 
-  const formatAmount = (amount: number | string) => {
-    if (typeof amount === "number") {
-      return amount.toFixed(2);
-    }
-    return amount;
+  const handleFieldChange = (field: keyof Transaction, value: any) => {
+    setEditData(prev => ({ ...prev, [field]: value }));
   };
 
+  // Don't render if no transaction
   if (!transaction) return null;
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth={DIALOG_CONFIG.MAX_WIDTH}
+      fullWidth={DIALOG_CONFIG.FULL_WIDTH}
+    >
       <DialogTitle sx={commonStyles.dialog.title}>
-        <Edit sx={{ fontSize: 20 }} />
-        Edit Transaction
+        <Edit sx={{ fontSize: ICON_SIZE }} />
+        {TEXT.TITLE}
       </DialogTitle>
+
       <DialogContent sx={commonStyles.dialog.content}>
         <Box sx={layoutStyles.dialogLayout.form}>
+          {/* Description */}
           <TextField
-            label="Description"
+            label={FIELD_LABELS.DESCRIPTION}
             value={editData.description || ""}
-            onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
+            onChange={(e) => handleFieldChange('description', e.target.value)}
             fullWidth
           />
 
+          {/* Amount and Account Row */}
           <Box sx={layoutStyles.dialogLayout.formRow}>
             <TextField
-              label="Amount"
+              label={FIELD_LABELS.AMOUNT}
               type="number"
               value={formatAmount(editData.amount || "")}
-              onChange={(e) => setEditData(prev => ({ ...prev, amount: Number(e.target.value) }))}
+              onChange={(e) => handleFieldChange('amount', Number(e.target.value))}
               fullWidth
             />
             <TextField
-              label="Account"
+              label={FIELD_LABELS.ACCOUNT}
               value={editData.account || ""}
-              onChange={(e) => setEditData(prev => ({ ...prev, account: e.target.value }))}
+              onChange={(e) => handleFieldChange('account', e.target.value)}
               fullWidth
             />
           </Box>
 
+          {/* Cost Center */}
           <TextField
-            label="Cost Center"
+            label={FIELD_LABELS.COST_CENTER}
             value={costCenterInput}
             onChange={(e) => setCostCenterInput(e.target.value)}
             fullWidth
-            placeholder="e.g. Living Expenses, Car, Meals"
-            helperText='Leave blank for "Uncategorized"'
+            placeholder={PLACEHOLDERS.COST_CENTER}
+            helperText={HELPER_TEXT.COST_CENTER}
           />
 
+          {/* Spend Categories */}
           <TextField
-            label="Spend Categories (comma-separated)"
+            label={FIELD_LABELS.SPEND_CATEGORIES}
             value={spendCategoryInput}
             onChange={(e) => setSpendCategoryInput(e.target.value)}
             fullWidth
-            placeholder="e.g. Rent, Gas, Groceries"
-            helperText='Leave blank for "Uncategorized"'
+            placeholder={PLACEHOLDERS.SPEND_CATEGORIES}
+            helperText={HELPER_TEXT.SPEND_CATEGORIES}
             multiline
-            maxRows={3}
+            maxRows={MULTILINE_MAX_ROWS}
           />
 
+          {/* Date */}
           <TextField
-            label="Date"
+            label={FIELD_LABELS.DATE}
             type="date"
             value={editData.date || ""}
-            onChange={(e) => setEditData(prev => ({ ...prev, date: e.target.value }))}
+            onChange={(e) => handleFieldChange('date', e.target.value)}
             fullWidth
             InputLabelProps={{ shrink: true }}
           />
         </Box>
       </DialogContent>
+
       <DialogActions sx={commonStyles.dialog.actions}>
-        <Button onClick={handleClose}>Cancel</Button>
+        <Button onClick={handleClose}>
+          {TEXT.CANCEL}
+        </Button>
         <Button
           onClick={handleSave}
           variant="contained"
           disabled={isLoading}
         >
-          {isLoading ? 'Saving...' : 'Save'}
+          {isLoading ? TEXT.LOADING : TEXT.SUBMIT}
         </Button>
       </DialogActions>
     </Dialog>
