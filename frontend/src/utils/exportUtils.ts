@@ -1,51 +1,38 @@
-// frontend/src/utils/exportUtils.ts - CSV export functionality
+// frontend/src/utils/exportUtils.ts
 import type { Transaction } from '../hooks/useTransactions';
 
+const CSV_HEADERS = ['Date', 'Description', 'Amount', 'Account', 'Cost Center', 'Spend Categories'];
+const UNCATEGORIZED = 'Uncategorized';
 
-/*
- * Export transactions to CSV file
- * Downloads a CSV file containing all transaction data
- */
-export function exportTransactionsToCSV(transactions: Transaction[]) {
-  if (transactions.length === 0) {
-    alert('No transactions to export');
-    return;
-  }
+function escapeCSVValue(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`;
+}
 
-  // CSV headers
-  const headers = ['Date', 'Description', 'Amount', 'Account', 'Cost Center', 'Spend Categories'];
+function formatTransactionRow(txn: Transaction): string[] {
+  const costCenter = txn.cost_center?.name || UNCATEGORIZED;
+  const spendCategories = txn.spend_categories?.length
+    ? txn.spend_categories.map(cat => cat.name).join(', ')
+    : UNCATEGORIZED;
 
-  // Convert transactions to CSV rows
-  const rows = transactions.map(txn => {
-    const costCenter = txn.cost_center?.name || 'Uncategorized';
-    const spendCategories = txn.spend_categories && txn.spend_categories.length > 0
-      ? txn.spend_categories.map(cat => cat.name).join(', ')
-      : 'Uncategorized';
+  return [
+    txn.date,
+    escapeCSVValue(txn.description),
+    txn.amount.toString(),
+    escapeCSVValue(txn.account),
+    escapeCSVValue(costCenter),
+    escapeCSVValue(spendCategories),
+  ];
+}
 
-    return [
-      txn.date,
-      `"${txn.description.replace(/"/g, '""')}"`, // Escape quotes in description
-      txn.amount,
-      `"${txn.account.replace(/"/g, '""')}"`,
-      `"${costCenter.replace(/"/g, '""')}"`,
-      `"${spendCategories.replace(/"/g, '""')}"`
-    ];
-  });
+function generateFilename(): string {
+  const timestamp = new Date().toISOString().split('T')[0];
+  return `transactions_${timestamp}.csv`;
+}
 
-  // Combine headers and rows
-  const csvContent = [
-    headers.join(','),
-    ...rows.map(row => row.join(','))
-  ].join('\n');
-
-  // Create blob and download
+function downloadCSV(csvContent: string, filename: string): void {
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-
-  // Generate filename with timestamp
-  const timestamp = new Date().toISOString().split('T')[0];
-  const filename = `transactions_${timestamp}.csv`;
 
   link.setAttribute('href', url);
   link.setAttribute('download', filename);
@@ -56,15 +43,17 @@ export function exportTransactionsToCSV(transactions: Transaction[]) {
   URL.revokeObjectURL(url);
 }
 
+export function exportTransactionsToCSV(transactions: Transaction[]): void {
+  if (transactions.length === 0) {
+    alert('No transactions to export');
+    return;
+  }
 
-/*
- * Format currency for display
- */
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  const rows = transactions.map(formatTransactionRow);
+  const csvContent = [
+    CSV_HEADERS.join(','),
+    ...rows.map(row => row.join(','))
+  ].join('\n');
+
+  downloadCSV(csvContent, generateFilename());
 }

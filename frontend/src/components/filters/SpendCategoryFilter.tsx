@@ -1,14 +1,11 @@
-// frontend/src/components/filters/SpendCategoryFilter.tsx - multi-select dropdown for spend categories
-import { FormControl, InputLabel, Select, MenuItem, Chip, Box } from "@mui/material";
-import { layoutStyles, commonStyles } from "../../styles";
-
+// frontend/src/components/filters/SpendCategoryFilter.tsx
+import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { MultiSelectChips, parseMultiSelectValue } from "../../utils/selectUtils";
 
 interface SpendCategoryOption {
   id: number;
   name: string;
-  cost_center_id?: number;
 }
-
 
 interface SpendCategoryFilterProps {
   value: number[];
@@ -16,8 +13,10 @@ interface SpendCategoryFilterProps {
   onChange: (value: number[]) => void;
 }
 
-
 export function SpendCategoryFilter({ value, options, onChange }: SpendCategoryFilterProps) {
+  const getLabel = (id: string | number) => 
+    options.find(opt => opt.id === Number(id))?.name || String(id);
+
   return (
     <FormControl size="small" fullWidth>
       <InputLabel>Spend Categories</InputLabel>
@@ -25,36 +24,17 @@ export function SpendCategoryFilter({ value, options, onChange }: SpendCategoryF
         multiple
         value={value}
         label="Spend Categories"
-        onChange={(e) => {
-          const newValue = typeof e.target.value === 'string'
-            ? [parseInt(e.target.value)]
-            : e.target.value;
-          onChange(newValue);
-        }}
-        renderValue={(selected) =>
-          selected.length === 0 ? (
-            <Box sx={{ color: 'text.secondary' }}>All Spend Categories</Box>
-          ) : (
-            <Box sx={{ ...layoutStyles.flex.wrap, gap: 0.5 }}>
-              {selected.map((id) => {
-                const option = options.find(opt => opt.id === id);
-                return option ? (
-                  <Chip
-                    key={id}
-                    label={option.name}
-                    size="small"
-                    sx={commonStyles.chip.default}
-                  />
-                ) : null;
-              })}
-            </Box>
-          )
-        }
+        onChange={(e) => onChange(parseMultiSelectValue(e.target.value))}
+        renderValue={(selected) => (
+          <MultiSelectChips 
+            selected={selected} 
+            getLabel={getLabel} 
+            placeholder="All Spend Categories" 
+          />
+        )}
       >
-        {options.map((spendCategory) => (
-          <MenuItem key={spendCategory.id} value={spendCategory.id}>
-            {spendCategory.name}
-          </MenuItem>
+        {options.map((sc) => (
+          <MenuItem key={sc.id} value={sc.id}>{sc.name}</MenuItem>
         ))}
       </Select>
     </FormControl>

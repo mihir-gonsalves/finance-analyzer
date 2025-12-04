@@ -142,6 +142,7 @@ Core modules:
 - `frontend/src/components/Header.tsx` - app header with title and navigation
 - `frontend/src/components/TransactionTable.tsx` - main transaction display (toggles between data grid and chart)
 - `frontend/src/components/Timeline.tsx` - trading View lightweight chart visualization of transaction history
+- `frontend/src/components/MoMBarChart.tsx` - bar chart displaying monthly expense totals
 - `frontend/src/components/FiltersPanel.tsx` - filter controls for transactions (dates, categories, amounts, search)
 - `frontend/src/components/AnalyticsPanel.tsx` - dashboard analytics (pie charts, top categories, stats)
 - `frontend/src/components/transactions/TransactionDataGrid.tsx` - MUI DataGrid ledger showing transaction rows

@@ -1,10 +1,10 @@
-// frontend/src/components/FiltersPanel.tsx - filter controls for transactions (dates, categories, amounts, search)
+// frontend/src/components/FiltersPanel.tsx
 import { Card, CardContent, Box, Divider, Alert } from "@mui/material";
 import { useState } from "react";
 import { useFilterOptions } from "../hooks/useFilterOptions";
 import { usePendingFilters } from "../hooks/usePendingFilters";
 import { getActiveFilterCount, hasActiveFilters, createEmptyFilters } from "../utils/filterUtils";
-import { validateFilters, sanitizeFilters, getValidationErrorMessage } from "../utils/filterValidation"
+import { validateFilters, sanitizeFilters, getValidationErrorMessage } from "../utils/filterValidation";
 import { FiltersPanelHeader } from "./filters/FiltersPanelHeader";
 import { SearchFilter } from "./filters/SearchFilter";
 import { DateRangeFilter } from "./filters/DateRangeFilter";
@@ -14,11 +14,10 @@ import { AccountFilter } from "./filters/AccountFilter";
 import { AmountRangeFilter } from "./filters/AmountRangeFilter";
 import { FilterActions } from "./filters/FilterActions";
 import { layoutStyles, commonStyles } from "../styles";
+import { SPACING } from "../styles/constants";
 import type { TransactionFilters } from "../types/filters";
 
-
 export type { TransactionFilters };
-
 
 interface FiltersPanelProps {
   filters: TransactionFilters;
@@ -26,8 +25,11 @@ interface FiltersPanelProps {
   onClose: () => void;
 }
 
-
-export default function FiltersPanel({ filters, onFiltersChange, onClose }: FiltersPanelProps) {
+export default function FiltersPanel({ 
+  filters, 
+  onFiltersChange, 
+  onClose 
+}: FiltersPanelProps) {
   const { spend_categories, cost_centers, accounts } = useFilterOptions();
   const { pendingFilters, updateFilter, reset, hasUnsavedChanges } = usePendingFilters(filters);
   const [validationError, setValidationError] = useState<string>("");
@@ -57,28 +59,35 @@ export default function FiltersPanel({ filters, onFiltersChange, onClose }: Filt
   };
 
   const activeFilterCount = getActiveFilterCount(filters);
-  const hasFilters = hasActiveFilters(filters);
+  const isFiltered = hasActiveFilters(filters);
 
   return (
-    <Card sx={{ ...commonStyles.card.elevated, mb: 1}}>
+    <Card sx={{ ...commonStyles.card.elevated, mb: SPACING.sm }}>
       <CardContent>
+        {/* Header */}
         <FiltersPanelHeader
           activeFilterCount={activeFilterCount}
-          hasActiveFilters={hasFilters}
+          hasActiveFilters={isFiltered}
           onClearAll={handleClearAll}
           onClose={onClose}
         />
 
-        <Divider sx={{ mb: 3 }} />
+        <Divider sx={{ mb: SPACING.lg }} />
 
+        {/* Validation Error */}
         {validationError && (
-          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setValidationError("")}>
+          <Alert 
+            severity="error" 
+            sx={{ mb: SPACING.lg }} 
+            onClose={() => setValidationError("")}
+          >
             {validationError}
           </Alert>
         )}
 
+        {/* Filter Controls */}
         <Box sx={layoutStyles.filterPanel.container}>
-          {/* Search and Date Range Row */}
+          {/* Search & Date Range */}
           <Box sx={layoutStyles.filterPanel.row}>
             <SearchFilter
               value={pendingFilters.searchTerm}
@@ -92,7 +101,7 @@ export default function FiltersPanel({ filters, onFiltersChange, onClose }: Filt
             />
           </Box>
 
-          {/* Cost Centers, Spend Categories and Accounts Row */}
+          {/* Categories & Accounts */}
           <Box sx={layoutStyles.filterPanel.row}>
             <CostCenterFilter
               value={pendingFilters.cost_center_ids}
@@ -111,7 +120,7 @@ export default function FiltersPanel({ filters, onFiltersChange, onClose }: Filt
             />
           </Box>
 
-          {/* Amount Range Row */}
+          {/* Amount Range */}
           <Box sx={layoutStyles.grid.twoColumn}>
             <AmountRangeFilter
               minAmount={pendingFilters.minAmount}
@@ -121,7 +130,7 @@ export default function FiltersPanel({ filters, onFiltersChange, onClose }: Filt
             />
           </Box>
 
-          {/* Actions Row */}
+          {/* Action Buttons */}
           <FilterActions
             hasUnsavedChanges={hasUnsavedChanges}
             onReset={handleReset}

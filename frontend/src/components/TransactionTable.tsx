@@ -1,9 +1,16 @@
-// frontend/src/components/TransactionTable.tsx - main transaction display (toggles between data grid, timeline, and bar chart)
+// frontend/src/components/TransactionTable.tsx
 import { useState, useRef } from "react";
 import { Card, CardContent, Box, Alert } from "@mui/material";
 import Timeline from "./Timeline";
 import MoMBarChart from "./MoMBarChart";
-import { useDeleteTransaction, useUpdateTransaction, useCreateTransaction, type Transaction, type CreateTransactionData, type UpdateTransactionData, } from "../hooks/useTransactions";
+import {
+  useDeleteTransaction,
+  useUpdateTransaction,
+  useCreateTransaction,
+  type Transaction,
+  type CreateTransactionData,
+  type UpdateTransactionData,
+} from "../hooks/useTransactions";
 import { useCSVUpload } from "../hooks/useCSVUpload";
 import { TransactionTableHeader } from "./transactions/TransactionTableHeader";
 import { TransactionDataGrid } from "./transactions/TransactionDataGrid";
@@ -16,9 +23,7 @@ import { useTransactionData } from "../context/TransactionContext";
 import { exportTransactionsToCSV } from "../utils/exportUtils";
 import { commonStyles, layoutStyles } from "../styles";
 
-
 type ViewMode = 'table' | 'timeline' | 'barchart';
-
 
 interface TransactionTableProps {
   filters: TransactionFilters;
@@ -26,8 +31,11 @@ interface TransactionTableProps {
   onToggleFilters: () => void;
 }
 
-
-export default function TransactionTable({ filters, filtersOpen, onToggleFilters }: TransactionTableProps) {
+export default function TransactionTable({
+  filters,
+  filtersOpen,
+  onToggleFilters,
+}: TransactionTableProps) {
   const { transactions: filteredTransactions, isLoading, error } = useTransactionData();
   const deleteMutation = useDeleteTransaction();
   const updateMutation = useUpdateTransaction();
@@ -37,12 +45,14 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('table');
 
+  // Dialog states
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editTransaction, setEditTransaction] = useState<Transaction | null>(null);
   const [deleteTransactionId, setDeleteTransactionId] = useState<number | null>(null);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [csvInstitution, setCsvInstitution] = useState("");
 
+  // View mode cycling
   const handleToggleView = () => {
     setViewMode(prev => {
       if (prev === 'table') return 'timeline';
@@ -51,10 +61,19 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
     });
   };
 
+  // Transaction actions
   const handleAddTransaction = () => setAddDialogOpen(true);
-  const handleSaveAdd = (transaction: CreateTransactionData) => createMutation.mutate(transaction);
+  
+  const handleSaveAdd = (transaction: CreateTransactionData) => {
+    createMutation.mutate(transaction);
+  };
+
   const handleEdit = (transaction: Transaction) => setEditTransaction(transaction);
-  const handleSaveEdit = (data: UpdateTransactionData) => updateMutation.mutate(data);
+  
+  const handleSaveEdit = (data: UpdateTransactionData) => {
+    updateMutation.mutate(data);
+  };
+
   const handleDelete = (id: number) => setDeleteTransactionId(id);
 
   const handleConfirmDelete = () => {
@@ -65,6 +84,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
     }
   };
 
+  // CSV upload
   const handleCSVUploadClick = () => fileInputRef.current?.click();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,6 +97,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
       alert('Please select a CSV file');
     }
 
+    // Reset input
     if (event.target) {
       event.target.value = '';
     }
@@ -95,13 +116,15 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
         },
         onError: (error: any) => {
           alert(`Upload failed: ${error.response?.data?.detail || error.message}`);
-        }
+        },
       }
     );
   };
 
+  // Export
   const handleExportCSV = () => exportTransactionsToCSV(filteredTransactions);
 
+  // Error state
   if (error) {
     return (
       <Card sx={commonStyles.card.default}>
@@ -118,6 +141,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
     <>
       <Card sx={commonStyles.card.elevated}>
         <CardContent>
+          {/* Header with controls */}
           <TransactionTableHeader
             viewMode={viewMode}
             filters={filters}
@@ -129,6 +153,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
             onExportCSV={handleExportCSV}
           />
 
+          {/* Hidden file input */}
           <input
             type="file"
             ref={fileInputRef}
@@ -136,7 +161,9 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
             accept=".csv"
             style={{ display: 'none' }}
           />
-          {viewMode === 'table' ? (
+
+          {/* View content */}
+          {viewMode === 'table' && (
             <Box sx={layoutStyles.dataDisplay.chartContainer}>
               <TransactionDataGrid
                 transactions={filteredTransactions}
@@ -145,11 +172,15 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
                 onDelete={handleDelete}
               />
             </Box>
-          ) : viewMode === 'timeline' ? (
+          )}
+          
+          {viewMode === 'timeline' && (
             <Box sx={layoutStyles.dataDisplay.chartContainer}>
               <Timeline />
             </Box>
-          ) : (
+          )}
+          
+          {viewMode === 'barchart' && (
             <Box sx={layoutStyles.dataDisplay.chartContainer}>
               <MoMBarChart />
             </Box>
@@ -157,6 +188,7 @@ export default function TransactionTable({ filters, filtersOpen, onToggleFilters
         </CardContent>
       </Card>
 
+      {/* Dialogs */}
       <AddTransactionDialog
         open={addDialogOpen}
         onClose={() => setAddDialogOpen(false)}

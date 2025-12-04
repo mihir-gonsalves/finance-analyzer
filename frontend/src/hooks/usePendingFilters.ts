@@ -3,7 +3,14 @@ import { useState, useEffect, useCallback } from 'react';
 import type { TransactionFilters } from '../types/filters';
 import { areFiltersEqual } from '../utils/filterUtils';
 
+// ========================
+// HOOK
+// ========================
 
+/**
+ * Manages pending filter state before applying to avoid unnecessary API calls
+ * Tracks unsaved changes and provides update/reset functions
+ */
 export function usePendingFilters(appliedFilters: TransactionFilters) {
   const [pendingFilters, setPendingFilters] = useState<TransactionFilters>(appliedFilters);
 
@@ -19,7 +26,6 @@ export function usePendingFilters(appliedFilters: TransactionFilters) {
     setPendingFilters(prev => ({ ...prev, [field]: value }));
   }, []);
 
-  // Batch update multiple filters at once
   const updateFilters = useCallback((updates: Partial<TransactionFilters>) => {
     setPendingFilters(prev => ({ ...prev, ...updates }));
   }, []);
@@ -28,7 +34,6 @@ export function usePendingFilters(appliedFilters: TransactionFilters) {
     setPendingFilters(appliedFilters);
   }, [appliedFilters]);
 
-  // Use proper deep equality check
   const hasUnsavedChanges = !areFiltersEqual(appliedFilters, pendingFilters);
 
   return {

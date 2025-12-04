@@ -1,10 +1,20 @@
-// frontend/src/components/transactions/dialogs/EditTransactionDialog.tsx - form for editing existing transactions
+// frontend/src/components/transactions/dialogs/EditTransactionDialog.tsx
 import { useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from "@mui/material";
 import { Edit } from "@mui/icons-material";
+import { 
+  DIALOG_CONFIG, 
+  BUTTON_TEXT, 
+  FIELD_LABELS, 
+  PLACEHOLDERS, 
+  HELPER_TEXT,
+  parseSpendCategories,
+  getCostCenterInput,
+  getSpendCategoryInput,
+  formatAmountForInput 
+} from "../../../utils/dialogUtils";
 import { layoutStyles, commonStyles } from "../../../styles";
 import type { Transaction, UpdateTransactionData } from "../../../hooks/useTransactions";
-
 
 interface EditTransactionDialogProps {
   open: boolean;
@@ -13,7 +23,6 @@ interface EditTransactionDialogProps {
   onSave: (data: UpdateTransactionData) => void;
   isLoading?: boolean;
 }
-
 
 export function EditTransactionDialog({
   open,
@@ -29,15 +38,8 @@ export function EditTransactionDialog({
   useEffect(() => {
     if (transaction) {
       setEditData(transaction);
-
-      if (transaction.cost_center) {
-        setCostCenterInput(transaction.cost_center.name === "Uncategorized" ? "" : transaction.cost_center.name);
-      } else {
-        setCostCenterInput("");
-      }
-
-      const spendCatNames = transaction.spend_categories?.filter(cat => cat.name !== "Uncategorized").map(cat => cat.name).join(", ") || "";
-      setSpendCategoryInput(spendCatNames);
+      setCostCenterInput(getCostCenterInput(transaction.cost_center));
+      setSpendCategoryInput(getSpendCategoryInput(transaction.spend_categories));
     }
   }, [transaction]);
 
@@ -51,103 +53,93 @@ export function EditTransactionDialog({
   const handleSave = () => {
     if (!transaction) return;
 
-    const costCenterName = costCenterInput.trim();
-    const spendCategoryNames = spendCategoryInput
-      ? spendCategoryInput.split(",").map(cat => cat.trim()).filter(cat => cat.length > 0)
-      : [];
-
     const updateData: UpdateTransactionData = {
       id: transaction.id,
       date: editData.date,
       description: editData.description,
       amount: editData.amount,
       account: editData.account,
-      cost_center_name: costCenterName,
-      spend_category_names: spendCategoryNames,
+      cost_center_name: costCenterInput.trim(),
+      spend_category_names: parseSpendCategories(spendCategoryInput),
     };
 
-    onSave(updateData as any);
+    onSave(updateData);
     handleClose();
   };
 
-  const formatAmount = (amount: number | string) => {
-    if (typeof amount === "number") {
-      return amount.toFixed(2);
-    }
-    return amount;
+  const handleFieldChange = (field: keyof Transaction, value: any) => {
+    setEditData(prev => ({ ...prev, [field]: value }));
   };
 
   if (!transaction) return null;
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth={DIALOG_CONFIG.MAX_WIDTH} fullWidth>
       <DialogTitle sx={commonStyles.dialog.title}>
         <Edit sx={{ fontSize: 20 }} />
         Edit Transaction
       </DialogTitle>
+
       <DialogContent sx={commonStyles.dialog.content}>
         <Box sx={layoutStyles.dialogLayout.form}>
           <TextField
-            label="Description"
+            label={FIELD_LABELS.DESCRIPTION}
             value={editData.description || ""}
-            onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
+            onChange={(e) => handleFieldChange('description', e.target.value)}
             fullWidth
           />
 
           <Box sx={layoutStyles.dialogLayout.formRow}>
             <TextField
-              label="Amount"
+              label={FIELD_LABELS.AMOUNT}
               type="number"
-              value={formatAmount(editData.amount || "")}
-              onChange={(e) => setEditData(prev => ({ ...prev, amount: Number(e.target.value) }))}
+              value={formatAmountForInput(editData.amount || "")}
+              onChange={(e) => handleFieldChange('amount', Number(e.target.value))}
               fullWidth
             />
             <TextField
-              label="Account"
+              label={FIELD_LABELS.ACCOUNT}
               value={editData.account || ""}
-              onChange={(e) => setEditData(prev => ({ ...prev, account: e.target.value }))}
+              onChange={(e) => handleFieldChange('account', e.target.value)}
               fullWidth
             />
           </Box>
 
           <TextField
-            label="Cost Center"
+            label={FIELD_LABELS.COST_CENTER}
             value={costCenterInput}
             onChange={(e) => setCostCenterInput(e.target.value)}
             fullWidth
-            placeholder="e.g. Living Expenses, Car, Meals"
-            helperText='Leave blank for "Uncategorized"'
+            placeholder={PLACEHOLDERS.COST_CENTER}
+            helperText={HELPER_TEXT.COST_CENTER}
           />
 
           <TextField
-            label="Spend Categories (comma-separated)"
+            label={FIELD_LABELS.SPEND_CATEGORIES}
             value={spendCategoryInput}
             onChange={(e) => setSpendCategoryInput(e.target.value)}
             fullWidth
-            placeholder="e.g. Rent, Gas, Groceries"
-            helperText='Leave blank for "Uncategorized"'
+            placeholder={PLACEHOLDERS.SPEND_CATEGORIES}
+            helperText={HELPER_TEXT.SPEND_CATEGORIES}
             multiline
             maxRows={3}
           />
 
           <TextField
-            label="Date"
+            label={FIELD_LABELS.DATE}
             type="date"
             value={editData.date || ""}
-            onChange={(e) => setEditData(prev => ({ ...prev, date: e.target.value }))}
+            onChange={(e) => handleFieldChange('date', e.target.value)}
             fullWidth
             InputLabelProps={{ shrink: true }}
           />
         </Box>
       </DialogContent>
+
       <DialogActions sx={commonStyles.dialog.actions}>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button
-          onClick={handleSave}
-          variant="contained"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Saving...' : 'Save'}
+        <Button onClick={handleClose}>{BUTTON_TEXT.CANCEL}</Button>
+        <Button onClick={handleSave} variant="contained" disabled={isLoading}>
+          {isLoading ? BUTTON_TEXT.LOADING : BUTTON_TEXT.SUBMIT}
         </Button>
       </DialogActions>
     </Dialog>

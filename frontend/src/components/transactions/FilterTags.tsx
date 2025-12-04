@@ -1,18 +1,27 @@
-// frontend/src/components/transactions/FilterTags.tsx - displays active filters as removable chips
+// frontend/src/components/transactions/FilterTags.tsx
 import { Box, Chip } from "@mui/material";
-import { AccountBalance, Category, BusinessCenter, CalendarMonth, Search, AttachMoney } from "@mui/icons-material";
+import {
+  AccountBalance,
+  Category,
+  BusinessCenter,
+  CalendarMonth,
+  Search,
+  AttachMoney,
+} from "@mui/icons-material";
 import { useSpendCategories, useCostCenters } from "../../hooks/useTransactions";
 import type { TransactionFilters } from "../../types/filters";
 import { formatDateString } from "../../utils/dateUtils";
 import type { ReactElement } from "react";
 import { layoutStyles, commonStyles } from "../../styles";
 
+// ========================
+// TYPE DEFINITIONS
+// ========================
 
 interface FilterTagsProps {
   filters: TransactionFilters;
   onRemove?: (filterKey: keyof TransactionFilters) => void;
 }
-
 
 interface TagConfig {
   key: string;
@@ -21,6 +30,32 @@ interface TagConfig {
   condition: boolean;
 }
 
+// ========================
+// UTILITY FUNCTIONS
+// ========================
+
+const buildAccountsLabel = (accounts: string[]): string => {
+  if (accounts.length === 1) return accounts[0];
+  return `${accounts.length} accounts`;
+};
+
+const buildAmountLabel = (minAmount: string, maxAmount: string): string => {
+  return `${minAmount || '...'} to ${maxAmount || '...'}`;
+};
+
+const buildDateLabel = (dateFrom: string, dateTo: string): string => {
+  const from = formatDateString(dateFrom) || '...';
+  const to = formatDateString(dateTo) || '...';
+  return `Dates: ${from} to ${to}`;
+};
+
+const buildSearchLabel = (searchTerm: string): string => {
+  return `"${searchTerm}"`;
+};
+
+// ========================
+// MAIN COMPONENT
+// ========================
 
 export function FilterTags({ filters, onRemove }: FilterTagsProps) {
   const { data: spendCategoriesData } = useSpendCategories();
@@ -29,7 +64,8 @@ export function FilterTags({ filters, onRemove }: FilterTagsProps) {
   const spendCategories = spendCategoriesData?.spend_categories || [];
   const costCenters = costCentersData?.cost_centers || [];
 
-  const getSpendCategoryLabel = () => {
+  // Build spend category label
+  const getSpendCategoryLabel = (): string => {
     if (filters.spend_category_ids.length === 0) return '';
 
     if (filters.spend_category_ids.length === 1) {
@@ -40,7 +76,8 @@ export function FilterTags({ filters, onRemove }: FilterTagsProps) {
     return `${filters.spend_category_ids.length} spend categories`;
   };
 
-  const getCostCenterLabel = () => {
+  // Build cost center label
+  const getCostCenterLabel = (): string => {
     if (filters.cost_center_ids.length === 0) return '';
 
     if (filters.cost_center_ids.length === 1) {
@@ -51,13 +88,12 @@ export function FilterTags({ filters, onRemove }: FilterTagsProps) {
     return `${filters.cost_center_ids.length} cost centers`;
   };
 
+  // Tag configurations
   const tagConfigs: TagConfig[] = [
     {
       key: 'accounts',
       icon: <AccountBalance />,
-      label: filters.accounts.length === 1
-        ? filters.accounts[0]
-        : `${filters.accounts.length} accounts`,
+      label: buildAccountsLabel(filters.accounts),
       condition: filters.accounts.length > 0,
     },
     {
@@ -75,23 +111,24 @@ export function FilterTags({ filters, onRemove }: FilterTagsProps) {
     {
       key: 'dates',
       icon: <CalendarMonth />,
-      label: `Dates: ${formatDateString(filters.dateFrom) || '...'} to ${formatDateString(filters.dateTo) || '...'}`,
+      label: buildDateLabel(filters.dateFrom, filters.dateTo),
       condition: !!(filters.dateFrom || filters.dateTo),
     },
     {
       key: 'searchTerm',
       icon: <Search />,
-      label: `"${filters.searchTerm}"`,
+      label: buildSearchLabel(filters.searchTerm),
       condition: !!filters.searchTerm,
     },
     {
       key: 'amount',
       icon: <AttachMoney />,
-      label: `${filters.minAmount || '...'} to ${filters.maxAmount || '...'}`,
+      label: buildAmountLabel(filters.minAmount, filters.maxAmount),
       condition: !!(filters.minAmount || filters.maxAmount),
     },
   ];
 
+  // Filter to only active tags
   const activeTags = tagConfigs.filter(config => config.condition);
 
   if (activeTags.length === 0) return null;

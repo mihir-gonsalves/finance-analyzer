@@ -1,4 +1,4 @@
-// frontend/src/pages/Dashboard.tsx - main app layout combining FiltersPanel, TransactionTable, and AnalyticsPanel
+// frontend/src/pages/Dashboard.tsx
 import { useState } from "react";
 import { Container, Grid, Box, Fade, Collapse } from "@mui/material";
 import { TransactionProvider } from "../context/TransactionContext";
@@ -6,56 +6,60 @@ import TransactionTable from "../components/TransactionTable";
 import AnalyticsPanel from "../components/AnalyticsPanel";
 import FiltersPanel from "../components/FiltersPanel";
 import { layoutStyles } from "../styles";
+import { TRANSITIONS } from "../styles/constants";
 import type { TransactionFilters } from "../types/filters";
 
+const INITIAL_FILTERS: TransactionFilters = {
+  dateFrom: '',
+  dateTo: '',
+  spend_category_ids: [],
+  cost_center_ids: [],
+  accounts: [],
+  minAmount: '',
+  maxAmount: '',
+  searchTerm: '',
+};
 
 export default function Dashboard() {
-  const [filters, setFilters] = useState<TransactionFilters>({
-    dateFrom: '',
-    dateTo: '',
-    spend_category_ids: [],
-    cost_center_ids: [],
-    accounts: [],
-    minAmount: '',
-    maxAmount: '',
-    searchTerm: '',
-  });
-
+  const [filters, setFilters] = useState<TransactionFilters>(INITIAL_FILTERS);
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const handleFiltersChange = (newFilters: TransactionFilters) => {
+    setFilters(newFilters);
+    setFiltersOpen(false);
+  };
+
+  const handleToggleFilters = () => {
+    setFiltersOpen(prev => !prev);
+  };
 
   return (
     <TransactionProvider filters={filters}>
-      <Container
-        maxWidth="xl"
-        sx={layoutStyles.dashboard.container}
-      >
-        <Fade in timeout={600}>
+      <Container maxWidth="xl" sx={layoutStyles.dashboard.container}>
+        <Fade in timeout={TRANSITIONS.pageLoad}>
           <Box>
             <Grid container spacing={layoutStyles.spacing.sectionGap}>
-              {/* Filters Panel with smooth transition */}
+              {/* Filters Panel */}
               <Grid size={{ xs: 12 }}>
-                <Collapse in={filtersOpen} timeout={300} unmountOnExit>
+                <Collapse in={filtersOpen} timeout={TRANSITIONS.normal} unmountOnExit>
                   <FiltersPanel
                     filters={filters}
-                    onFiltersChange={(newFilters) => {
-                      setFilters(newFilters);
-                      setFiltersOpen(false);
-                    }}
+                    onFiltersChange={handleFiltersChange}
                     onClose={() => setFiltersOpen(false)}
                   />
                 </Collapse>
               </Grid>
 
-              {/* Left side - Transaction Table */}
+              {/* Transaction Table */}
               <Grid size={{ xs: 12, lg: 8 }}>
                 <TransactionTable
                   filters={filters}
                   filtersOpen={filtersOpen}
-                  onToggleFilters={() => setFiltersOpen(!filtersOpen)}
+                  onToggleFilters={handleToggleFilters}
                 />
               </Grid>
 
-              {/* Right side - Analytics */}
+              {/* Analytics Panel */}
               <Grid size={{ xs: 12, lg: 4 }}>
                 <AnalyticsPanel />
               </Grid>

@@ -1,11 +1,18 @@
-// frontend/src/components/transactions/dialogs/AddTransactionDialog.tsx - form for creating new transactions
+// frontend/src/components/transactions/dialogs/AddTransactionDialog.tsx
 import { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { getTodayDateString } from "../../../utils/dateUtils";
+import { 
+  DIALOG_CONFIG, 
+  BUTTON_TEXT, 
+  FIELD_LABELS, 
+  PLACEHOLDERS, 
+  HELPER_TEXT,
+  parseSpendCategories 
+} from "../../../utils/dialogUtils";
 import { layoutStyles, commonStyles } from "../../../styles";
 import type { CreateTransactionData } from "../../../hooks/useTransactions";
-
 
 interface AddTransactionDialogProps {
   open: boolean;
@@ -14,7 +21,6 @@ interface AddTransactionDialogProps {
   isLoading?: boolean;
 }
 
-
 const INITIAL_STATE: CreateTransactionData = {
   date: getTodayDateString(),
   description: "",
@@ -22,7 +28,6 @@ const INITIAL_STATE: CreateTransactionData = {
   amount: 0,
   account: "",
 };
-
 
 export function AddTransactionDialog({
   open,
@@ -42,97 +47,94 @@ export function AddTransactionDialog({
   };
 
   const handleSave = () => {
-    const costCenterName = costCenterInput.trim();
-    const spendCategoryNames = spendCategoryInput
-      ? spendCategoryInput.split(",").map(cat => cat.trim()).filter(cat => cat.length > 0)
-      : [];
-
-    const finalTransaction = {
+    const finalTransaction: CreateTransactionData = {
       ...transaction,
-      cost_center_name: costCenterName || undefined,
-      spend_category_names: spendCategoryNames,
+      cost_center_name: costCenterInput.trim() || undefined,
+      spend_category_names: parseSpendCategories(spendCategoryInput),
     };
 
-    onSave(finalTransaction as any);
+    onSave(finalTransaction);
     handleClose();
   };
 
-  const isValid = transaction.description && transaction.account && transaction.amount !== 0;
+  const handleFieldChange = (field: keyof CreateTransactionData, value: any) => {
+    setTransaction(prev => ({ ...prev, [field]: value }));
+  };
+
+  const isValid = !!(transaction.description && transaction.account && transaction.amount !== 0);
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth={DIALOG_CONFIG.MAX_WIDTH} fullWidth>
       <DialogTitle sx={commonStyles.dialog.title}>
         <Add sx={{ fontSize: 20 }} />
-        Add New Transaction
+        {BUTTON_TEXT.ADD}
       </DialogTitle>
+
       <DialogContent sx={commonStyles.dialog.content}>
         <Box sx={layoutStyles.dialogLayout.form}>
           <TextField
-            label="Description"
+            label={FIELD_LABELS.DESCRIPTION}
             value={transaction.description}
-            onChange={(e) => setTransaction(prev => ({ ...prev, description: e.target.value }))}
+            onChange={(e) => handleFieldChange('description', e.target.value)}
             fullWidth
             required
           />
 
           <Box sx={layoutStyles.dialogLayout.formRow}>
             <TextField
-              label="Amount"
+              label={FIELD_LABELS.AMOUNT}
               type="number"
               value={transaction.amount || ""}
-              onChange={(e) => setTransaction(prev => ({ ...prev, amount: Number(e.target.value) }))}
+              onChange={(e) => handleFieldChange('amount', Number(e.target.value))}
               fullWidth
               required
-              helperText="Use negative values for expenses"
+              helperText={HELPER_TEXT.AMOUNT}
             />
             <TextField
-              label="Account"
+              label={FIELD_LABELS.ACCOUNT}
               value={transaction.account}
-              onChange={(e) => setTransaction(prev => ({ ...prev, account: e.target.value }))}
+              onChange={(e) => handleFieldChange('account', e.target.value)}
               fullWidth
               required
             />
           </Box>
 
           <TextField
-            label="Cost Center"
+            label={FIELD_LABELS.COST_CENTER}
             value={costCenterInput}
             onChange={(e) => setCostCenterInput(e.target.value)}
             fullWidth
-            placeholder="e.g. Living Expenses, Car, Meals"
-            helperText='Leave blank for "Uncategorized"'
+            placeholder={PLACEHOLDERS.COST_CENTER}
+            helperText={HELPER_TEXT.COST_CENTER}
           />
 
           <TextField
-            label="Spend Categories (comma-separated)"
+            label={FIELD_LABELS.SPEND_CATEGORIES}
             value={spendCategoryInput}
             onChange={(e) => setSpendCategoryInput(e.target.value)}
             fullWidth
-            placeholder="e.g. Rent, Gas, Groceries"
-            helperText='Leave blank for "Uncategorized"'
+            placeholder={PLACEHOLDERS.SPEND_CATEGORIES}
+            helperText={HELPER_TEXT.SPEND_CATEGORIES}
             multiline
             maxRows={3}
           />
 
           <TextField
-            label="Date"
+            label={FIELD_LABELS.DATE}
             type="date"
             value={transaction.date}
-            onChange={(e) => setTransaction(prev => ({ ...prev, date: e.target.value }))}
+            onChange={(e) => handleFieldChange('date', e.target.value)}
             fullWidth
             InputLabelProps={{ shrink: true }}
             required
           />
         </Box>
       </DialogContent>
+
       <DialogActions sx={commonStyles.dialog.actions}>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button
-          onClick={handleSave}
-          variant="contained"
-          disabled={isLoading || !isValid}
-        >
-          {isLoading ? 'Adding...' : 'Add Transaction'}
+        <Button onClick={handleClose}>{BUTTON_TEXT.CANCEL}</Button>
+        <Button onClick={handleSave} variant="contained" disabled={isLoading || !isValid}>
+          {isLoading ? BUTTON_TEXT.ADDING : BUTTON_TEXT.ADD}
         </Button>
       </DialogActions>
     </Dialog>

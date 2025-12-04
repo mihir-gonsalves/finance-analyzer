@@ -13,36 +13,31 @@ import {
 } from '../utils/analyticsUtils';
 import type { Transaction } from './useTransactions';
 
+// ========================
+// TYPE DEFINITIONS
+// ========================
 
 export interface SpendCategoryData {
   name: string;
   value: number;
 }
 
-
 export interface SpendingAnalytics {
-  // Spending breakdowns
   costCenterSpending: Record<string, number>;
   spendCategorySpending: Record<string, number>;
-
-  // Chart-ready data
   costCenterChartData: SpendCategoryData[];
   spendCategoryChartData: SpendCategoryData[];
-
-  // Financial totals
   totalExpenses: number;
   totalIncome: number;
-  totalSpent: number; // Alias for totalExpenses
+  totalSpent: number;
   netBalance: number;
-
-  // Statistics
   stats: {
     transactionCount: number;
     expenseCount: number;
     incomeCount: number;
     paycheckCount: number;
     avgExpense: number;
-    avgPerExpense: number; // Alias for avgExpense
+    avgPerExpense: number;
     avgIncome: number;
     avgPerPaycheck: number;
     costCenterCount: number;
@@ -50,24 +45,36 @@ export interface SpendingAnalytics {
   };
 }
 
+// ========================
+// CONSTANTS
+// ========================
 
-/*
- * Helper: Check if transaction has "paycheck" spend category
+const PAYCHECK_CATEGORY = 'paycheck';
+
+// ========================
+// UTILITY FUNCTIONS
+// ========================
+
+/**
+ * Check if transaction has "paycheck" spend category
  */
 function isPaycheck(transaction: Transaction): boolean {
   if (!transaction.spend_categories || transaction.spend_categories.length === 0) {
     return false;
   }
   return transaction.spend_categories.some(
-    cat => cat.name.toLowerCase() === 'paycheck'
+    cat => cat.name.toLowerCase() === PAYCHECK_CATEGORY
   );
 }
 
-
-/*
- * Helper: Calculate paycheck statistics
+/**
+ * Calculate paycheck statistics
  */
-function calculatePaycheckStats(transactions: Transaction[]): { count: number; total: number; average: number } {
+function calculatePaycheckStats(transactions: Transaction[]): {
+  count: number;
+  total: number;
+  average: number;
+} {
   const paychecks = transactions.filter(t => t.amount > 0 && isPaycheck(t));
   const count = paychecks.length;
   const total = paychecks.reduce((sum, t) => sum + t.amount, 0);
@@ -76,12 +83,15 @@ function calculatePaycheckStats(transactions: Transaction[]): { count: number; t
   return { count, total, average };
 }
 
+// ========================
+// HOOK
+// ========================
 
-/*
- * Calculate spending analytics from a list of transactions
+/**
+ * Calculate spending analytics from transactions
  * 
  * NOTE: For production dashboards with filters, prefer using the backend
- * analytics API via useAnalytics hooks. This is for quick local calculations.
+ * analytics API. This is for quick client-side calculations.
  */
 export function useSpendingAnalytics(transactions: Transaction[]): SpendingAnalytics {
   return useMemo(() => {
@@ -99,8 +109,6 @@ export function useSpendingAnalytics(transactions: Transaction[]): SpendingAnaly
     const incomeCount = getIncomeCount(transactions);
     const avgExpense = calculateAverageExpense(transactions);
     const avgIncome = totalIncome / (incomeCount > 0 ? incomeCount : 1);
-
-    // Calculate paycheck-specific statistics
     const paycheckStats = calculatePaycheckStats(transactions);
 
     // Prepare chart data (sorted by value descending)
@@ -114,7 +122,7 @@ export function useSpendingAnalytics(transactions: Transaction[]): SpendingAnaly
       spendCategoryChartData,
       totalExpenses,
       totalIncome,
-      totalSpent: totalExpenses, // Alias for easier access
+      totalSpent: totalExpenses,
       netBalance,
       stats: {
         transactionCount: transactions.length,
@@ -122,7 +130,7 @@ export function useSpendingAnalytics(transactions: Transaction[]): SpendingAnaly
         incomeCount,
         paycheckCount: paycheckStats.count,
         avgExpense,
-        avgPerExpense: avgExpense, // Alias
+        avgPerExpense: avgExpense,
         avgIncome,
         avgPerPaycheck: paycheckStats.average,
         costCenterCount: Object.keys(costCenterSpending).length,
