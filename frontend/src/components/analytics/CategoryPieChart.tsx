@@ -52,7 +52,7 @@ const TOOLTIP_STYLES = {
       borderColor: 'grey.200',
       borderRadius: BORDER_RADIUS.lg,
       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06)',
-      padding: '12px',
+      padding: '8px',
     },
     // Tooltip table spacing
     [`& .${chartsTooltipClasses.table}`]: {

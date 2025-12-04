@@ -12,7 +12,8 @@ const HEADER_STYLES = {
   },
   
   toolbar: {
-    py: { sm: 1.5 },
+    py: 1.5,
+    px: { xs: 2, sm: 3 },
   },
   
   logo: {

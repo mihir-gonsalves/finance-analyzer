@@ -25,15 +25,28 @@ export const customPalette = {
     900: '#0f172a',
   },
 
-  red: {
+  // Semantic colors
+  success: {
+    light: '#6ee7b7',
+    main: '#10b981',
+    dark: '#059669',
+  },
+
+  error: {
+    light: '#fca5a5',
     main: '#ef4444',
-    light: '#f87171',
     dark: '#dc2626',
   },
 
-  green: {
-    main: '#22c55e',
-    light: '#4ade80',
-    dark: '#16a34a',
+  info: {
+    light: '#93c5fd',
+    main: '#3b82f6',
+    dark: '#2563eb',
+  },
+
+  warning: {
+    light: '#fcd34d',
+    main: '#f59e0b',
+    dark: '#d97706',
   },
 };

@@ -17,8 +17,8 @@ export const theme = createTheme({
       secondary: customPalette.slate[500],
       disabled: customPalette.slate[400],
     },
-    success: customPalette.green,
-    error: customPalette.red,
+    success: customPalette.success,
+    error: customPalette.error,
     grey: customPalette.slate,
   },
 
@@ -110,20 +110,16 @@ export const theme = createTheme({
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
-          backgroundColor: '#ffffff',
-          color: customPalette.slate[800],
-          border: `1px solid ${customPalette.slate[200]}`,
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06)',
-          fontSize: '0.875rem',
+          backgroundColor: customPalette.slate[800],
+          color: '#ffffff',
+          fontSize: '0.8125rem',
           fontWeight: 500,
           padding: '8px 12px',
-          borderRadius: 12,
+          borderRadius: 8,
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
         },
         arrow: {
-          color: '#ffffff',
-          '&::before': {
-            border: `1px solid ${customPalette.slate[200]}`,
-          },
+          color: customPalette.slate[800],
         },
       },
     },

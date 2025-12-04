@@ -178,13 +178,13 @@ const lightweightChartsConfig: DeepPartial<ChartOptions> = {
  */
 const baselineSeriesConfig: DeepPartial<BaselineSeriesPartialOptions> = {
   baseValue: { type: 'price', price: 0 },
-  topLineColor: customPalette.green.light,
+  topLineColor: customPalette.emerald.light,
   topFillColor1: 'rgba(16, 185, 129, 0.28)',
   topFillColor2: 'rgba(16, 185, 129, 0.05)',
-  bottomLineColor: customPalette.red.main,
+  bottomLineColor: customPalette.error.main,
   bottomFillColor1: 'rgba(239, 68, 68, 0.28)',
   bottomFillColor2: 'rgba(239, 68, 68, 0.05)',
-  lineWidth: 2,
+  lineWidth: 1,
   priceFormat: {
     type: 'price',
     precision: 2,

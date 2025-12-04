@@ -9,17 +9,31 @@ import { SPACING, BORDER_RADIUS, FONT_WEIGHT } from './constants';
  */
 export const cardStyles = {
   default: {
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.04)',
-    border: '1px solid #f1f5f9',
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+    border: `1px solid ${customPalette.slate[100]}`,
     borderRadius: BORDER_RADIUS.sm,
-    background: 'linear-gradient(135deg, #ffffff 0%, #fefefe 100%)',
+    background: '#ffffff',
+    transition: 'box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1)',
   } as SxProps<Theme>,
 
   elevated: {
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 20px rgba(0, 0, 0, 0.06)',
-    border: '1px solid #f1f5f9',
-    borderRadius: BORDER_RADIUS.xl,
-    background: 'linear-gradient(135deg, #ffffff 0%, #fefefe 100%)',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    border: `1px solid ${customPalette.slate[100]}`,
+    borderRadius: BORDER_RADIUS.lg,
+    background: '#ffffff',
+    transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
+    '&:hover': {
+      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    },
+  } as SxProps<Theme>,
+
+  interactive: {
+    cursor: 'pointer',
+    transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
+    '&:hover': {
+      transform: 'translateY(-2px)',
+      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    },
   } as SxProps<Theme>,
 };
 
@@ -28,17 +42,19 @@ export const cardStyles = {
  */
 export const buttonStyles = {
   icon: {
-    border: '1px solid',
-    borderColor: 'grey.300',
+    border: '1.5px solid',
+    borderColor: 'grey.200',
     borderRadius: BORDER_RADIUS.lg,
+    transition: 'all 200ms ease-in-out',
     '&:hover': {
       borderColor: 'primary.main',
       bgcolor: 'primary.50',
+      transform: 'translateY(-1px)',
     },
   } as SxProps<Theme>,
 
   iconActive: {
-    border: '1px solid',
+    border: '1.5px solid',
     borderColor: 'primary.main',
     bgcolor: 'primary.50',
     borderRadius: BORDER_RADIUS.lg,
@@ -49,9 +65,21 @@ export const buttonStyles = {
 
   text: {
     textTransform: 'none',
-    fontWeight: FONT_WEIGHT.medium,
+    fontWeight: FONT_WEIGHT.semibold,
     letterSpacing: '-0.01em',
     borderRadius: BORDER_RADIUS.lg,
+    transition: 'all 150ms ease-in-out',
+  } as SxProps<Theme>,
+
+  primary: {
+    boxShadow: 'none',
+    '&:hover': {
+      boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+      transform: 'translateY(-1px)',
+    },
+    '&:active': {
+      transform: 'translateY(0)',
+    },
   } as SxProps<Theme>,
 };
 
@@ -69,18 +97,13 @@ export const statCardStyles = {
   } as SxProps<Theme>,
 
   success: {
-    borderColor: 'success.light',
+    borderColor: 'success.main',
     bgcolor: 'success.50',
   } as SxProps<Theme>,
 
   error: {
-    borderColor: 'error.light',
+    borderColor: 'error.main',
     bgcolor: 'error.50',
-  } as SxProps<Theme>,
-
-  info: {
-    borderColor: 'info.light',
-    bgcolor: 'info.50',
   } as SxProps<Theme>,
 };
 
@@ -114,7 +137,7 @@ export const listItemStyles = {
  */
 export const typographyStyles = {
   sectionTitle: {
-    fontWeight: FONT_WEIGHT.semibold,
+    fontWeight: FONT_WEIGHT.bold,
     color: 'text.primary',
     mb: SPACING.md,
   } as SxProps<Theme>,
@@ -176,6 +199,7 @@ export const dialogStyles = {
     borderColor: 'grey.200',
     px: SPACING.lg,
     py: SPACING.md,
+    gap: SPACING.sm,
   } as SxProps<Theme>,
 };
 
