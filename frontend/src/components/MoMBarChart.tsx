@@ -40,12 +40,12 @@ const CHART_CONFIG = {
 
 const TOOLTIP_STYLES = {
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     border: '1px solid',
     borderColor: 'grey.200',
     borderRadius: BORDER_RADIUS.lg,
     boxShadow: '0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06)',
-    padding: '12px',
+    padding: '12px 16px',
     minWidth: 200,
     pointerEvents: 'none',
   },
@@ -63,7 +63,22 @@ const TOOLTIP_STYLES = {
 const AVG_LINE_STYLES = {
   lineColor: 'rgba(0, 0, 0, 1)',
   lineWidth: 1,
-  lineDashArray: '6 6',
+  lineDashArray: '6 5',
+} as const;
+
+const AVG_LABEL_STYLES = {
+  container: {
+    position: 'absolute',
+    transform: 'translateY(-125%)',
+    backgroundColor: '#1e293b',
+    padding: '4px 5px',
+    fontSize: '0.70rem',
+    fontWeight: 500,
+    fontFamily: 'Inter, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    color: '#ffffff',
+    zIndex: 10,
+    pointerEvents: 'none',
+  },
 } as const;
 
 // ========================
@@ -278,30 +293,50 @@ export default function MoMBarChart() {
     ? monthlyData.reduce((sum, m) => sum + (m.total ?? 0), 0) / monthlyData.length 
     : 0;
 
-  // Prepare average line series
+  // Prepare average line series with extended range
   const lineSeries = useMemo(() => [{
     type: 'line' as const,
-    data: monthlyData.map(() => avgTotal),
-    label: `Avg: ${formatCurrency(avgTotal)}`,
+    xAxisId: 'lineXAxis',
+    yAxisId: 'leftAxis',
+    data: [avgTotal, avgTotal],
     showMark: false,
     color: AVG_LINE_STYLES.lineColor,
-  }], [monthlyData, avgTotal]);
+  }], [avgTotal]);
 
   // Check if there's any actual spending data
   const hasSpendingData = monthlyData.length > 0 && maxTotal > 0;
 
   if (!hasSpendingData) return <EmptyState />;
 
-  const xAxisConfig = [{
-    scaleType: 'band' as const,
-    data: monthlyData.map(d => d.month),
-    tickLabelInterval: (_val: any, idx: number) => idx % CHART_CONFIG.TICK_INTERVAL === 0,
-  }];
+  // Calculate y-position for average line label
+  const yScale = maxTotal > 0 ? (avgTotal / maxTotal) : 0.5;
+  const chartHeight = CHART_CONFIG.HEIGHT - CHART_CONFIG.MARGIN.TOP - CHART_CONFIG.MARGIN.BOTTOM;
+  const labelTopPosition = CHART_CONFIG.MARGIN.TOP + chartHeight * (1 - yScale);
 
-  const yAxisConfig = [{ 
-    tickNumber: 5, 
-    valueFormatter: formatYAxis 
-  }];
+  const xAxisConfig = [
+    {
+      id: 'barXAxis',
+      scaleType: 'band' as const,
+      data: monthlyData.map(d => d.month),
+      tickLabelInterval: (_val: any, idx: number) => idx % CHART_CONFIG.TICK_INTERVAL === 0,
+    },
+    {
+      id: 'lineXAxis',
+      scaleType: 'linear' as const,
+      data: [-0.5, monthlyData.length - 0.5],
+      min: -0.5,
+      max: monthlyData.length - 0.5,
+      tickNumber: 0,
+    }
+  ];
+
+  const yAxisConfig = [
+    { 
+      id: 'leftAxis',
+      tickNumber: 5, 
+      valueFormatter: formatYAxis 
+    }
+  ];
 
   return (
     <Card sx={commonStyles.card.default}>
@@ -309,6 +344,15 @@ export default function MoMBarChart() {
         <ChartHeader monthCount={monthlyData.length} />
 
         <Box sx={{ height: 417, width: '100%', overflow: 'visible', position: 'relative' }}>
+          <Box 
+            sx={{
+              ...AVG_LABEL_STYLES.container,
+              top: `${labelTopPosition}px`,
+            }}
+          >
+            {formatCurrency(avgTotal)}
+          </Box>
+          
           <ChartContainer
             series={[...barSeries, ...lineSeries]}
             xAxis={xAxisConfig}
@@ -334,8 +378,8 @@ export default function MoMBarChart() {
             <BarPlot />
             <LinePlot />
             <MarkPlot />
-            <ChartsXAxis />
-            <ChartsYAxis />
+            <ChartsXAxis axisId="barXAxis" />
+            <ChartsYAxis axisId="leftAxis" />
             <CustomTooltip />
           </ChartContainer>
         </Box>
