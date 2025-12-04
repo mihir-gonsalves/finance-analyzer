@@ -5,7 +5,7 @@ export const HEIGHTS = {
   analyticsPanel: 658,
   timelineChart: 410,
   barChart: 410,
-  pieChartWrapper: 389,
+  timelineWrapper: 389.5,
   categoryList: 570,
 };
 

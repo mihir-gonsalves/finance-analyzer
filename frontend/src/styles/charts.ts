@@ -10,7 +10,7 @@ import { customPalette } from './colors';
 const containerStyles = {
   wrapper: {
     position: 'relative',
-    height: HEIGHTS.pieChartWrapper,
+    height: HEIGHTS.timelineWrapper,
     mb: SPACING.xl,
   } as SxProps<Theme>,
 

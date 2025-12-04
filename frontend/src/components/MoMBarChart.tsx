@@ -1,7 +1,11 @@
 // frontend/src/components/MoMBarChart.tsx
 import { useMemo } from "react";
 import { Card, CardContent, Typography, Box, useTheme, Paper } from "@mui/material";
-import { BarChart } from "@mui/x-charts/BarChart";
+import { ChartContainer } from "@mui/x-charts/ChartContainer";
+import { BarPlot } from "@mui/x-charts/BarChart";
+import { LinePlot, MarkPlot } from "@mui/x-charts/LineChart";
+import { ChartsXAxis } from "@mui/x-charts/ChartsXAxis";
+import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
 import { ChartsTooltipContainer, useItemTooltip } from '@mui/x-charts/ChartsTooltip';
 import { useTransactionData } from "../context/TransactionContext";
 import { formatCurrency } from "../utils/analyticsUtils";
@@ -31,7 +35,7 @@ const CHART_CONFIG = {
     LEFT: 55,
     RIGHT: 30,
   },
-  TICK_INTERVAL: 2, // Show every nth label
+  TICK_INTERVAL: 2,
 } as const;
 
 const TOOLTIP_STYLES = {
@@ -47,35 +51,19 @@ const TOOLTIP_STYLES = {
   },
   title: {
     fontWeight: 600,
-    mb: 0.5,
+    mb: 1.5,
   },
   item: {
     fontSize: '0.8125rem',
     color: 'text.secondary',
-    mb: 0.5,
+    mt: 1,
   },
 } as const;
 
 const AVG_LINE_STYLES = {
-  label: {
-    position: 'absolute',
-    left: 5,
-    color: 'white',
-    backgroundColor: 'black',
-    padding: '2px 4px',
-    fontSize: '0.75rem',
-    pointerEvents: 'none',
-    zIndex: 2,
-    borderRadius: BORDER_RADIUS.lg,
-  },
-  line: {
-    position: 'absolute',
-    left: CHART_CONFIG.MARGIN.LEFT,
-    right: CHART_CONFIG.MARGIN.RIGHT,
-    borderTop: '2px dashed rgba(0,0,0,0.6)',
-    pointerEvents: 'none',
-    zIndex: 1,
-  },
+  lineColor: 'rgba(0, 0, 0, 1)',
+  lineWidth: 1,
+  lineDashArray: '6 6',
 } as const;
 
 // ========================
@@ -154,7 +142,7 @@ function EmptyState() {
         </Typography>
         <Box sx={commonStyles.emptyState.container}>
           <Typography sx={commonStyles.emptyState.description}>
-            No transaction data available
+            No spending data available
           </Typography>
         </Box>
       </CardContent>
@@ -221,7 +209,6 @@ export default function MoMBarChart() {
   const monthlyData = useMemo(() => {
     if (!transactions?.length) return [];
 
-    // Get date range
     const dates = transactions
       .map(t => parseDateString(t.date))
       .filter(Boolean);
@@ -231,7 +218,6 @@ export default function MoMBarChart() {
     const start = new Date(Math.min(...dates.map(d => d.getTime())));
     const end = new Date(Math.max(...dates.map(d => d.getTime())));
 
-    // Build map of monthKey -> cost centers
     const dataMap = new Map<string, Record<string, number>>();
     
     transactions.forEach(txn => {
@@ -247,7 +233,6 @@ export default function MoMBarChart() {
       dataMap.set(monthKey, monthData);
     });
 
-    // Generate all months in range
     const fullMonths: { monthKey: string; date: Date }[] = [];
     const current = new Date(start.getFullYear(), start.getMonth(), 1);
     const last = new Date(end.getFullYear(), end.getMonth(), 1);
@@ -258,7 +243,6 @@ export default function MoMBarChart() {
       current.setMonth(current.getMonth() + 1);
     }
 
-    // Map to monthly data with totals
     return fullMonths.map(({ monthKey, date }) => {
       const costCenters = dataMap.get(monthKey) ?? {};
       const total = Object.values(costCenters).reduce((sum, v) => sum + (v || 0), 0);
@@ -267,8 +251,9 @@ export default function MoMBarChart() {
     });
   }, [transactions]);
 
-  // Prepare series data
-  const series = useMemo(() => [{
+  // Prepare bar series data
+  const barSeries = useMemo(() => [{
+    type: 'bar' as const,
     data: monthlyData.map(m => m.total ?? 0),
     label: 'Monthly Total',
     valueFormatter: (value: number | null, context: any) => {
@@ -287,15 +272,36 @@ export default function MoMBarChart() {
     },
   }], [monthlyData]);
 
-  if (!monthlyData.length) return <EmptyState />;
-
   // Calculate statistics
-  const maxTotal = Math.max(...monthlyData.map(d => d.total ?? 0));
-  const avgTotal = monthlyData.reduce((sum, m) => sum + (m.total ?? 0), 0) / monthlyData.length;
+  const maxTotal = monthlyData.length > 0 ? Math.max(...monthlyData.map(d => d.total ?? 0)) : 0;
+  const avgTotal = monthlyData.length > 0 
+    ? monthlyData.reduce((sum, m) => sum + (m.total ?? 0), 0) / monthlyData.length 
+    : 0;
 
-  // Calculate average line position
-  const DRAWING_HEIGHT = CHART_CONFIG.HEIGHT - CHART_CONFIG.MARGIN.TOP - CHART_CONFIG.MARGIN.BOTTOM;
-  const avgLineYPosition = CHART_CONFIG.MARGIN.TOP + ((maxTotal - avgTotal) / maxTotal) * DRAWING_HEIGHT;
+  // Prepare average line series
+  const lineSeries = useMemo(() => [{
+    type: 'line' as const,
+    data: monthlyData.map(() => avgTotal),
+    label: `Avg: ${formatCurrency(avgTotal)}`,
+    showMark: false,
+    color: AVG_LINE_STYLES.lineColor,
+  }], [monthlyData, avgTotal]);
+
+  // Check if there's any actual spending data
+  const hasSpendingData = monthlyData.length > 0 && maxTotal > 0;
+
+  if (!hasSpendingData) return <EmptyState />;
+
+  const xAxisConfig = [{
+    scaleType: 'band' as const,
+    data: monthlyData.map(d => d.month),
+    tickLabelInterval: (_val: any, idx: number) => idx % CHART_CONFIG.TICK_INTERVAL === 0,
+  }];
+
+  const yAxisConfig = [{ 
+    tickNumber: 5, 
+    valueFormatter: formatYAxis 
+  }];
 
   return (
     <Card sx={commonStyles.card.default}>
@@ -303,19 +309,10 @@ export default function MoMBarChart() {
         <ChartHeader monthCount={monthlyData.length} />
 
         <Box sx={{ height: 417, width: '100%', overflow: 'visible', position: 'relative' }}>
-          {/* Bar Chart */}
-          <BarChart
-            series={series}
-            colors={COLORS}
-            xAxis={[{
-              scaleType: 'band',
-              data: monthlyData.map(d => d.month),
-              tickLabelInterval: (_val, idx) => idx % CHART_CONFIG.TICK_INTERVAL === 0,
-            }]}
-            yAxis={[{ 
-              tickNumber: 5, 
-              valueFormatter: formatYAxis 
-            }]}
+          <ChartContainer
+            series={[...barSeries, ...lineSeries]}
+            xAxis={xAxisConfig}
+            yAxis={yAxisConfig}
             height={CHART_CONFIG.HEIGHT}
             margin={{
               top: CHART_CONFIG.MARGIN.TOP,
@@ -323,34 +320,24 @@ export default function MoMBarChart() {
               bottom: CHART_CONFIG.MARGIN.BOTTOM,
               left: -10,
             }}
-            hideLegend
-            slots={{ tooltip: CustomTooltip }}
             sx={{
-              [`& .MuiBarElement-root:nth-of-type(4n+1)`]: { fill: theme.palette.primary.main },
-              [`& .MuiBarElement-root:nth-of-type(4n+2)`]: { fill: theme.palette.secondary.main },
-              [`& .MuiBarElement-root:nth-of-type(4n+3)`]: { fill: theme.palette.info.main },
-              [`& .MuiBarElement-root:nth-of-type(4n+4)`]: { fill: theme.palette.error.main },
-            }}
-          />
-
-          {/* Average Line Label */}
-          <Typography
-            variant="body2"
-            sx={{
-              ...AVG_LINE_STYLES.label,
-              top: `${avgLineYPosition - 10}px`,
+              [`& .MuiBarElement-root:nth-of-type(4n+1)`]: { fill: COLORS[0] },
+              [`& .MuiBarElement-root:nth-of-type(4n+2)`]: { fill: COLORS[1] },
+              [`& .MuiBarElement-root:nth-of-type(4n+3)`]: { fill: COLORS[2] },
+              [`& .MuiBarElement-root:nth-of-type(4n+4)`]: { fill: COLORS[3] },
+              [`& .MuiLineElement-root`]: {
+                strokeDasharray: AVG_LINE_STYLES.lineDashArray,
+                strokeWidth: AVG_LINE_STYLES.lineWidth,
+              },
             }}
           >
-            Avg: {formatCurrency(avgTotal)}
-          </Typography>
-
-          {/* Average Line */}
-          <Box
-            sx={{
-              ...AVG_LINE_STYLES.line,
-              top: `${avgLineYPosition}px`,
-            }}
-          />
+            <BarPlot />
+            <LinePlot />
+            <MarkPlot />
+            <ChartsXAxis />
+            <ChartsYAxis />
+            <CustomTooltip />
+          </ChartContainer>
         </Box>
 
         <ChartFooter maxTotal={maxTotal} avgTotal={avgTotal} />

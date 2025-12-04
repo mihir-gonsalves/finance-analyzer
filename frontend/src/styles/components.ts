@@ -265,7 +265,6 @@ export const emptyStateStyles = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    py: 10,
     px: SPACING.lg,
   } as SxProps<Theme>,
 
