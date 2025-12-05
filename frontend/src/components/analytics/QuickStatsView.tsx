@@ -61,7 +61,7 @@ const getStatCardStyle = (type: StatType) => {
     case 'negative':
       return commonStyles.statCard.error;
     case 'neutral':
-      return commonStyles.statCard.info;
+      return commonStyles.statCard.success;
   }
 };
 

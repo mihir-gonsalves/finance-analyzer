@@ -56,7 +56,7 @@ const formatCurrency = (amount: number): string => {
 
 function DateCell({ value }: GridRenderCellParams) {
   const formattedDate = formatDateString(value);
-  
+
   return (
     <Tooltip title={formattedDate} placement="top-start">
       <Typography>{formattedDate}</Typography>
@@ -66,7 +66,7 @@ function DateCell({ value }: GridRenderCellParams) {
 
 function DescriptionCell({ value }: GridRenderCellParams) {
   const description = value as string;
-  
+
   return (
     <Tooltip title={description} placement="top-start">
       <Typography
@@ -154,7 +154,7 @@ function CategoriesCell({ row }: GridRenderCellParams) {
 function AmountCell({ value }: GridRenderCellParams) {
   const amount = value as number;
   const isNegative = amount < 0;
-  
+
   return (
     <Box sx={layoutStyles.flex.row}>
       <Typography
@@ -171,7 +171,7 @@ function AmountCell({ value }: GridRenderCellParams) {
 
 function AccountCell({ value }: GridRenderCellParams) {
   const account = value as string;
-  
+
   return (
     <Tooltip title={account} placement="top-start">
       <Typography

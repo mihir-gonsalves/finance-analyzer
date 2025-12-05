@@ -25,10 +25,10 @@ interface FiltersPanelProps {
   onClose: () => void;
 }
 
-export default function FiltersPanel({ 
-  filters, 
-  onFiltersChange, 
-  onClose 
+export default function FiltersPanel({
+  filters,
+  onFiltersChange,
+  onClose
 }: FiltersPanelProps) {
   const { spend_categories, cost_centers, accounts } = useFilterOptions();
   const { pendingFilters, updateFilter, reset, hasUnsavedChanges } = usePendingFilters(filters);
@@ -76,9 +76,9 @@ export default function FiltersPanel({
 
         {/* Validation Error */}
         {validationError && (
-          <Alert 
-            severity="error" 
-            sx={{ mb: SPACING.lg }} 
+          <Alert
+            severity="error"
+            sx={{ mb: SPACING.lg }}
             onClose={() => setValidationError("")}
           >
             {validationError}

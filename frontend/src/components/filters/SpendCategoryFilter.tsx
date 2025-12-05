@@ -14,7 +14,7 @@ interface SpendCategoryFilterProps {
 }
 
 export function SpendCategoryFilter({ value, options, onChange }: SpendCategoryFilterProps) {
-  const getLabel = (id: string | number) => 
+  const getLabel = (id: string | number) =>
     options.find(opt => opt.id === Number(id))?.name || String(id);
 
   return (
@@ -26,10 +26,10 @@ export function SpendCategoryFilter({ value, options, onChange }: SpendCategoryF
         label="Spend Categories"
         onChange={(e) => onChange(parseMultiSelectValue(e.target.value))}
         renderValue={(selected) => (
-          <MultiSelectChips 
-            selected={selected} 
-            getLabel={getLabel} 
-            placeholder="All Spend Categories" 
+          <MultiSelectChips
+            selected={selected}
+            getLabel={getLabel}
+            placeholder="All Spend Categories"
           />
         )}
       >

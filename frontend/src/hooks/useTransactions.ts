@@ -168,7 +168,7 @@ export function useFilteredTransactions(filters: TransactionFilters) {
  */
 export function useCreateTransaction() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (txn: CreateTransactionData) => {
       const res = await client.post("/transactions/", txn);
@@ -189,7 +189,7 @@ export function useCreateTransaction() {
  */
 export function useUpdateTransaction() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (txn: UpdateTransactionData) => {
       const { id, ...updateData } = txn;
@@ -209,7 +209,7 @@ export function useUpdateTransaction() {
  */
 export function useDeleteTransaction() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (id: number) => {
       await client.delete(`/transactions/${id}`);
@@ -227,7 +227,7 @@ export function useDeleteTransaction() {
  */
 export function useBulkDeleteTransactions() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (transaction_ids: number[]) => {
       const res = await client.post("/transactions/admin/bulk-delete", { transaction_ids });
@@ -246,7 +246,7 @@ export function useBulkDeleteTransactions() {
  */
 export function useBulkUpdateTransactions() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (data: { transaction_ids: number[]; update_data: Omit<UpdateTransactionData, 'id'> }) => {
       const res = await client.post("/transactions/admin/bulk-update", data);

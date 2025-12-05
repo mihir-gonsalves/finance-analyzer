@@ -47,7 +47,7 @@ export function FilterActions({
       >
         {BUTTON_CONFIG.RESET.LABEL}
       </Button>
-      
+
       <Button
         onClick={onApply}
         disabled={!hasUnsavedChanges}

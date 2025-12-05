@@ -63,13 +63,13 @@ export default function TransactionTable({
 
   // Transaction actions
   const handleAddTransaction = () => setAddDialogOpen(true);
-  
+
   const handleSaveAdd = (transaction: CreateTransactionData) => {
     createMutation.mutate(transaction);
   };
 
   const handleEdit = (transaction: Transaction) => setEditTransaction(transaction);
-  
+
   const handleSaveEdit = (data: UpdateTransactionData) => {
     updateMutation.mutate(data);
   };
@@ -173,13 +173,13 @@ export default function TransactionTable({
               />
             </Box>
           )}
-          
+
           {viewMode === 'timeline' && (
             <Box sx={layoutStyles.dataDisplay.chartContainer}>
               <Timeline />
             </Box>
           )}
-          
+
           {viewMode === 'barchart' && (
             <Box sx={layoutStyles.dataDisplay.chartContainer}>
               <MoMBarChart />

@@ -30,13 +30,13 @@ export function isCategorized(transaction: Transaction): boolean {
 // ========================
 
 export function calculateTotalExpenses(transactions: Transaction[]): number {
-  return transactions.reduce((sum, t) => 
+  return transactions.reduce((sum, t) =>
     t.amount < 0 ? sum + Math.abs(t.amount) : sum, 0
   );
 }
 
 export function calculateTotalIncome(transactions: Transaction[]): number {
-  return transactions.reduce((sum, t) => 
+  return transactions.reduce((sum, t) =>
     t.amount > 0 ? sum + t.amount : sum, 0
   );
 }
@@ -133,8 +133,8 @@ export interface RankedItem {
 }
 
 export function getTopN(
-  spending: Record<string, number>, 
-  limit = 5, 
+  spending: Record<string, number>,
+  limit = 5,
   includePercentage = false
 ): RankedItem[] {
   const total = Object.values(spending).reduce((sum, val) => sum + val, 0);

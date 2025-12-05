@@ -3,13 +3,13 @@ import { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { getTodayDateString } from "../../../utils/dateUtils";
-import { 
-  DIALOG_CONFIG, 
-  BUTTON_TEXT, 
-  FIELD_LABELS, 
-  PLACEHOLDERS, 
+import {
+  DIALOG_CONFIG,
+  BUTTON_TEXT,
+  FIELD_LABELS,
+  PLACEHOLDERS,
   HELPER_TEXT,
-  parseSpendCategories 
+  parseSpendCategories
 } from "../../../utils/dialogUtils";
 import { layoutStyles, commonStyles } from "../../../styles";
 import type { CreateTransactionData } from "../../../hooks/useTransactions";

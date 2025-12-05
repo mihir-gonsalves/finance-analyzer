@@ -72,10 +72,10 @@ function TimelineHeader({ currentBalance }: { currentBalance: number }) {
   );
 }
 
-function TimelineFooter({ dataLength, startDate, endDate }: { 
-  dataLength: number; 
-  startDate: string; 
-  endDate: string; 
+function TimelineFooter({ dataLength, startDate, endDate }: {
+  dataLength: number;
+  startDate: string;
+  endDate: string;
 }) {
   return (
     <Box sx={chartStyles.footer}>
