@@ -10,22 +10,22 @@ const HEADER_STYLES = {
     borderColor: 'grey.200',
     color: 'text.primary',
   },
-  
+
   toolbar: {
     py: 1.5,
     px: { xs: 2, sm: 3 },
   },
-  
+
   logo: {
     color: 'primary.main',
     fontSize: { sm: 36 },
   },
-  
+
   title: {
     fontWeight: 700,
     color: 'primary.main',
   },
-  
+
   logoContainer: {
     gap: 1.5,
   },

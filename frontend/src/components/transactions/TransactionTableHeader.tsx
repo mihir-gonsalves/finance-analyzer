@@ -206,7 +206,7 @@ export function TransactionTableHeader({
         {/* Right Side Actions */}
         <Box sx={{ ...layoutStyles.flex.row, gap: SPACING.md }}>
           <FilterTags filters={filters} />
-          
+
           <ActionButtons
             filtersOpen={filtersOpen}
             onToggleFilters={onToggleFilters}

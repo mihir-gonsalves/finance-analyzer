@@ -159,8 +159,14 @@ Core modules:
 ### Backend Development
 
 ```bash
-# Install Python dependencies
+# Create Virtual Environment (only do this once)
+python3 -m venv .venv
+
+# Install Python dependencies (only do this once)
 pip install -r requirements.txt
+
+# Activate Virtual Environemnt
+source .venv/bin/activate
 
 # Run FastAPI development server
 uvicorn app.main:app --reload
@@ -182,7 +188,7 @@ pytest -v
 # Navigate to frontend directory
 cd frontend
 
-# Install dependencies
+# Install dependencies (only do this once)
 npm install
 
 # Run development server (starts on http://localhost:5173)

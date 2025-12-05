@@ -13,8 +13,8 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
-          <Header />
-          <Dashboard />
+        <Header />
+        <Dashboard />
       </ThemeProvider>
     </QueryClientProvider>
   );

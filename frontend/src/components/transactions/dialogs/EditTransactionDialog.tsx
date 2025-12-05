@@ -2,16 +2,16 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from "@mui/material";
 import { Edit } from "@mui/icons-material";
-import { 
-  DIALOG_CONFIG, 
-  BUTTON_TEXT, 
-  FIELD_LABELS, 
-  PLACEHOLDERS, 
+import {
+  DIALOG_CONFIG,
+  BUTTON_TEXT,
+  FIELD_LABELS,
+  PLACEHOLDERS,
   HELPER_TEXT,
   parseSpendCategories,
   getCostCenterInput,
   getSpendCategoryInput,
-  formatAmountForInput 
+  formatAmountForInput
 } from "../../../utils/dialogUtils";
 import { layoutStyles, commonStyles } from "../../../styles";
 import type { Transaction, UpdateTransactionData } from "../../../hooks/useTransactions";

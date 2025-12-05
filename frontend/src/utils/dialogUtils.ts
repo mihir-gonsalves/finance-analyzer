@@ -51,11 +51,11 @@ export function getCostCenterInput(costCenter: { name: string } | null | undefin
 
 export function getSpendCategoryInput(spendCategories: { name: string }[] | null | undefined): string {
   if (!spendCategories) return "";
-  
+
   const names = spendCategories
     .filter(cat => cat.name !== UNCATEGORIZED)
     .map(cat => cat.name);
-  
+
   return names.join(", ");
 }
 

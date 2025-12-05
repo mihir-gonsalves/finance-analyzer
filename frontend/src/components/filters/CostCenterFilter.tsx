@@ -14,7 +14,7 @@ interface CostCenterFilterProps {
 }
 
 export function CostCenterFilter({ value, options, onChange }: CostCenterFilterProps) {
-  const getLabel = (id: string | number) => 
+  const getLabel = (id: string | number) =>
     options.find(opt => opt.id === Number(id))?.name || String(id);
 
   return (
@@ -26,10 +26,10 @@ export function CostCenterFilter({ value, options, onChange }: CostCenterFilterP
         label="Cost Centers"
         onChange={(e) => onChange(parseMultiSelectValue(e.target.value))}
         renderValue={(selected) => (
-          <MultiSelectChips 
-            selected={selected} 
-            getLabel={getLabel} 
-            placeholder="All Cost Centers" 
+          <MultiSelectChips
+            selected={selected}
+            getLabel={getLabel}
+            placeholder="All Cost Centers"
           />
         )}
       >

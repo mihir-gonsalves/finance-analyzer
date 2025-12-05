@@ -40,7 +40,7 @@ const PANEL_STYLES = {
   card: {
     height: HEIGHTS.analyticsPanel,
   },
-  
+
   toggleButton: {
     fontSize: '1.25rem',
     p: 0,

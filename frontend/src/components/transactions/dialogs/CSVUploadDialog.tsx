@@ -98,7 +98,7 @@ export function CSVUploadDialog({
           )}
 
           <Alert severity="warning">
-            {institution === 'custom' 
+            {institution === 'custom'
               ? 'Re-uploading edited transactions will create duplicates. Consider deleting the old transactions first.'
               : 'Duplicate transactions may be created if you upload the same file multiple times.'}
           </Alert>

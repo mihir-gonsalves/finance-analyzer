@@ -199,25 +199,25 @@ export const chartStyles = {
   // Component styles
   chartWrapper: containerStyles.wrapper,
   chartContainer: containerStyles.chart,
-  
+
   // Header styles
   header: headerStyles.container,
   headerTitle: headerStyles.title,
   balanceDisplay: headerStyles.balanceDisplay,
   balanceLabel: headerStyles.balanceLabel,
   balanceAmount: headerStyles.balanceAmount,
-  
+
   // Footer styles
   footer: footerStyles.container,
   footerText: footerStyles.text,
-  
+
   // Tooltip styles
   tooltip: tooltipStyles.container,
   tooltipDate: tooltipStyles.date,
   tooltipDescription: tooltipStyles.description,
   tooltipTransaction: tooltipStyles.transaction,
   tooltipBalance: tooltipStyles.balance,
-  
+
   // Chart configurations
   chartConfig: lightweightChartsConfig,
   seriesConfig: baselineSeriesConfig,

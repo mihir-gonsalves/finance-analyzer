@@ -26,9 +26,9 @@ export { customPalette } from './colors';
 export { typography } from './typography';
 export { theme } from './theme';
 export { chartStyles } from './charts';
-export { 
-  commonStyles, 
-  combineStyles, 
+export {
+  commonStyles,
+  combineStyles,
   conditionalStyle,
   cardStyles,
   buttonStyles,

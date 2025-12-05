@@ -18,10 +18,10 @@ export function AccountFilter({ value, options, onChange }: AccountFilterProps) 
         label="Accounts"
         onChange={(e) => onChange(parseMultiSelectValue(e.target.value))}
         renderValue={(selected) => (
-          <MultiSelectChips 
-            selected={selected} 
-            getLabel={(val) => String(val)} 
-            placeholder="All Accounts" 
+          <MultiSelectChips
+            selected={selected}
+            getLabel={(val) => String(val)}
+            placeholder="All Accounts"
           />
         )}
       >

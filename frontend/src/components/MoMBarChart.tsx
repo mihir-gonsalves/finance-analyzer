@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { Card, CardContent, Typography, Box, useTheme, Paper } from "@mui/material";
 import { ChartContainer } from "@mui/x-charts/ChartContainer";
 import { BarPlot } from "@mui/x-charts/BarChart";
-import { LinePlot, MarkPlot } from "@mui/x-charts/LineChart";
+import { LinePlot } from "@mui/x-charts/LineChart";
 import { ChartsXAxis } from "@mui/x-charts/ChartsXAxis";
 import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
 import { ChartsTooltipContainer, useItemTooltip } from '@mui/x-charts/ChartsTooltip';
@@ -124,7 +124,7 @@ const parseCostCenterData = (formattedValue: string): {
 
 function CustomTooltip() {
   const tooltipData = useItemTooltip();
-  
+
   if (!tooltipData?.formattedValue) return null;
 
   const parsed = parseCostCenterData(tooltipData.formattedValue);
@@ -227,14 +227,14 @@ export default function MoMBarChart() {
     const dates = transactions
       .map(t => parseDateString(t.date))
       .filter(Boolean);
-    
+
     if (!dates.length) return [];
 
     const start = new Date(Math.min(...dates.map(d => d.getTime())));
     const end = new Date(Math.max(...dates.map(d => d.getTime())));
 
     const dataMap = new Map<string, Record<string, number>>();
-    
+
     transactions.forEach(txn => {
       if (!txn?.amount || txn.amount >= 0) return;
 
@@ -275,7 +275,7 @@ export default function MoMBarChart() {
       const idx = context?.dataIndex ?? 0;
       const monthData = monthlyData[idx] ?? { month: '', total: 0, costCenters: {} };
       const val = value ?? monthData.total ?? 0;
-      
+
       const costCenterEntries = Object.entries(monthData.costCenters ?? {})
         .filter(([_, amt]) => amt > 0)
         .sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0));
@@ -289,8 +289,8 @@ export default function MoMBarChart() {
 
   // Calculate statistics
   const maxTotal = monthlyData.length > 0 ? Math.max(...monthlyData.map(d => d.total ?? 0)) : 0;
-  const avgTotal = monthlyData.length > 0 
-    ? monthlyData.reduce((sum, m) => sum + (m.total ?? 0), 0) / monthlyData.length 
+  const avgTotal = monthlyData.length > 0
+    ? monthlyData.reduce((sum, m) => sum + (m.total ?? 0), 0) / monthlyData.length
     : 0;
 
   // Prepare average line series with extended range
@@ -331,10 +331,10 @@ export default function MoMBarChart() {
   ];
 
   const yAxisConfig = [
-    { 
+    {
       id: 'leftAxis',
-      tickNumber: 5, 
-      valueFormatter: formatYAxis 
+      tickNumber: 5,
+      valueFormatter: formatYAxis
     }
   ];
 
@@ -344,7 +344,7 @@ export default function MoMBarChart() {
         <ChartHeader monthCount={monthlyData.length} />
 
         <Box sx={{ height: 417, width: '100%', overflow: 'visible', position: 'relative' }}>
-          <Box 
+          <Box
             sx={{
               ...AVG_LABEL_STYLES.container,
               top: `${labelTopPosition}px`,
@@ -352,7 +352,7 @@ export default function MoMBarChart() {
           >
             {formatCurrency(avgTotal)}
           </Box>
-          
+
           <ChartContainer
             series={[...barSeries, ...lineSeries]}
             xAxis={xAxisConfig}
@@ -377,7 +377,6 @@ export default function MoMBarChart() {
           >
             <BarPlot />
             <LinePlot />
-            <MarkPlot />
             <ChartsXAxis axisId="barXAxis" />
             <ChartsYAxis axisId="leftAxis" />
             <CustomTooltip />

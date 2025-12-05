@@ -258,7 +258,7 @@ export const layoutStyles = {
   dataDisplay: dataDisplayLayout,
   analytics: analyticsLayout,
   dialogLayout,
-  
+
   // Legacy spacing export
   spacing: {
     sectionGap: { xs: SPACING.md, md: SPACING.lg },
